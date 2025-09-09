@@ -1,0 +1,37 @@
+{
+  "name": "DX1 - Elevate Your Game",
+  "short_name": "DX1",
+  "description": "Revolutionary sports communication platform with RF-enabled wearable technology",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a4d33",
+  "theme_color": "#1a4d33",
+  "orientation": "any",
+  "categories": ["business", "sports", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/lovable-uploads/bcb3b88f-d227-437e-af8d-ddc0c670649e.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "features": ["Cross Platform", "Fast", "Simple"],
+  "prefer_related_applications": false
+}
