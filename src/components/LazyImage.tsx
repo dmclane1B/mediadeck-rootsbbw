@@ -8,6 +8,7 @@ interface LazyImageProps {
   onLoad?: () => void;
   onError?: () => void;
   placeholder?: React.ReactNode;
+  fallbackToPlaceholder?: boolean;
 }
 
 const LazyImage = ({ 
@@ -16,7 +17,8 @@ const LazyImage = ({
   className = '', 
   onLoad, 
   onError,
-  placeholder 
+  placeholder,
+  fallbackToPlaceholder = false 
 }: LazyImageProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -61,6 +63,13 @@ const LazyImage = ({
   }
 
   if (hasError) {
+    if (fallbackToPlaceholder) {
+      return (
+        <div className={className}>
+          {placeholder || <Skeleton className="w-full h-full" />}
+        </div>
+      );
+    }
     return (
       <div className={`${className} bg-muted flex items-center justify-center`}>
         <div className="text-center text-muted-foreground">

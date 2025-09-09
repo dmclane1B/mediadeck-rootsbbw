@@ -5,6 +5,31 @@ import { Image, Upload, Eye } from 'lucide-react';
 import LazyImage from '@/components/LazyImage';
 import ImagePreviewModal from '@/components/ImagePreviewModal';
 
+// Enhanced URL validation utility
+const isValidImageUrl = (url: string): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) return false;
+  
+  // Check for common invalid patterns
+  const invalidPatterns = ['undefined', 'null', '[object Object]', 'NaN'];
+  if (invalidPatterns.includes(trimmedUrl)) return false;
+  
+  try {
+    // Check if it's a valid URL structure
+    const urlObj = new URL(trimmedUrl);
+    // Accept http, https, blob, and data URLs
+    if (!['http:', 'https:', 'blob:', 'data:'].includes(urlObj.protocol)) {
+      return false;
+    }
+    return true;
+  } catch {
+    // If URL constructor fails, check if it's a relative path
+    return trimmedUrl.match(/^[./]/) !== null || trimmedUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) !== null;
+  }
+};
+
 interface ImageShowcaseProps {
   imageUrl?: string;
   imageAlt?: string;
@@ -39,14 +64,15 @@ const ImageShowcase = ({
   const baseClasses = `relative w-full overflow-hidden rounded-xl ${getVariantClasses()}`;
 
   // Only render image if we have a valid URL
-  if (imageUrl && imageUrl.trim() && imageUrl !== 'undefined' && imageUrl !== 'null') {
+  if (isValidImageUrl(imageUrl)) {
     return (
       <>
         <div className={`group ${baseClasses} ${className}`}>
           <LazyImage
-            src={imageUrl}
+            src={imageUrl!}
             alt={imageAlt}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            fallbackToPlaceholder={true}
           />
           
           {/* Overlay for interaction */}

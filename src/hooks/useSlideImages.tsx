@@ -19,6 +19,44 @@ export interface SlideConfiguration {
 
 const SLIDE_CONFIG_KEY = 'slide-configurations';
 
+// Enhanced URL validation utility (same as in ImageShowcase)
+const isValidImageUrl = (url: string): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) return false;
+  
+  // Check for common invalid patterns
+  const invalidPatterns = ['undefined', 'null', '[object Object]', 'NaN'];
+  if (invalidPatterns.includes(trimmedUrl)) return false;
+  
+  try {
+    // Check if it's a valid URL structure
+    const urlObj = new URL(trimmedUrl);
+    // Accept http, https, blob, and data URLs
+    if (!['http:', 'https:', 'blob:', 'data:'].includes(urlObj.protocol)) {
+      return false;
+    }
+    return true;
+  } catch {
+    // If URL constructor fails, check if it's a relative path
+    return trimmedUrl.match(/^[./]/) !== null || trimmedUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) !== null;
+  }
+};
+
+// Clean configuration by removing invalid entries
+const cleanSlideConfiguration = (config: SlideConfiguration): SlideConfiguration => {
+  const cleanedConfig: SlideConfiguration = {};
+  
+  Object.entries(config).forEach(([slideId, slideData]) => {
+    if (slideData?.imageUrl && isValidImageUrl(slideData.imageUrl)) {
+      cleanedConfig[slideId] = slideData;
+    }
+  });
+  
+  return cleanedConfig;
+};
+
 export const useSlideImages = () => {
   const [slideConfig, setSlideConfig] = useState<SlideConfiguration>({});
   
@@ -26,7 +64,16 @@ export const useSlideImages = () => {
     const savedConfig = localStorage.getItem(SLIDE_CONFIG_KEY);
     if (savedConfig) {
       try {
-        setSlideConfig(JSON.parse(savedConfig));
+        const parsedConfig = JSON.parse(savedConfig);
+        const cleanedConfig = cleanSlideConfiguration(parsedConfig);
+        
+        // If we had to clean invalid entries, save the cleaned version
+        if (Object.keys(cleanedConfig).length !== Object.keys(parsedConfig).length) {
+          console.log('Cleaned invalid image URLs from slide configuration');
+          localStorage.setItem(SLIDE_CONFIG_KEY, JSON.stringify(cleanedConfig));
+        }
+        
+        setSlideConfig(cleanedConfig);
       } catch (error) {
         console.error('Error loading slide configurations:', error);
       }
@@ -63,11 +110,18 @@ export const useSlideImages = () => {
     localStorage.removeItem(SLIDE_CONFIG_KEY);
   };
 
+  const cleanInvalidImages = () => {
+    const cleanedConfig = cleanSlideConfiguration(slideConfig);
+    saveConfiguration(cleanedConfig);
+    return Object.keys(slideConfig).length - Object.keys(cleanedConfig).length;
+  };
+
   return {
     slideConfig,
     setSlideImage,
     getSlideImage,
     clearAllConfigurations,
+    cleanInvalidImages,
     saveConfiguration
   };
 };
