@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Image, Upload } from 'lucide-react';
+import { Image, Upload, Eye } from 'lucide-react';
+import LazyImage from '@/components/LazyImage';
+import ImagePreviewModal from '@/components/ImagePreviewModal';
 
 interface ImageShowcaseProps {
   imageUrl?: string;
@@ -20,6 +22,7 @@ const ImageShowcase = ({
   variant = 'standard',
   showPlaceholder = true 
 }: ImageShowcaseProps) => {
+  const [showPreview, setShowPreview] = useState(false);
   
   const getVariantClasses = () => {
     switch (variant) {
@@ -37,30 +40,49 @@ const ImageShowcase = ({
 
   if (imageUrl) {
     return (
-      <div className={`${baseClasses} ${className}`}>
-        <img
-          src={imageUrl}
-          alt={imageAlt}
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-        />
-        
-        {/* Overlay for interaction */}
-        {onImageSelect && (
-          <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+      <>
+        <div className={`group ${baseClasses} ${className}`}>
+          <LazyImage
+            src={imageUrl}
+            alt={imageAlt}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          />
+          
+          {/* Overlay for interaction */}
+          <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
+            {onImageSelect && (
+              <Button
+                variant="secondary"
+                onClick={onImageSelect}
+                className="bg-white/90 text-primary hover:bg-white"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Change Image
+              </Button>
+            )}
             <Button
               variant="secondary"
-              onClick={onImageSelect}
+              onClick={() => setShowPreview(true)}
               className="bg-white/90 text-primary hover:bg-white"
             >
-              <Upload className="w-4 h-4 mr-2" />
-              Change Image
+              <Eye className="w-4 h-4 mr-2" />
+              Preview
             </Button>
           </div>
-        )}
-        
-        {/* Gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20 pointer-events-none" />
-      </div>
+          
+          {/* Gradient overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20 pointer-events-none" />
+        </div>
+
+        {/* Preview Modal */}
+        <ImagePreviewModal
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          imageUrl={imageUrl}
+          imageName={imageAlt}
+          imageAlt={imageAlt}
+        />
+      </>
     );
   }
 

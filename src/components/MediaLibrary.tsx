@@ -2,9 +2,12 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Upload, Search, Trash2, Edit, Image, Check } from 'lucide-react';
+import { Upload, Search, Trash2, Edit, Image, Check, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import LazyImage from '@/components/LazyImage';
+import ImagePreviewModal from '@/components/ImagePreviewModal';
 
 interface MediaFile {
   id: string;
@@ -25,8 +28,11 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
   const [images, setImages] = useState<MediaFile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isDragOver, setIsDragOver] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
+  const [previewImage, setPreviewImage] = useState<MediaFile | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -36,9 +42,11 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
 
   const handleFileUpload = async (files: FileList) => {
     setIsUploading(true);
+    setUploadProgress(0);
     
     try {
       const newImages: MediaFile[] = [];
+      const totalFiles = files.length;
       
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -51,6 +59,9 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
           });
           continue;
         }
+
+        // Simulate upload progress
+        setUploadProgress(((i + 1) / totalFiles) * 100);
 
         // Create object URL for preview
         const url = URL.createObjectURL(file);
@@ -72,6 +83,9 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
         });
         
         newImages.push(newImage);
+        
+        // Small delay to show progress
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
       setImages(prev => [...prev, ...newImages]);
@@ -87,6 +101,7 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
       });
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -101,10 +116,17 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragOver(false);
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileUpload(files);
@@ -165,14 +187,14 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
           {filteredImages.map(image => (
             <div
               key={image.id}
-              className={`relative aspect-square cursor-pointer rounded-md overflow-hidden border-2 transition-all ${
+              className={`group relative aspect-square cursor-pointer rounded-md overflow-hidden border-2 transition-all ${
                 selectedImageId === image.id 
                   ? 'border-primary ring-2 ring-primary/20' 
                   : 'border-border hover:border-primary/50'
               }`}
               onClick={() => onSelectImage?.(image)}
             >
-              <img
+              <LazyImage
                 src={image.url}
                 alt={image.name}
                 className="w-full h-full object-cover"
@@ -182,6 +204,20 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
                   <Check className="w-6 h-6 text-primary" />
                 </div>
               )}
+              {/* Preview button */}
+              <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewImage(image);
+                  }}
+                  className="h-6 w-6 p-0"
+                >
+                  <Eye className="w-3 h-3" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>
@@ -202,16 +238,33 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
     <div className="space-y-6">
       {/* Upload Area */}
       <Card
-        className="border-2 border-dashed border-border hover:border-primary/50 transition-colors"
+        className={`border-2 border-dashed transition-all ${
+          isDragOver 
+            ? 'border-primary bg-primary/5 scale-[1.02]' 
+            : 'border-border hover:border-primary/50'
+        }`}
         onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
         <div className="p-8 text-center">
-          <Image className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <Image className={`w-12 h-12 mx-auto mb-4 transition-colors ${
+            isDragOver ? 'text-primary' : 'text-muted-foreground'
+          }`} />
           <h3 className="text-lg font-semibold mb-2">Upload Images</h3>
           <p className="text-muted-foreground mb-4">
-            Drag and drop images here, or click to browse
+            {isDragOver ? 'Drop images here to upload' : 'Drag and drop images here, or click to browse'}
           </p>
+          
+          {isUploading && (
+            <div className="mb-4 space-y-2">
+              <Progress value={uploadProgress} className="w-full max-w-xs mx-auto" />
+              <p className="text-sm text-muted-foreground">
+                Uploading... {Math.round(uploadProgress)}%
+              </p>
+            </div>
+          )}
+          
           <Button 
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
@@ -243,7 +296,7 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
             }`}
             onClick={() => onSelectImage?.(image)}
           >
-            <img
+            <LazyImage
               src={image.url}
               alt={image.name}
               className="w-full h-full object-cover"
@@ -277,6 +330,17 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               </div>
               
               <div className="absolute top-2 right-2 flex gap-1">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewImage(image);
+                  }}
+                  className="h-6 w-6 p-0"
+                >
+                  <Eye className="w-3 h-3" />
+                </Button>
                 <Button
                   size="sm"
                   variant="secondary"
@@ -319,6 +383,17 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
         onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
         className="hidden"
       />
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <ImagePreviewModal
+          isOpen={!!previewImage}
+          onClose={() => setPreviewImage(null)}
+          imageUrl={previewImage.url}
+          imageName={previewImage.name}
+          imageAlt={previewImage.name}
+        />
+      )}
     </div>
   );
 };
