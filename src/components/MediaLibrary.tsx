@@ -8,15 +8,7 @@ import { Upload, Search, Trash2, Edit, Image, Check, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import LazyImage from '@/components/LazyImage';
 import ImagePreviewModal from '@/components/ImagePreviewModal';
-
-interface MediaFile {
-  id: string;
-  name: string;
-  url: string;
-  uploadDate: string;
-  dimensions?: { width: number; height: number };
-  size?: number;
-}
+import { useMediaLibrary, type MediaFile } from '@/hooks/useMediaLibrary';
 
 interface MediaLibraryProps {
   onSelectImage?: (image: MediaFile) => void;
@@ -25,7 +17,7 @@ interface MediaLibraryProps {
 }
 
 const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: MediaLibraryProps) => {
-  const [images, setImages] = useState<MediaFile[]>([]);
+  const { images, loading, addImages, removeImage, updateImage, getStorageInfo } = useMediaLibrary();
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -45,59 +37,41 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
     setUploadProgress(0);
     
     try {
-      const newImages: MediaFile[] = [];
       const totalFiles = files.length;
+      let processedFiles = 0;
       
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      const { success, errors } = await addImages(files);
+      
+      // Show progress as files are processed
+      const progressInterval = setInterval(() => {
+        processedFiles++;
+        setUploadProgress((processedFiles / totalFiles) * 100);
         
-        if (!file.type.startsWith('image/')) {
-          toast({
-            variant: "destructive",
-            title: "Invalid file type",
-            description: `${file.name} is not an image file.`
-          });
-          continue;
+        if (processedFiles >= totalFiles) {
+          clearInterval(progressInterval);
         }
-
-        // Simulate upload progress
-        setUploadProgress(((i + 1) / totalFiles) * 100);
-
-        // Create object URL for preview
-        const url = URL.createObjectURL(file);
-        
-        const newImage: MediaFile = {
-          id: `img-${Date.now()}-${i}`,
-          name: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
-          url,
-          uploadDate: new Date().toISOString(),
-          size: file.size
-        };
-        
-        // Get dimensions asynchronously after creating the image object
-        getImageDimensions(url).then(dimensions => {
-          const updatedImage = { ...newImage, dimensions };
-          setImages(prev => prev.map(img => img.id === newImage.id ? updatedImage : img));
-        }).catch(() => {
-          // Dimensions loading failed, but that's okay
+      }, 100);
+      
+      // Show results
+      if (success.length > 0) {
+        toast({
+          title: "Images uploaded",
+          description: `Successfully uploaded ${success.length} image(s).`
         });
-        
-        newImages.push(newImage);
-        
-        // Small delay to show progress
-        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
-      setImages(prev => [...prev, ...newImages]);
-      toast({
-        title: "Images uploaded",
-        description: `Successfully uploaded ${newImages.length} image(s).`
-      });
+      if (errors.length > 0) {
+        toast({
+          variant: "destructive",
+          title: "Some uploads failed",
+          description: errors.length === 1 ? errors[0] : `${errors.length} files failed to upload.`
+        });
+      }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Upload failed",
-        description: "Failed to upload one or more images."
+        description: "Failed to upload images."
       });
     } finally {
       setIsUploading(false);
@@ -105,14 +79,6 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
     }
   };
 
-  const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
-    return new Promise((resolve, reject) => {
-      const img = document.createElement('img') as HTMLImageElement;
-      img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
-      img.onerror = () => reject(new Error('Failed to load image'));
-      img.src = url;
-    });
-  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -140,9 +106,7 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
 
   const saveRename = () => {
     if (editingId && newName.trim()) {
-      setImages(prev => prev.map(img => 
-        img.id === editingId ? { ...img, name: newName.trim() } : img
-      ));
+      updateImage(editingId, { name: newName.trim() });
       setEditingId(null);
       setNewName('');
       toast({
@@ -153,15 +117,11 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
   };
 
   const deleteImage = (id: string) => {
-    const image = images.find(img => img.id === id);
-    if (image) {
-      URL.revokeObjectURL(image.url);
-      setImages(prev => prev.filter(img => img.id !== id));
-      toast({
-        title: "Image deleted",
-        description: "Image removed from library."
-      });
-    }
+    removeImage(id);
+    toast({
+      title: "Image deleted",
+      description: "Image removed from library."
+    });
   };
 
   if (compact) {
@@ -198,6 +158,7 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
                 src={image.url}
                 alt={image.name}
                 className="w-full h-full object-cover"
+                fallbackToPlaceholder={true}
               />
               {selectedImageId === image.id && (
                 <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
@@ -300,6 +261,7 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               src={image.url}
               alt={image.name}
               className="w-full h-full object-cover"
+              fallbackToPlaceholder={true}
             />
             
             {selectedImageId === image.id && (
