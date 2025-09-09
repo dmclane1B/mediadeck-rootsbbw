@@ -93,7 +93,15 @@ export const useSlideImages = () => {
 
   const saveConfiguration = (config: SlideConfiguration) => {
     setSlideConfig(config);
-    localStorage.setItem(SLIDE_CONFIG_KEY, JSON.stringify(config));
+    try {
+      localStorage.setItem(SLIDE_CONFIG_KEY, JSON.stringify(config));
+    } catch (error) {
+      console.error('Failed to save slide configuration:', error);
+      if (error instanceof Error && error.name === 'QuotaExceededError') {
+        throw new Error('QuotaExceededError');
+      }
+      throw error;
+    }
   };
 
   const setSlideImage = (slideId: string, image: SlideImage | null) => {

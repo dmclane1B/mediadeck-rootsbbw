@@ -9,9 +9,11 @@ import ImageShowcase from '@/components/ImageShowcase';
 import useSlideImages, { SlideImage } from '@/hooks/useSlideImages';
 import { MediaFile } from '@/hooks/useMediaLibrary';
 import { ArrowLeft, Settings, Image, Presentation, Download, Upload } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const MediaDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { slideConfig, setSlideImage, getSlideImage, clearAllConfigurations } = useSlideImages();
   const [selectedSlide, setSelectedSlide] = useState<string | null>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
@@ -46,10 +48,31 @@ const MediaDashboard = () => {
 
   const handleImageSelect = (image: MediaFile) => {
     if (selectedSlide) {
-      const slideImage = convertMediaFileToSlideImage(image);
-      setSlideImage(selectedSlide, slideImage);
-      setShowImageSelector(false);
-      setSelectedSlide(null);
+      try {
+        const slideImage = convertMediaFileToSlideImage(image);
+        setSlideImage(selectedSlide, slideImage);
+        setShowImageSelector(false);
+        setSelectedSlide(null);
+        toast({
+          title: "Image Selected",
+          description: `${image.name} has been assigned to the slide.`,
+        });
+      } catch (error) {
+        console.error('Error selecting image:', error);
+        if (error instanceof Error && error.name === 'QuotaExceededError') {
+          toast({
+            title: "Storage Full",
+            description: "Your browser storage is full. Please clear some images from your media library.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Selection Failed",
+            description: "Failed to assign image to slide. Please try again.",
+            variant: "destructive",
+          });
+        }
+      }
     }
   };
 
