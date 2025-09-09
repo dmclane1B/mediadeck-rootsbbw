@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import MediaLibrary from '@/components/MediaLibrary';
 import ImageShowcase from '@/components/ImageShowcase';
 import useSlideImages, { SlideImage } from '@/hooks/useSlideImages';
+import { MediaFile } from '@/hooks/useMediaLibrary';
 import { ArrowLeft, Settings, Image, Presentation, Download, Upload } from 'lucide-react';
 
 const MediaDashboard = () => {
@@ -31,9 +32,22 @@ const MediaDashboard = () => {
     { id: 'contact', name: 'Contact', route: '/slides/contact' }
   ];
 
-  const handleImageSelect = (image: SlideImage) => {
+  // Convert MediaFile to SlideImage format
+  const convertMediaFileToSlideImage = (mediaFile: MediaFile): SlideImage => {
+    return {
+      id: mediaFile.id,
+      name: mediaFile.name,
+      url: mediaFile.url,
+      uploadDate: mediaFile.uploadDate,
+      dimensions: mediaFile.dimensions,
+      size: mediaFile.size
+    };
+  };
+
+  const handleImageSelect = (image: MediaFile) => {
     if (selectedSlide) {
-      setSlideImage(selectedSlide, image);
+      const slideImage = convertMediaFileToSlideImage(image);
+      setSlideImage(selectedSlide, slideImage);
       setShowImageSelector(false);
       setSelectedSlide(null);
     }

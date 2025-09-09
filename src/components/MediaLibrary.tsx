@@ -262,8 +262,13 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
       </div>
 
       {/* Image Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {filteredImages.map(image => (
+      {loading ? (
+        <div className="text-center py-12 text-muted-foreground">
+          Loading images...
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {filteredImages.map(image => (
           <Card 
             key={image.id} 
             className={`group relative aspect-square overflow-hidden cursor-pointer transition-all ${
@@ -342,10 +347,11 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               </div>
             </div>
           </Card>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {filteredImages.length === 0 && (
+      {!loading && filteredImages.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           {searchTerm ? 'No images match your search.' : 'No images uploaded yet.'}
         </div>
