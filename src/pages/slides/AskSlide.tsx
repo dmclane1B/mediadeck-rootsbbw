@@ -4,9 +4,13 @@ import { Card } from '@/components/ui/card';
 import { DollarSign, Users, Zap, Globe, BarChart3, Target, Smartphone, Shield, TrendingUp, Layers } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 
 const AskSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('ask');
 
   const fundingBreakdown = [
     {
@@ -95,7 +99,7 @@ const AskSlide = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
         {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
+        <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-6xl md:text-8xl font-bold text-white leading-tight font-space mb-8">
             THE <span className="text-white/80">ASK</span>
           </h1>
@@ -103,6 +107,16 @@ const AskSlide = () => {
           <p className="text-xl text-white/80 max-w-4xl mx-auto font-inter leading-relaxed">
             Strategic investment to revolutionize sports communication and capture market leadership
           </p>
+        </div>
+
+        {/* Image Showcase */}
+        <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <ImageShowcase
+            imageUrl={slideImage?.imageUrl}
+            imageAlt={slideImage?.imageAlt}
+            onImageSelect={() => navigate('/media')}
+            variant="standard"
+          />
         </div>
 
         {/* Funding Request */}

@@ -4,9 +4,13 @@ import { Card } from '@/components/ui/card';
 import { User, Target, TrendingUp, DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 
 const CustomerPersonaSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('customer-persona');
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
@@ -48,7 +52,7 @@ const CustomerPersonaSlide = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
         {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
+        <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-6xl md:text-8xl font-black text-foreground mb-6 font-space leading-tight">
             CUSTOMER <span className="text-accent">PERSONA</span>
           </h1>
@@ -56,6 +60,16 @@ const CustomerPersonaSlide = () => {
           <p className="text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed">
             Understanding our primary target audience and their specific pain points in sports communication
           </p>
+        </div>
+
+        {/* Image Showcase */}
+        <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <ImageShowcase
+            imageUrl={slideImage?.imageUrl}
+            imageAlt={slideImage?.imageAlt}
+            onImageSelect={() => navigate('/media')}
+            variant="standard"
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">

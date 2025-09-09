@@ -4,9 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 
 const ChallengesSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('challenges');
 
   const handleNext = () => navigate('/slides/product-glimpse');
   const handlePrevious = () => navigate('/slides/overview');
@@ -60,32 +64,44 @@ const ChallengesSlide = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-        {/* Left Column - Title */}
-        <div className="space-y-8 animate-fade-in">
-          <div>
-            <h1 className="text-5xl md:text-7xl font-black text-foreground mb-4 font-space leading-tight">
-              THE
-            </h1>
-            <h1 className="text-5xl md:text-7xl font-black text-accent mb-4 font-space leading-tight animate-slide-in">
-              CHALLENGES
-            </h1>
-            <div className="w-32 h-1 bg-gradient-to-r from-accent to-primary animate-scale-in"></div>
+      <div className="max-w-7xl mx-auto px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-16">
+          {/* Left Column - Title */}
+          <div className="space-y-8 animate-fade-in">
+            <div>
+              <h1 className="text-5xl md:text-7xl font-black text-foreground mb-4 font-space leading-tight">
+                THE
+              </h1>
+              <h1 className="text-5xl md:text-7xl font-black text-accent mb-4 font-space leading-tight animate-slide-in">
+                CHALLENGES
+              </h1>
+              <div className="w-32 h-1 bg-gradient-to-r from-accent to-primary animate-scale-in"></div>
+            </div>
+            
+            <p className="text-xl text-muted-foreground leading-relaxed font-inter animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              Modern sports communication still has significant room for improvement. Here are some <span className="font-semibold text-accent">key challenges</span> teams face today:
+            </p>
+            
+            {/* Problem Statement */}
+            <div className="bg-card/50 backdrop-blur-sm p-6 rounded-lg border border-accent/20 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+              <div className="text-accent font-medium text-sm mb-2">CURRENT STATE</div>
+              <div className="text-foreground font-semibold">Teams are stuck with outdated communication methods that cost them games.</div>
+            </div>
           </div>
-          
-          <p className="text-xl text-muted-foreground leading-relaxed font-inter animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            Modern sports communication still has significant room for improvement. Here are some <span className="font-semibold text-accent">key challenges</span> teams face today:
-          </p>
-          
-          {/* Problem Statement */}
-          <div className="bg-card/50 backdrop-blur-sm p-6 rounded-lg border border-accent/20 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-accent font-medium text-sm mb-2">CURRENT STATE</div>
-            <div className="text-foreground font-semibold">Teams are stuck with outdated communication methods that cost them games.</div>
+
+          {/* Right Column - Image */}
+          <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <ImageShowcase
+              imageUrl={slideImage?.imageUrl}
+              imageAlt={slideImage?.imageAlt}
+              onImageSelect={() => navigate('/media')}
+              variant="standard"
+            />
           </div>
         </div>
 
-        {/* Right Column - Challenges */}
-        <div className="space-y-8">
+        {/* Challenges List */}
+        <div className="max-w-5xl mx-auto space-y-8">
           <div className="flex items-start gap-6 group animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <div className="text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300">1.</div>
             <div className="space-y-3 flex-1">

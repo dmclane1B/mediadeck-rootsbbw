@@ -6,8 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 const ContactSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('contact');
   const handleNext = () => navigate('/');
   const handlePrevious = () => navigate('/slides/ask');
   const handleHome = () => navigate('/');
@@ -97,7 +101,7 @@ const ContactSlide = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
-        <div className="max-w-6xl mx-auto text-center mb-12">
+        <div className="max-w-6xl mx-auto text-center mb-8">
           <div className="mb-8">
             <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               GET IN TOUCH
@@ -105,6 +109,17 @@ const ContactSlide = () => {
             <p className="text-xl text-foreground/80 max-w-3xl mx-auto">
               Ready to transform your industry? Let's connect and explore how DX1 can drive your digital transformation.
             </p>
+          </div>
+
+          {/* Image Showcase */}
+          <div className="mb-8">
+            <ImageShowcase
+              imageUrl={slideImage?.imageUrl}
+              imageAlt={slideImage?.imageAlt}
+              onImageSelect={() => navigate('/media')}
+              variant="standard"
+              className="animate-fade-in"
+            />
           </div>
 
           {/* Contact Methods Grid */}

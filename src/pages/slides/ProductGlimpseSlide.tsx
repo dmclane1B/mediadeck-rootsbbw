@@ -4,9 +4,13 @@ import { Card } from '@/components/ui/card';
 import { Shield, Users, Zap, Settings, ChevronRight, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 
 const ProductGlimpseSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('product-glimpse');
 
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center relative">
@@ -44,7 +48,7 @@ const ProductGlimpseSlide = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
         {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
+        <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-5xl md:text-7xl font-black text-foreground mb-6 font-space leading-tight">
             PRODUCT <span className="text-accent">OVERVIEW</span>
           </h1>
@@ -52,6 +56,16 @@ const ProductGlimpseSlide = () => {
           <p className="text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed">
             Comprehensive overview of DX1's features and capabilities for modern sports teams
           </p>
+        </div>
+
+        {/* Image Showcase */}
+        <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <ImageShowcase
+            imageUrl={slideImage?.imageUrl}
+            imageAlt={slideImage?.imageAlt}
+            onImageSelect={() => navigate('/media')}
+            variant="standard"
+          />
         </div>
 
         {/* Product Features Grid */}

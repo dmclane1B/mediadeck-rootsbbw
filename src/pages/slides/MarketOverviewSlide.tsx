@@ -4,9 +4,13 @@ import { TrendingUp, Target, DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import MarketChart from '@/components/MarketChart';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 
 const MarketOverviewSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('market-overview');
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
@@ -53,7 +57,7 @@ const MarketOverviewSlide = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
         {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
+        <div className="text-center mb-12 animate-fade-in">
           <div className="text-accent/60 text-lg font-inter mb-4">TAM-SAM-SOM Framework Analysis</div>
           <h1 className="text-6xl md:text-8xl font-black text-foreground mb-6 font-space leading-tight">
             Market <span className="text-accent">Opportunity</span>
@@ -62,6 +66,16 @@ const MarketOverviewSlide = () => {
           <p className="text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed">
             RF-enabled wearable technology market with <span className="font-bold text-accent bg-accent/10 px-2 py-1 rounded">mission-critical communication</span> applications across sports, defense, and industrial sectors.
           </p>
+        </div>
+
+        {/* Image Showcase */}
+        <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <ImageShowcase
+            imageUrl={slideImage?.imageUrl}
+            imageAlt={slideImage?.imageAlt}
+            onImageSelect={() => navigate('/media')}
+            variant="standard"
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">

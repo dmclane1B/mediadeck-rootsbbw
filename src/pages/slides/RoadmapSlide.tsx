@@ -5,8 +5,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Code, Globe, Rocket, Target, TrendingUp, Users, Zap, BarChart3, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 const RoadmapSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('roadmap');
   return <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-primary flex items-center justify-center relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 opacity-10">
@@ -35,7 +39,7 @@ const RoadmapSlide = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
         {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
+        <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight font-space mb-6">
             ROADMAP <span className="text-white/80">& EXPANSION</span>
           </h1>
@@ -43,6 +47,16 @@ const RoadmapSlide = () => {
           <p className="text-lg text-white/80 max-w-3xl mx-auto font-inter leading-relaxed">
             Strategic roadmap for technology development, market expansion, and sustainable growth
           </p>
+        </div>
+
+        {/* Image Showcase */}
+        <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <ImageShowcase
+            imageUrl={slideImage?.imageUrl}
+            imageAlt={slideImage?.imageAlt}
+            onImageSelect={() => navigate('/media')}
+            variant="standard"
+          />
         </div>
 
         {/* Financial Dashboard */}

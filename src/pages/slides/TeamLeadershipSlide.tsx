@@ -5,8 +5,12 @@ import { User, Award, Briefcase, GraduationCap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import teamLeadershipImage from '@/assets/team-leadership.png';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 const TeamLeadershipSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('team-leadership');
   return <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -41,7 +45,7 @@ const TeamLeadershipSlide = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
         {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
+        <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-6xl md:text-8xl font-black text-foreground mb-6 font-space leading-tight">
             TEAM <span className="text-accent">&</span><br />
             <span className="text-accent">LEADERSHIP</span>
@@ -50,6 +54,16 @@ const TeamLeadershipSlide = () => {
           <p className="text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed">
             Experienced leaders driving innovation in sports communication technology
           </p>
+        </div>
+
+        {/* Image Showcase */}
+        <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <ImageShowcase
+            imageUrl={slideImage?.imageUrl}
+            imageAlt={slideImage?.imageAlt}
+            onImageSelect={() => navigate('/media')}
+            variant="standard"
+          />
         </div>
 
         <div className="max-w-6xl mx-auto">

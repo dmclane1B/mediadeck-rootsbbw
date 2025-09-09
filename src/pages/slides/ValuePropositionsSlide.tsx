@@ -7,9 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 
 const ValuePropositionsSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('value-propositions');
 
   const handlePrevious = () => navigate('/slides/market-overview');
   const handleNext = () => navigate('/slides/ask');
@@ -69,7 +73,7 @@ const ValuePropositionsSlide = () => {
         <div className="pt-20 sm:pt-24 pb-24 sm:pb-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
-            <div className="text-center mb-12 sm:mb-16 animate-fade-in">
+            <div className="text-center mb-8 sm:mb-12 animate-fade-in">
               <div className="text-white/60 text-base sm:text-lg font-inter mb-3 sm:mb-4">Transforming Sports Communication</div>
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight font-space mb-6 sm:mb-8">
                 DX-PLAY <span className="text-white/80">VALUE</span><br />
@@ -79,6 +83,16 @@ const ValuePropositionsSlide = () => {
               <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto font-inter leading-relaxed px-4">
                 AI-powered technology for secure and efficient play calling
               </p>
+            </div>
+
+            {/* Image Showcase */}
+            <div className="mb-8 sm:mb-12 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <ImageShowcase
+                imageUrl={slideImage?.imageUrl}
+                imageAlt={slideImage?.imageAlt}
+                onImageSelect={() => navigate('/media')}
+                variant="standard"
+              />
             </div>
 
             {/* Value Propositions Grid */}

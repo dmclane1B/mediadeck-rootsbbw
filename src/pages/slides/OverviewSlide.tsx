@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImages } from '@/hooks/useSlideImages';
 
 const slides = [
   {
@@ -124,6 +126,8 @@ const slides = [
 
 const OverviewSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('overview');
 
   const handleNext = () => navigate('/slides/challenges');
   const handlePrevious = () => navigate('/');
@@ -178,14 +182,25 @@ const OverviewSlide = () => {
       <div className="relative z-10 pt-24 pb-20 px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 font-space">
               PRESENTATION OVERVIEW
             </h1>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-6">
               Navigate through our comprehensive pitch deck covering problem, solution, market opportunity, and investment ask
             </p>
-            <div className="w-32 h-1 bg-primary mx-auto mt-8"></div>
+            <div className="w-32 h-1 bg-primary mx-auto"></div>
+          </div>
+
+          {/* Image Showcase */}
+          <div className="mb-12">
+            <ImageShowcase
+              imageUrl={slideImage?.imageUrl}
+              imageAlt={slideImage?.imageAlt}
+              onImageSelect={() => navigate('/media')}
+              variant="standard"
+              className="animate-fade-in"
+            />
           </div>
 
           {/* Slides Grid */}
