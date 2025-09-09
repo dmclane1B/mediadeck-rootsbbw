@@ -11,56 +11,19 @@ export interface SlideImage {
 
 export interface SlideConfiguration {
   [slideId: string]: {
-    imageId?: string;
-    imageUrl?: string;
+    imageId: string;
     imageAlt?: string;
   };
 }
 
 const SLIDE_CONFIG_KEY = 'slide-configurations';
 
-// Enhanced URL validation utility with better base64 support
-const isValidImageUrl = (url: string): boolean => {
-  if (!url || typeof url !== 'string') return false;
-  
-  const trimmedUrl = url.trim();
-  if (!trimmedUrl) return false;
-  
-  // Check for common invalid patterns
-  const invalidPatterns = ['undefined', 'null', '[object Object]', 'NaN'];
-  if (invalidPatterns.includes(trimmedUrl)) return false;
-  
-  // Handle data URLs (base64) with regex - more reliable for long strings
-  if (trimmedUrl.startsWith('data:')) {
-    const dataUrlPattern = /^data:image\/(jpeg|jpg|png|gif|webp|svg\+xml);base64,[A-Za-z0-9+/]+=*$/;
-    return dataUrlPattern.test(trimmedUrl);
-  }
-  
-  // Handle blob URLs
-  if (trimmedUrl.startsWith('blob:')) {
-    return true;
-  }
-  
-  // Handle relative paths
-  if (trimmedUrl.match(/^[./]/) || trimmedUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-    return true;
-  }
-  
-  // Handle http/https URLs with URL constructor
-  try {
-    const urlObj = new URL(trimmedUrl);
-    return ['http:', 'https:'].includes(urlObj.protocol);
-  } catch {
-    return false;
-  }
-};
-
 // Clean configuration by removing invalid entries
 const cleanSlideConfiguration = (config: SlideConfiguration): SlideConfiguration => {
   const cleanedConfig: SlideConfiguration = {};
   
   Object.entries(config).forEach(([slideId, slideData]) => {
-    if (slideData?.imageUrl && isValidImageUrl(slideData.imageUrl)) {
+    if (slideData?.imageId) {
       cleanedConfig[slideId] = slideData;
     }
   });
@@ -112,7 +75,6 @@ export const useSlideImages = () => {
     if (image) {
       newConfig[slideId] = {
         imageId: image.id,
-        imageUrl: image.url,
         imageAlt: image.name
       };
     } else {

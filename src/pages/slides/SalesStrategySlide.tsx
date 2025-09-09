@@ -54,7 +54,7 @@ const SalesStrategySlide = () => {
         {/* Image Showcase */}
         <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <ImageShowcase
-            imageUrl={slideImage?.imageUrl}
+            imageId={slideImage?.imageId}
             imageAlt={slideImage?.imageAlt || 'Sales Strategy'}
             variant="hero"
             className="mx-auto max-w-4xl"

@@ -114,7 +114,7 @@ const ContactSlide = () => {
           {/* Image Showcase */}
           <div className="mb-8">
             <ImageShowcase
-              imageUrl={slideImage?.imageUrl}
+              imageId={slideImage?.imageId}
               imageAlt={slideImage?.imageAlt}
               onImageSelect={() => navigate('/media')}
               variant="standard"

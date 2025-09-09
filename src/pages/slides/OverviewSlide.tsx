@@ -195,7 +195,7 @@ const OverviewSlide = () => {
           {/* Image Showcase */}
           <div className="mb-12">
             <ImageShowcase
-              imageUrl={slideImage?.imageUrl}
+              imageId={slideImage?.imageId}
               imageAlt={slideImage?.imageAlt}
               onImageSelect={() => navigate('/media')}
               variant="standard"

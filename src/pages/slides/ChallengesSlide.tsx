@@ -92,7 +92,7 @@ const ChallengesSlide = () => {
           {/* Right Column - Image */}
           <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <ImageShowcase
-              imageUrl={slideImage?.imageUrl}
+              imageId={slideImage?.imageId}
               imageAlt={slideImage?.imageAlt}
               onImageSelect={() => navigate('/media')}
               variant="standard"

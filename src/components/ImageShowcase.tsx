@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Image, Upload, Eye } from 'lucide-react';
 import LazyImage from '@/components/LazyImage';
 import ImagePreviewModal from '@/components/ImagePreviewModal';
+import { useMediaLibrary } from '@/hooks/useMediaLibrary';
 
 // Enhanced URL validation utility with better base64 support
 const isValidImageUrl = (url: string): boolean => {
@@ -43,6 +44,7 @@ const isValidImageUrl = (url: string): boolean => {
 
 interface ImageShowcaseProps {
   imageUrl?: string;
+  imageId?: string;
   imageAlt?: string;
   onImageSelect?: () => void;
   className?: string;
@@ -52,6 +54,7 @@ interface ImageShowcaseProps {
 
 const ImageShowcase = ({ 
   imageUrl, 
+  imageId,
   imageAlt = 'Slide image', 
   onImageSelect, 
   className = '',
@@ -59,6 +62,19 @@ const ImageShowcase = ({
   showPlaceholder = true 
 }: ImageShowcaseProps) => {
   const [showPreview, setShowPreview] = useState(false);
+  const { images } = useMediaLibrary();
+  
+  // Get image from media library if imageId is provided
+  const resolvedImage = useMemo(() => {
+    if (imageUrl) {
+      return { url: imageUrl, alt: imageAlt };
+    }
+    if (imageId) {
+      const mediaImage = images.find(img => img.id === imageId);
+      return mediaImage ? { url: mediaImage.url, alt: mediaImage.name } : null;
+    }
+    return null;
+  }, [imageUrl, imageId, imageAlt, images]);
   
   const getVariantClasses = () => {
     switch (variant) {
@@ -74,14 +90,14 @@ const ImageShowcase = ({
 
   const baseClasses = `relative w-full overflow-hidden rounded-xl ${getVariantClasses()}`;
 
-  // Only render image if we have a valid URL
-  if (isValidImageUrl(imageUrl)) {
+  // Only render image if we have resolved image data
+  if (resolvedImage && isValidImageUrl(resolvedImage.url)) {
     return (
       <>
         <div className={`group ${baseClasses} ${className}`}>
           <LazyImage
-            src={imageUrl!}
-            alt={imageAlt}
+            src={resolvedImage.url}
+            alt={resolvedImage.alt}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
             fallbackToPlaceholder={true}
           />
@@ -116,9 +132,9 @@ const ImageShowcase = ({
         <ImagePreviewModal
           isOpen={showPreview}
           onClose={() => setShowPreview(false)}
-          imageUrl={imageUrl}
-          imageName={imageAlt}
-          imageAlt={imageAlt}
+          imageUrl={resolvedImage.url}
+          imageName={resolvedImage.alt}
+          imageAlt={resolvedImage.alt}
         />
       </>
     );

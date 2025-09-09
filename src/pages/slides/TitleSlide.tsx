@@ -86,7 +86,7 @@ const TitleSlide = () => {
         {/* Image Showcase */}
         <div className="order-1 lg:order-2">
           <ImageShowcase
-            imageUrl={slideImage?.imageUrl}
+            imageId={slideImage?.imageId}
             imageAlt={slideImage?.imageAlt}
             onImageSelect={() => navigate('/media')}
             variant="hero"

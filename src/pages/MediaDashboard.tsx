@@ -158,7 +158,7 @@ const MediaDashboard = () => {
                     </div>
                     
                     <ImageShowcase
-                      imageUrl={slideImage?.imageUrl}
+                      imageId={slideImage?.imageId}
                       imageAlt={slideImage?.imageAlt}
                       variant="compact"
                       onImageSelect={() => openImageSelector(slide.id)}
