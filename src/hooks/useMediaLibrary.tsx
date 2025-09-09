@@ -16,6 +16,8 @@ export interface UploadProgress {
   progress: number;
   completed: boolean;
   error?: string;
+  fileIndex: number;
+  stage: string;
 }
 
 // Constants
@@ -85,10 +87,12 @@ export const useMediaLibrary = () => {
     };
 
     // Initialize progress tracking
-    const progressArray: UploadProgress[] = fileArray.map(file => ({
+    const progressArray: UploadProgress[] = fileArray.map((file, index) => ({
       fileName: file.name,
       progress: 0,
-      completed: false
+      completed: false,
+      fileIndex: index,
+      stage: 'preparing'
     }));
     
     setUploadProgress(progressArray);
@@ -100,6 +104,7 @@ export const useMediaLibrary = () => {
       try {
         // Update progress to show processing
         progressArray[i].progress = 10;
+        progressArray[i].stage = 'validating';
         setUploadProgress([...progressArray]);
         onProgress?.([...progressArray]);
 
@@ -121,6 +126,7 @@ export const useMediaLibrary = () => {
 
         // Update progress to show compression
         progressArray[i].progress = 30;
+        progressArray[i].stage = 'compressing';
         setUploadProgress([...progressArray]);
         onProgress?.([...progressArray]);
 
@@ -129,6 +135,7 @@ export const useMediaLibrary = () => {
         
         // Update progress to show conversion
         progressArray[i].progress = 60;
+        progressArray[i].stage = 'processing';
         setUploadProgress([...progressArray]);
         onProgress?.([...progressArray]);
 
@@ -137,6 +144,7 @@ export const useMediaLibrary = () => {
         
         // Update progress to show dimension calculation
         progressArray[i].progress = 80;
+        progressArray[i].stage = 'analyzing';
         setUploadProgress([...progressArray]);
         onProgress?.([...progressArray]);
 
@@ -155,6 +163,7 @@ export const useMediaLibrary = () => {
 
         // Update progress to show saving
         progressArray[i].progress = 90;
+        progressArray[i].stage = 'saving';
         setUploadProgress([...progressArray]);
         onProgress?.([...progressArray]);
 
@@ -168,6 +177,7 @@ export const useMediaLibrary = () => {
         // Mark as completed
         progressArray[i].progress = 100;
         progressArray[i].completed = true;
+        progressArray[i].stage = 'completed';
         setUploadProgress([...progressArray]);
         onProgress?.([...progressArray]);
 
