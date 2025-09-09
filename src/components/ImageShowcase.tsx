@@ -38,7 +38,8 @@ const ImageShowcase = ({
 
   const baseClasses = `relative w-full overflow-hidden rounded-xl ${getVariantClasses()}`;
 
-  if (imageUrl) {
+  // Only render image if we have a valid URL
+  if (imageUrl && imageUrl.trim() && imageUrl !== 'undefined' && imageUrl !== 'null') {
     return (
       <>
         <div className={`group ${baseClasses} ${className}`}>
