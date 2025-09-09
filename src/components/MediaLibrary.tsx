@@ -45,17 +45,10 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
       });
       
       // Show results
-      if (success.length > 0) {
-        const compressionSummary = success
-          .filter(img => img.compressionRatio && img.compressionRatio > 1.1)
-          .map(img => `${img.name}: ${formatFileSize(img.originalSize!)} → ${formatFileSize(img.size!)}`)
-          .slice(0, 3);
-        
+      if (success.length > 0) {        
         toast({
           title: "Images uploaded",
-          description: compressionSummary.length > 0 
-            ? `${success.length} image(s) uploaded and compressed. ${compressionSummary.join(', ')}`
-            : `Successfully uploaded ${success.length} image(s).`
+          description: `Successfully uploaded ${success.length} image(s).`
         });
       }
       

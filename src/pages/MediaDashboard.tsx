@@ -3,12 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import StorageMonitor from '@/components/StorageMonitor';
 import { useNavigate } from 'react-router-dom';
 import MediaLibrary from '@/components/MediaLibrary';
 import ImageShowcase from '@/components/ImageShowcase';
 import useSlideImages, { SlideImage } from '@/hooks/useSlideImages';
 import { MediaFile } from '@/hooks/useMediaLibrary';
-import { ArrowLeft, Settings, Image, Presentation, Download, Upload } from 'lucide-react';
+import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const MediaDashboard = () => {
@@ -128,7 +129,7 @@ const MediaDashboard = () => {
         </div>
 
         <Tabs defaultValue="slides" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsList className="grid w-full grid-cols-3 max-w-lg">
             <TabsTrigger value="slides" className="flex items-center gap-2">
               <Presentation className="w-4 h-4" />
               Slide Images
@@ -136,6 +137,10 @@ const MediaDashboard = () => {
             <TabsTrigger value="library" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
               Media Library
+            </TabsTrigger>
+            <TabsTrigger value="storage" className="flex items-center gap-2">
+              <HardDrive className="w-4 h-4" />
+              Storage
             </TabsTrigger>
           </TabsList>
 
@@ -194,6 +199,10 @@ const MediaDashboard = () => {
             <Card className="p-6">
               <MediaLibrary />
             </Card>
+          </TabsContent>
+
+          <TabsContent value="storage" className="space-y-4">
+            <StorageMonitor />
           </TabsContent>
         </Tabs>
       </div>

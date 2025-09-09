@@ -1,66 +1,55 @@
 import { useState, useEffect, useCallback } from 'react';
-import { compressImage, formatFileSize, type CompressionResult } from '@/utils/imageCompression';
+import { compressImage } from '@/utils/imageCompression';
+import { indexedDBManager } from '@/utils/indexedDBManager';
 
 export interface MediaFile {
   id: string;
   name: string;
-  url: string; // base64 data URL for persistence
+  url: string; // base64 data URL
   uploadDate: string;
   dimensions?: { width: number; height: number };
   size?: number;
-  originalSize?: number;
-  compressionRatio?: number;
 }
 
 export interface UploadProgress {
-  fileIndex: number;
   fileName: string;
   progress: number;
-  stage: 'reading' | 'compressing' | 'saving' | 'complete';
+  completed: boolean;
+  error?: string;
 }
 
-const STORAGE_KEY = 'mediaLibrary';
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB limit (after compression)
-const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024; // 50MB original file limit
-const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50MB total limit
+// Constants
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_TOTAL_SIZE = 500 * 1024 * 1024; // 500MB total storage (IndexedDB)
+const SUPPORTED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-// Convert file to base64 data URL
+// Helper functions
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
   });
 };
 
-// Get image dimensions from data URL
-const getImageDimensions = (dataUrl: string): Promise<{ width: number; height: number }> => {
-  return new Promise((resolve, reject) => {
+const getImageDimensions = (base64: string): Promise<{ width: number; height: number }> => {
+  return new Promise((resolve) => {
     const img = new Image();
-    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
-    img.onerror = () => reject(new Error('Failed to load image'));
-    img.src = dataUrl;
+    img.onload = () => {
+      resolve({ width: img.width, height: img.height });
+    };
+    img.onerror = () => {
+      resolve({ width: 0, height: 0 });
+    };
+    img.src = base64;
   });
 };
 
-// Calculate total storage size
 const calculateTotalSize = (images: MediaFile[]): number => {
-  return images.reduce((total, img) => total + (img.size || 0), 0);
-};
-
-// Clean invalid entries from storage
-const cleanMediaLibrary = (images: MediaFile[]): MediaFile[] => {
-  return images.filter(img => {
-    if (!img.id || !img.name || !img.url || !img.uploadDate) {
-      return false;
-    }
-    // Validate data URL format
-    if (!img.url.startsWith('data:image/')) {
-      return false;
-    }
-    return true;
-  });
+  return images.reduce((total, image) => {
+    return total + (image.size || 0);
+  }, 0);
 };
 
 export const useMediaLibrary = () => {
@@ -68,152 +57,169 @@ export const useMediaLibrary = () => {
   const [loading, setLoading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
 
-  // Load images from localStorage on mount
+  // Load images from IndexedDB on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsedImages = JSON.parse(stored) as MediaFile[];
-        const cleanedImages = cleanMediaLibrary(parsedImages);
-        
-        if (cleanedImages.length !== parsedImages.length) {
-          // Save cleaned data back to localStorage
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedImages));
-        }
-        
-        setImages(cleanedImages);
+    const loadImages = async () => {
+      try {
+        const storedImages = await indexedDBManager.getAllImages();
+        setImages(storedImages);
+      } catch (error) {
+        console.error('Error loading images from IndexedDB:', error);
+        setImages([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Failed to load media library:', error);
-      // Clear corrupted data
-      localStorage.removeItem(STORAGE_KEY);
-      setImages([]);
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    loadImages();
   }, []);
 
-  // Save images to localStorage whenever they change
-  useEffect(() => {
-    if (!loading) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(images));
-      } catch (error) {
-        console.error('Failed to save media library:', error);
-      }
-    }
-  }, [images, loading]);
-
-  const addImages = useCallback(async (
+  const addImages = async (
     files: FileList,
     onProgress?: (progress: UploadProgress[]) => void
   ): Promise<{ success: MediaFile[], errors: string[] }> => {
-    const success: MediaFile[] = [];
-    const errors: string[] = [];
-    const progressArray: UploadProgress[] = [];
-    
+    const fileArray = Array.from(files);
+    const results: { success: MediaFile[], errors: string[] } = {
+      success: [],
+      errors: []
+    };
+
     // Initialize progress tracking
-    for (let i = 0; i < files.length; i++) {
-      progressArray.push({
-        fileIndex: i,
-        fileName: files[i].name,
-        progress: 0,
-        stage: 'reading'
-      });
-    }
+    const progressArray: UploadProgress[] = fileArray.map(file => ({
+      fileName: file.name,
+      progress: 0,
+      completed: false
+    }));
+    
     setUploadProgress(progressArray);
     onProgress?.(progressArray);
-    
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      
-      const updateProgress = (progress: number, stage: UploadProgress['stage']) => {
-        progressArray[i] = { ...progressArray[i], progress, stage };
-        setUploadProgress([...progressArray]);
-        onProgress?.([...progressArray]);
-      };
-      
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        errors.push(`${file.name}: Not an image file`);
-        updateProgress(100, 'complete');
-        continue;
-      }
-      
-      // Validate original file size
-      if (file.size > MAX_ORIGINAL_SIZE) {
-        errors.push(`${file.name}: File too large (max ${formatFileSize(MAX_ORIGINAL_SIZE)})`);
-        updateProgress(100, 'complete');
-        continue;
-      }
+
+    for (let i = 0; i < fileArray.length; i++) {
+      const file = fileArray[i];
       
       try {
-        updateProgress(10, 'reading');
-        
-        // Compress the image
-        updateProgress(20, 'compressing');
-        const compressionResult = await compressImage(
-          file, 
-          { maxSizeBytes: MAX_FILE_SIZE },
-          (compressProgress) => {
-            updateProgress(20 + (compressProgress * 0.6), 'compressing');
-          }
-        );
-        
-        updateProgress(85, 'saving');
-        
-        // Check total storage limit with compressed size
-        const currentSize = calculateTotalSize(images) + calculateTotalSize(success);
-        if (currentSize + compressionResult.compressedSize > MAX_TOTAL_SIZE) {
-          errors.push(`${file.name}: Storage limit exceeded (max ${formatFileSize(MAX_TOTAL_SIZE)} total)`);
-          updateProgress(100, 'complete');
-          continue;
+        // Update progress to show processing
+        progressArray[i].progress = 10;
+        setUploadProgress([...progressArray]);
+        onProgress?.([...progressArray]);
+
+        // Validate file type
+        if (!SUPPORTED_TYPES.includes(file.type)) {
+          throw new Error(`Unsupported file type: ${file.type}`);
         }
+
+        // Validate file size
+        if (file.size > MAX_FILE_SIZE) {
+          throw new Error(`File too large: ${(file.size / (1024 * 1024)).toFixed(1)}MB (max: ${MAX_FILE_SIZE / (1024 * 1024)}MB)`);
+        }
+
+        // Check total storage limit
+        const currentSize = calculateTotalSize(images);
+        if (currentSize + file.size > MAX_TOTAL_SIZE) {
+          throw new Error('Storage limit exceeded. Please delete some images first.');
+        }
+
+        // Update progress to show compression
+        progressArray[i].progress = 30;
+        setUploadProgress([...progressArray]);
+        onProgress?.([...progressArray]);
+
+        // Compress image
+        const compressionResult = await compressImage(file);
         
-        const newImage: MediaFile = {
-          id: `img-${Date.now()}-${i}`,
-          name: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
-          url: compressionResult.compressedFile,
+        // Update progress to show conversion
+        progressArray[i].progress = 60;
+        setUploadProgress([...progressArray]);
+        onProgress?.([...progressArray]);
+
+        // Get base64 from compression result
+        const base64 = compressionResult.compressedFile;
+        
+        // Update progress to show dimension calculation
+        progressArray[i].progress = 80;
+        setUploadProgress([...progressArray]);
+        onProgress?.([...progressArray]);
+
+        // Get dimensions
+        const dimensions = compressionResult.dimensions;
+
+        // Create media file
+        const mediaFile: MediaFile = {
+          id: crypto.randomUUID(),
+          name: file.name,
+          url: base64,
           uploadDate: new Date().toISOString(),
-          size: compressionResult.compressedSize,
-          originalSize: compressionResult.originalSize,
-          compressionRatio: compressionResult.compressionRatio,
-          dimensions: compressionResult.dimensions
+          dimensions,
+          size: compressionResult.compressedSize
         };
+
+        // Update progress to show saving
+        progressArray[i].progress = 90;
+        setUploadProgress([...progressArray]);
+        onProgress?.([...progressArray]);
+
+        // Save to IndexedDB
+        await indexedDBManager.addImage(mediaFile);
         
-        updateProgress(100, 'complete');
-        success.push(newImage);
+        // Add to local state
+        setImages(prev => [...prev, mediaFile]);
+        results.success.push(mediaFile);
+
+        // Mark as completed
+        progressArray[i].progress = 100;
+        progressArray[i].completed = true;
+        setUploadProgress([...progressArray]);
+        onProgress?.([...progressArray]);
+
       } catch (error) {
-        errors.push(`${file.name}: Failed to process file`);
-        updateProgress(100, 'complete');
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        results.errors.push(`${file.name}: ${errorMessage}`);
+        
+        progressArray[i].error = errorMessage;
+        progressArray[i].completed = true;
+        setUploadProgress([...progressArray]);
+        onProgress?.([...progressArray]);
       }
     }
-    
-    if (success.length > 0) {
-      setImages(prev => [...prev, ...success]);
-    }
-    
+
     // Clear progress after a delay
     setTimeout(() => {
       setUploadProgress([]);
-    }, 2000);
-    
-    return { success, errors };
-  }, [images]);
+    }, 3000);
 
-  const removeImage = useCallback((id: string) => {
-    setImages(prev => prev.filter(img => img.id !== id));
+    return results;
+  };
+
+  const removeImage = useCallback(async (id: string) => {
+    try {
+      await indexedDBManager.removeImage(id);
+      setImages(prev => prev.filter(image => image.id !== id));
+    } catch (error) {
+      console.error('Error removing image:', error);
+      throw error;
+    }
   }, []);
 
-  const updateImage = useCallback((id: string, updates: Partial<MediaFile>) => {
-    setImages(prev => prev.map(img => 
-      img.id === id ? { ...img, ...updates } : img
-    ));
+  const updateImage = useCallback(async (id: string, updates: Partial<MediaFile>) => {
+    try {
+      await indexedDBManager.updateImage(id, updates);
+      setImages(prev => prev.map(image => 
+        image.id === id ? { ...image, ...updates } : image
+      ));
+    } catch (error) {
+      console.error('Error updating image:', error);
+      throw error;
+    }
   }, []);
 
-  const clearAll = useCallback(() => {
-    setImages([]);
-    localStorage.removeItem(STORAGE_KEY);
+  const clearAll = useCallback(async () => {
+    try {
+      await indexedDBManager.clearAll();
+      setImages([]);
+    } catch (error) {
+      console.error('Error clearing all images:', error);
+      throw error;
+    }
   }, []);
 
   const getStorageInfo = useCallback(() => {

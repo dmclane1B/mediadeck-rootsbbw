@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { indexedDBManager } from '@/utils/indexedDBManager';
 
 export interface SlideImage {
   id: string;
@@ -99,12 +100,46 @@ export const useSlideImages = () => {
     return Object.keys(slideConfig).length - Object.keys(cleanedConfig).length;
   };
 
+  const cleanupUnusedImages = async (): Promise<number> => {
+    try {
+      // Get all images from IndexedDB
+      const allImages = await indexedDBManager.getAllImages();
+      
+      // Get all used image IDs from slide configurations
+      const usedImageIds = new Set(
+        Object.values(slideConfig)
+          .map(config => config.imageId)
+          .filter(Boolean)
+      );
+      
+      // Find unused images
+      const unusedImages = allImages.filter(image => !usedImageIds.has(image.id));
+      
+      // Remove unused images
+      let deletedCount = 0;
+      for (const image of unusedImages) {
+        try {
+          await indexedDBManager.removeImage(image.id);
+          deletedCount++;
+        } catch (error) {
+          console.error(`Failed to delete unused image ${image.id}:`, error);
+        }
+      }
+      
+      return deletedCount;
+    } catch (error) {
+      console.error('Error during cleanup of unused images:', error);
+      return 0;
+    }
+  };
+
   return {
     slideConfig,
     setSlideImage,
     getSlideImage,
     clearAllConfigurations,
     cleanInvalidImages,
+    cleanupUnusedImages,
     saveConfiguration
   };
 };
