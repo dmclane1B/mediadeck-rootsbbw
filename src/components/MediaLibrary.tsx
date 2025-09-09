@@ -8,7 +8,8 @@ import { Upload, Search, Trash2, Edit, Image, Check, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import LazyImage from '@/components/LazyImage';
 import ImagePreviewModal from '@/components/ImagePreviewModal';
-import { useMediaLibrary, type MediaFile } from '@/hooks/useMediaLibrary';
+import { useMediaLibrary, type MediaFile, type UploadProgress } from '@/hooks/useMediaLibrary';
+import { formatFileSize } from '@/utils/imageCompression';
 
 interface MediaLibraryProps {
   onSelectImage?: (image: MediaFile) => void;
@@ -17,16 +18,18 @@ interface MediaLibraryProps {
 }
 
 const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: MediaLibraryProps) => {
-  const { images, loading, addImages, removeImage, updateImage, getStorageInfo } = useMediaLibrary();
+  const { images, loading, uploadProgress, addImages, removeImage, updateImage, getStorageInfo } = useMediaLibrary();
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [isDragOver, setIsDragOver] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [previewImage, setPreviewImage] = useState<MediaFile | null>(null);
+  const [currentProgress, setCurrentProgress] = useState<UploadProgress[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const storageInfo = getStorageInfo();
 
   const filteredImages = images.filter(img => 
     img.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -34,29 +37,25 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
 
   const handleFileUpload = async (files: FileList) => {
     setIsUploading(true);
-    setUploadProgress(0);
+    setCurrentProgress([]);
     
     try {
-      const totalFiles = files.length;
-      let processedFiles = 0;
-      
-      const { success, errors } = await addImages(files);
-      
-      // Show progress as files are processed
-      const progressInterval = setInterval(() => {
-        processedFiles++;
-        setUploadProgress((processedFiles / totalFiles) * 100);
-        
-        if (processedFiles >= totalFiles) {
-          clearInterval(progressInterval);
-        }
-      }, 100);
+      const { success, errors } = await addImages(files, (progress) => {
+        setCurrentProgress(progress);
+      });
       
       // Show results
       if (success.length > 0) {
+        const compressionSummary = success
+          .filter(img => img.compressionRatio && img.compressionRatio > 1.1)
+          .map(img => `${img.name}: ${formatFileSize(img.originalSize!)} → ${formatFileSize(img.size!)}`)
+          .slice(0, 3);
+        
         toast({
           title: "Images uploaded",
-          description: `Successfully uploaded ${success.length} image(s).`
+          description: compressionSummary.length > 0 
+            ? `${success.length} image(s) uploaded and compressed. ${compressionSummary.join(', ')}`
+            : `Successfully uploaded ${success.length} image(s).`
         });
       }
       
@@ -75,7 +74,7 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
       });
     } finally {
       setIsUploading(false);
-      setUploadProgress(0);
+      setCurrentProgress([]);
     }
   };
 
@@ -217,12 +216,27 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
             {isDragOver ? 'Drop images here to upload' : 'Drag and drop images here, or click to browse'}
           </p>
           
-          {isUploading && (
-            <div className="mb-4 space-y-2">
-              <Progress value={uploadProgress} className="w-full max-w-xs mx-auto" />
-              <p className="text-sm text-muted-foreground">
-                Uploading... {Math.round(uploadProgress)}%
-              </p>
+          {/* Storage Info */}
+          <div className="mb-4 text-sm text-muted-foreground">
+            <div className="flex justify-between items-center mb-1">
+              <span>Storage Used: {formatFileSize(storageInfo.totalSize)}</span>
+              <span>{Math.round(storageInfo.usagePercent)}%</span>
+            </div>
+            <Progress value={storageInfo.usagePercent} className="w-full max-w-xs mx-auto" />
+          </div>
+          
+          {/* Upload Progress */}
+          {isUploading && currentProgress.length > 0 && (
+            <div className="mb-4 space-y-2 max-w-xs mx-auto">
+              {currentProgress.map((progress) => (
+                <div key={progress.fileIndex} className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="truncate">{progress.fileName}</span>
+                    <span className="capitalize">{progress.stage}</span>
+                  </div>
+                  <Progress value={progress.progress} className="h-2" />
+                </div>
+              ))}
             </div>
           )}
           

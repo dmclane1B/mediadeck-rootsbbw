@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { compressImage, formatFileSize, type CompressionResult } from '@/utils/imageCompression';
 
 export interface MediaFile {
   id: string;
@@ -7,10 +8,20 @@ export interface MediaFile {
   uploadDate: string;
   dimensions?: { width: number; height: number };
   size?: number;
+  originalSize?: number;
+  compressionRatio?: number;
+}
+
+export interface UploadProgress {
+  fileIndex: number;
+  fileName: string;
+  progress: number;
+  stage: 'reading' | 'compressing' | 'saving' | 'complete';
 }
 
 const STORAGE_KEY = 'mediaLibrary';
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB limit (after compression)
+const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024; // 50MB original file limit
 const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50MB total limit
 
 // Convert file to base64 data URL
@@ -55,6 +66,7 @@ const cleanMediaLibrary = (images: MediaFile[]): MediaFile[] => {
 export const useMediaLibrary = () => {
   const [images, setImages] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
 
   // Load images from localStorage on mount
   useEffect(() => {
@@ -92,61 +104,99 @@ export const useMediaLibrary = () => {
     }
   }, [images, loading]);
 
-  const addImages = useCallback(async (files: FileList): Promise<{ success: MediaFile[], errors: string[] }> => {
+  const addImages = useCallback(async (
+    files: FileList,
+    onProgress?: (progress: UploadProgress[]) => void
+  ): Promise<{ success: MediaFile[], errors: string[] }> => {
     const success: MediaFile[] = [];
     const errors: string[] = [];
+    const progressArray: UploadProgress[] = [];
+    
+    // Initialize progress tracking
+    for (let i = 0; i < files.length; i++) {
+      progressArray.push({
+        fileIndex: i,
+        fileName: files[i].name,
+        progress: 0,
+        stage: 'reading'
+      });
+    }
+    setUploadProgress(progressArray);
+    onProgress?.(progressArray);
     
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       
+      const updateProgress = (progress: number, stage: UploadProgress['stage']) => {
+        progressArray[i] = { ...progressArray[i], progress, stage };
+        setUploadProgress([...progressArray]);
+        onProgress?.([...progressArray]);
+      };
+      
       // Validate file type
       if (!file.type.startsWith('image/')) {
         errors.push(`${file.name}: Not an image file`);
+        updateProgress(100, 'complete');
         continue;
       }
       
-      // Validate file size
-      if (file.size > MAX_FILE_SIZE) {
-        errors.push(`${file.name}: File too large (max 5MB)`);
+      // Validate original file size
+      if (file.size > MAX_ORIGINAL_SIZE) {
+        errors.push(`${file.name}: File too large (max ${formatFileSize(MAX_ORIGINAL_SIZE)})`);
+        updateProgress(100, 'complete');
         continue;
       }
       
       try {
-        // Convert to base64
-        const dataUrl = await fileToBase64(file);
+        updateProgress(10, 'reading');
         
-        // Check total storage limit
+        // Compress the image
+        updateProgress(20, 'compressing');
+        const compressionResult = await compressImage(
+          file, 
+          { maxSizeBytes: MAX_FILE_SIZE },
+          (compressProgress) => {
+            updateProgress(20 + (compressProgress * 0.6), 'compressing');
+          }
+        );
+        
+        updateProgress(85, 'saving');
+        
+        // Check total storage limit with compressed size
         const currentSize = calculateTotalSize(images) + calculateTotalSize(success);
-        if (currentSize + file.size > MAX_TOTAL_SIZE) {
-          errors.push(`${file.name}: Storage limit exceeded (max 50MB total)`);
+        if (currentSize + compressionResult.compressedSize > MAX_TOTAL_SIZE) {
+          errors.push(`${file.name}: Storage limit exceeded (max ${formatFileSize(MAX_TOTAL_SIZE)} total)`);
+          updateProgress(100, 'complete');
           continue;
         }
         
         const newImage: MediaFile = {
           id: `img-${Date.now()}-${i}`,
           name: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
-          url: dataUrl,
+          url: compressionResult.compressedFile,
           uploadDate: new Date().toISOString(),
-          size: file.size
+          size: compressionResult.compressedSize,
+          originalSize: compressionResult.originalSize,
+          compressionRatio: compressionResult.compressionRatio,
+          dimensions: compressionResult.dimensions
         };
         
-        // Get dimensions asynchronously
-        try {
-          const dimensions = await getImageDimensions(dataUrl);
-          newImage.dimensions = dimensions;
-        } catch {
-          // Dimensions loading failed, but that's okay
-        }
-        
+        updateProgress(100, 'complete');
         success.push(newImage);
       } catch (error) {
         errors.push(`${file.name}: Failed to process file`);
+        updateProgress(100, 'complete');
       }
     }
     
     if (success.length > 0) {
       setImages(prev => [...prev, ...success]);
     }
+    
+    // Clear progress after a delay
+    setTimeout(() => {
+      setUploadProgress([]);
+    }, 2000);
     
     return { success, errors };
   }, [images]);
@@ -184,6 +234,7 @@ export const useMediaLibrary = () => {
   return {
     images,
     loading,
+    uploadProgress,
     addImages,
     removeImage,
     updateImage,
