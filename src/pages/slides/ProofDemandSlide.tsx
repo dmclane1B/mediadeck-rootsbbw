@@ -2,8 +2,13 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import useSlideImages from '@/hooks/useSlideImages';
+
 const ProofDemandSlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('proof-demand');
   return <div className="min-h-screen bg-gradient-to-br from-primary via-accent to-success flex items-center justify-center relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 opacity-10">
@@ -33,13 +38,23 @@ const ProofDemandSlide = () => {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-8">
         {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
+        <div className="text-center mb-12 animate-fade-in">
           <div className="text-white/60 text-lg font-inter mb-4">Market Validation & Demand Analysis</div>
           <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight font-space mb-8">
             PROOF OF <span className="text-white/80">DEMAND</span><br />
             AND <span className="text-white/80">MARKET FIT</span>
           </h1>
           <div className="w-32 h-1 bg-white/80 mx-auto mb-8 animate-scale-in"></div>
+        </div>
+
+        {/* Image Showcase */}
+        <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <ImageShowcase
+            imageUrl={slideImage?.imageUrl}
+            imageAlt={slideImage?.imageAlt || 'Proof of Demand'}
+            variant="hero"
+            className="mx-auto max-w-4xl"
+          />
         </div>
 
         {/* Proof Points */}

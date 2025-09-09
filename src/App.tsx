@@ -19,6 +19,7 @@ import TeamLeadershipSlide from "./pages/slides/TeamLeadershipSlide";
 import RoadmapSlide from "./pages/slides/RoadmapSlide";
 import AskSlide from "./pages/slides/AskSlide";
 import ContactSlide from "./pages/slides/ContactSlide";
+import MediaDashboard from "./pages/MediaDashboard";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/slides/roadmap" element={<RoadmapSlide />} />
           <Route path="/slides/ask" element={<AskSlide />} />
           <Route path="/slides/contact" element={<ContactSlide />} />
+          <Route path="/media" element={<MediaDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import SlideEditor from '@/components/SlideEditor';
 import SlideTemplates from '@/components/SlideTemplates';
 import PWAInstallButton from '@/components/PWAInstallButton';
-import { Presentation, Sparkles, Zap } from 'lucide-react';
+import { Presentation, Sparkles, Zap, Image } from 'lucide-react';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'home' | 'templates' | 'editor'>('home');
@@ -114,10 +114,20 @@ const Index = () => {
                 variant="outline" 
                 size="lg" 
                 onClick={() => window.location.href = '/slides/title'}
-                className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-white/50 text-white/90 hover:bg-white/5"
+                className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-white/50 text-white/90 hover:bg-white/5 mr-4"
               >
                 <Presentation className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 DX1 Presentation
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="lg" 
+                onClick={() => window.location.href = '/media'}
+                className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-white/50 text-white/90 hover:bg-white/5"
+              >
+                <Image className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                Media Dashboard
               </Button>
             </div>
             

@@ -4,9 +4,13 @@ import { Card } from '@/components/ui/card';
 import { Target, Users, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
+import ImageShowcase from '@/components/ImageShowcase';
+import useSlideImages from '@/hooks/useSlideImages';
 
 const SalesStrategySlide = () => {
   const navigate = useNavigate();
+  const { getSlideImage } = useSlideImages();
+  const slideImage = getSlideImage('sales-strategy');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-success flex items-center justify-center relative overflow-hidden">
@@ -37,7 +41,7 @@ const SalesStrategySlide = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
         {/* Header */}
-        <div className="text-center mb-16 animate-fade-in">
+        <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-6xl md:text-8xl font-bold text-white leading-tight font-space mb-8">
             SALES <span className="text-white/80">STRATEGY</span>
           </h1>
@@ -45,6 +49,16 @@ const SalesStrategySlide = () => {
           <p className="text-xl text-white/80 max-w-4xl mx-auto font-inter leading-relaxed">
             Strategic approach to penetrate the sports communication market and drive rapid adoption
           </p>
+        </div>
+
+        {/* Image Showcase */}
+        <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <ImageShowcase
+            imageUrl={slideImage?.imageUrl}
+            imageAlt={slideImage?.imageAlt || 'Sales Strategy'}
+            variant="hero"
+            className="mx-auto max-w-4xl"
+          />
         </div>
 
         {/* Strategy Components */}
