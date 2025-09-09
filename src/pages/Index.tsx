@@ -113,20 +113,20 @@ const Index = () => {
             {/* View Sample Slides Button */}
             <div className="text-center">
               <Button 
-                variant="outline" 
+                variant="outline-white" 
                 size="lg" 
                 onClick={() => navigate('/slides/title')}
-                className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-white/50 text-white/90 hover:bg-white/5 mr-4"
+                className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 mr-4"
               >
                 <Presentation className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 DX1 Presentation
               </Button>
               
               <Button 
-                variant="outline" 
+                variant="outline-white" 
                 size="lg" 
                 onClick={() => navigate('/media')}
-                className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-white/50 text-white/90 hover:bg-white/5"
+                className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6"
               >
                 <Image className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Media Dashboard
