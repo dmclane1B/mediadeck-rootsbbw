@@ -59,7 +59,7 @@ const MediaDashboard = () => {
         });
       } catch (error) {
         console.error('Error selecting image:', error);
-        if (error instanceof Error && error.name === 'QuotaExceededError') {
+        if (error instanceof Error && (error.name === 'QuotaExceededError' || error.message.includes('QuotaExceededError'))) {
           toast({
             title: "Storage Full",
             description: "Your browser storage is full. Please clear some images from your media library.",

@@ -98,7 +98,9 @@ export const useSlideImages = () => {
     } catch (error) {
       console.error('Failed to save slide configuration:', error);
       if (error instanceof Error && error.name === 'QuotaExceededError') {
-        throw new Error('QuotaExceededError');
+        const quotaError = new Error('Storage quota exceeded');
+        quotaError.name = 'QuotaExceededError';
+        throw quotaError;
       }
       throw error;
     }
