@@ -50,16 +50,16 @@ const ChallengesSlide = () => {
         </Button>
       </div>
 
-      {/* DX1 Branding */}
+      {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <img src="/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png" alt="DX1 Logo" className="h-8 w-auto ml-auto mb-2" />
+        <div className="text-primary text-2xl font-space font-bold mb-2">ROOTS</div>
         <div className="text-accent text-xl font-space font-bold">03</div>
       </div>
 
-      {/* The Problem Tab */}
+      {/* Why This Matters Tab */}
       <div className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-accent to-primary text-white px-6 py-20 rounded-l-lg shadow-elegant animate-slide-in">
         <div className="transform rotate-90 text-lg font-medium whitespace-nowrap font-space">
-          THE PROBLEM
+          WHY THIS MATTERS
         </div>
       </div>
 
@@ -70,22 +70,22 @@ const ChallengesSlide = () => {
           <div className="space-y-8 animate-fade-in">
             <div>
               <h1 className="text-5xl md:text-7xl font-black text-foreground mb-4 font-space leading-tight">
-                THE
+                WHY THIS
               </h1>
               <h1 className="text-5xl md:text-7xl font-black text-accent mb-4 font-space leading-tight animate-slide-in">
-                CHALLENGES
+                MATTERS
               </h1>
               <div className="w-32 h-1 bg-gradient-to-r from-accent to-primary animate-scale-in"></div>
             </div>
             
             <p className="text-xl text-muted-foreground leading-relaxed font-inter animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              Modern sports communication still has significant room for improvement. Here are some <span className="font-semibold text-accent">key challenges</span> teams face today:
+              Black Breastfeeding Week addresses critical health disparities in our community. Here are the <span className="font-semibold text-accent">key challenges</span> we're working to overcome:
             </p>
             
             {/* Problem Statement */}
             <div className="bg-card/50 backdrop-blur-sm p-6 rounded-lg border border-accent/20 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-              <div className="text-accent font-medium text-sm mb-2">CURRENT STATE</div>
-              <div className="text-foreground font-semibold">Teams are stuck with outdated communication methods that cost them games.</div>
+              <div className="text-accent font-medium text-sm mb-2">CURRENT REALITY</div>
+              <div className="text-foreground font-semibold">In the Black community, breastfeeding rates are lower compared to other communities, contributing to health disparities.</div>
             </div>
           </div>
 
@@ -105,36 +105,36 @@ const ChallengesSlide = () => {
           <div className="flex items-start gap-6 group animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <div className="text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300">1.</div>
             <div className="space-y-3 flex-1">
-              <h3 className="text-2xl font-bold text-accent font-space">Inefficient Traditional Methods</h3>
+              <h3 className="text-2xl font-bold text-accent font-space">Lower Breastfeeding Rates</h3>
               <div className="w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
               <p className="text-muted-foreground font-inter leading-relaxed">
-                Hand signals, shouting, and call cards <span className="font-medium text-foreground bg-accent/10 px-1 rounded">slow down</span> decision-making and <span className="font-medium text-foreground bg-accent/10 px-1 rounded">hinder</span> coordination during critical moments
+                Black women have <span className="font-medium text-foreground bg-accent/10 px-1 rounded">significantly lower</span> breastfeeding initiation and duration rates compared to other racial groups, affecting long-term health outcomes
               </p>
-              <div className="text-sm text-accent font-medium">→ Lost seconds = Lost games</div>
+              <div className="text-sm text-accent font-medium">→ Health disparities start early</div>
             </div>
           </div>
 
           <div className="flex items-start gap-6 group animate-fade-in" style={{ animationDelay: '0.6s' }}>
             <div className="text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300">2.</div>
             <div className="space-y-3 flex-1">
-              <h3 className="text-2xl font-bold text-accent font-space">Risk of Interceptions</h3>
+              <h3 className="text-2xl font-bold text-accent font-space">Maternal Mortality Crisis</h3>
               <div className="w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
               <p className="text-muted-foreground font-inter leading-relaxed">
-                Without secure communication, teams are <span className="font-medium text-foreground bg-accent/10 px-1 rounded">vulnerable</span> to interception and sabotage, weakening their competitive edge
+                Black women are <span className="font-medium text-foreground bg-accent/10 px-1 rounded">three to four times</span> more likely to die from pregnancy-related complications, highlighting critical gaps in maternal healthcare
               </p>
-              <div className="text-sm text-accent font-medium">→ Exposed strategies = Predictable plays</div>
+              <div className="text-sm text-accent font-medium">→ Lives depend on addressing this crisis</div>
             </div>
           </div>
 
           <div className="flex items-start gap-6 group animate-fade-in" style={{ animationDelay: '0.8s' }}>
             <div className="text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300">3.</div>
             <div className="space-y-3 flex-1">
-              <h3 className="text-2xl font-bold text-accent font-space">Slow Strategic Adjustments</h3>
+              <h3 className="text-2xl font-bold text-accent font-space">Structural Barriers</h3>
               <div className="w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
               <p className="text-muted-foreground font-inter leading-relaxed">
-                Delays in adjusting player shifts, pitch calls, and other strategies can result in <span className="font-medium text-foreground bg-accent/10 px-1 rounded">missed opportunities</span> and ultimately <span className="font-medium text-foreground bg-accent/10 px-1 rounded">affect</span> the <span className="font-medium text-foreground bg-accent/10 px-1 rounded">outcome</span> of the game.
+                <span className="font-medium text-foreground bg-accent/10 px-1 rounded">Systemic inequities</span> in healthcare access, workplace support, and community resources create barriers to successful breastfeeding journeys
               </p>
-              <div className="text-sm text-accent font-medium">→ Slow adaptation = Championship losses</div>
+              <div className="text-sm text-accent font-medium">→ Change requires community action</div>
             </div>
           </div>
         </div>
@@ -142,8 +142,8 @@ const ChallengesSlide = () => {
 
       {/* Bottom Tagline */}
       <div className="absolute bottom-16 left-8 animate-fade-in" style={{ animationDelay: '1s' }}>
-        <div className="text-accent font-bold font-space text-lg">ELEVATE YOUR GAME.</div>
-        <div className="text-muted-foreground text-sm font-inter">Identify. Solve. Dominate.</div>
+        <div className="text-accent font-bold font-space text-lg">TOGETHER WE THRIVE.</div>
+        <div className="text-muted-foreground text-sm font-inter">Educate. Support. Empower.</div>
       </div>
 
       {/* Slide Navigation */}

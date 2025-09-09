@@ -40,9 +40,9 @@ const TitleSlide = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-background/95 to-muted/95"></div>
       </div>
       
-      {/* DX1 Branding */}
+      {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <img src="/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png" alt="DX1 Logo" className="h-8 w-auto ml-auto mb-2" />
+        <div className="text-primary text-2xl font-space font-bold mb-2">ROOTS</div>
         <div className="text-muted-foreground text-xl font-space font-bold">01</div>
       </div>
 
@@ -61,17 +61,17 @@ const TitleSlide = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto px-4 sm:px-8 animate-fade-in z-10 relative items-center">
         <div className="order-2 lg:order-1">
           <div className="mb-8 sm:mb-12">
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-none mb-4 sm:mb-8">
-              DX1
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-tight mb-4 sm:mb-8">
+              BLACK BREASTFEEDING WEEK
             </h1>
-            <div className="text-xl sm:text-2xl md:text-3xl text-muted-foreground font-inter mb-4 sm:mb-8">
-              ELEVATE YOUR GAME
+            <div className="text-xl sm:text-2xl md:text-3xl text-primary font-inter mb-4 sm:mb-8">
+              AUGUST 25-31, 2025
             </div>
             <div className="w-20 sm:w-32 h-1 bg-primary animate-fade-in" style={{ animationDelay: '0.5s' }}></div>
           </div>
           
           <div className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '1s' }}>
-            We are revolutionizing sports communication through AI-driven, encrypted coordination that combines the speed of real-time technology with the intelligence of advanced analytics.
+            Join Roots Community Health in celebrating and promoting Black Breastfeeding Week! A week dedicated to raising awareness about the importance of breastfeeding, particularly within our community.
           </div>
           
           <Button 
@@ -79,7 +79,7 @@ const TitleSlide = () => {
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 text-lg animate-fade-in shadow-lg"
             style={{ animationDelay: '1.2s' }}
           >
-            View Presentation Overview
+            View Week Overview
           </Button>
         </div>
 

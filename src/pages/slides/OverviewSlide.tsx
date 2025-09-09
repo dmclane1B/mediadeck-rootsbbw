@@ -12,112 +12,112 @@ import { useSlideImages } from '@/hooks/useSlideImages';
 const slides = [
   {
     number: 1,
-    title: "Title",
-    description: "Introduction to DX1",
+    title: "Welcome",
+    description: "Black Breastfeeding Week 2025",
     icon: Target,
     route: "/",
     section: "Introduction"
   },
   {
     number: 2,
-    title: "Overview",
-    description: "Presentation overview",
+    title: "Week Overview",
+    description: "Complete schedule and activities",
     icon: BarChart3,
     route: "/slides/overview",
-    section: "Navigation"
+    section: "Schedule"
   },
   {
     number: 3,
-    title: "Challenges",
-    description: "Current market problems",
+    title: "Why This Matters",
+    description: "Addressing challenges in our community",
     icon: Target,
     route: "/slides/challenges",
-    section: "Problem"
+    section: "Impact"
   },
   {
     number: 4,
-    title: "Product Glimpse",
-    description: "Our solution overview",
+    title: "Monday Kick-Off",
+    description: "Virtual welcome & discussion",
     icon: Lightbulb,
     route: "/slides/product-glimpse",
-    section: "Solution"
+    section: "Events"
   },
   {
     number: 5,
-    title: "Product Page",
-    description: "Detailed product features",
+    title: "Expert Panel",
+    description: "Board-certified lactation consultant",
     icon: Shield,
     route: "/slides/product-page",
-    section: "Solution"
+    section: "Events"
   },
   {
     number: 6,
-    title: "Market Overview",
-    description: "Market size and opportunity",
-    icon: BarChart3,
+    title: "Community Voices",
+    description: "Panel discussion with local mothers",
+    icon: Users,
     route: "/slides/market-overview",
-    section: "Market"
+    section: "Events"
   },
   {
     number: 7,
-    title: "Proof of Demand",
-    description: "Market validation evidence",
+    title: "Wellness Fair",
+    description: "Friday celebration and resources",
     icon: TrendingUp,
     route: "/slides/proof-demand",
-    section: "Market"
+    section: "Events"
   },
   {
     number: 8,
-    title: "Sales Strategy",
-    description: "Go-to-market approach",
+    title: "Workout Session",
+    description: "Fitness and wellness activities",
     icon: Zap,
     route: "/slides/sales-strategy",
-    section: "Business"
+    section: "Activities"
   },
   {
     number: 9,
-    title: "Customer Persona",
-    description: "Target audience profile",
+    title: "Smoothie Demo",
+    description: "Led by our very own Jocelyn",
     icon: Users,
     route: "/slides/customer-persona",
-    section: "Business"
+    section: "Activities"
   },
   {
     number: 10,
-    title: "Value Propositions",
-    description: "Our competitive advantages",
+    title: "Resources & Support",
+    description: "Available community services",
     icon: MapPin,
     route: "/slides/value-propositions",
-    section: "Business"
+    section: "Support"
   },
   {
     number: 11,
-    title: "Team Leadership",
-    description: "Our core team",
+    title: "Community Partners",
+    description: "Organizations supporting the week",
     icon: Users,
     route: "/slides/team-leadership",
-    section: "Team"
+    section: "Partners"
   },
   {
     number: 12,
-    title: "Roadmap",
-    description: "Future development plans",
+    title: "How to Participate",
+    description: "RSVP and join the movement",
     icon: Calendar,
     route: "/slides/roadmap",
-    section: "Execution"
+    section: "Action"
   },
   {
     number: 13,
-    title: "The Ask",
-    description: "Investment opportunity",
+    title: "Register Today",
+    description: "Don't miss these important events",
     icon: DollarSign,
     route: "/slides/ask",
-    section: "Investment"
+    section: "RSVP"
   },
   {
     number: 14,
-    title: "Contact",
-    description: "Get in touch with our team",
+    title: "Contact Us",
+    description: "Roots Community Health information",
     icon: Mail,
     route: "/slides/contact",
     section: "Connect"
@@ -161,9 +161,9 @@ const OverviewSlide = () => {
       </div>
 
 
-      {/* DX1 Branding */}
+      {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <img src="/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png" alt="DX1 Logo" className="h-8 w-auto ml-auto mb-2" />
+        <div className="text-primary text-2xl font-space font-bold mb-2">ROOTS</div>
         <div className="text-slate-500 text-xl font-space font-bold">02</div>
       </div>
 
@@ -184,10 +184,10 @@ const OverviewSlide = () => {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 font-space">
-              PRESENTATION OVERVIEW
+              BLACK BREASTFEEDING WEEK
             </h1>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-6">
-              Navigate through our comprehensive pitch deck covering problem, solution, market opportunity, and investment ask
+              A comprehensive week of events, education, and community support celebrating and promoting breastfeeding in the Black community
             </p>
             <div className="w-32 h-1 bg-primary mx-auto"></div>
           </div>
@@ -245,7 +245,7 @@ const OverviewSlide = () => {
           {/* Estimated Duration */}
           <div className="text-center mt-12">
             <p className="text-slate-500">
-              <strong>Estimated Duration:</strong> 15-20 minutes
+              <strong>Event Week:</strong> August 25-31, 2025 | <strong>Location:</strong> Community & Virtual Events
             </p>
           </div>
         </div>
