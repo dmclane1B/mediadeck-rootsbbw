@@ -31,6 +31,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<TitleSlide />} />
+          <Route path="/slides/title" element={<TitleSlide />} />
           <Route path="/builder" element={<Index />} />
           <Route path="/slides/overview" element={<OverviewSlide />} />
           <Route path="/slides/challenges" element={<ChallengesSlide />} />

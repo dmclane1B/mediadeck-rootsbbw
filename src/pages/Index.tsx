@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import SlideEditor from '@/components/SlideEditor';
@@ -8,6 +9,7 @@ import { Presentation, Sparkles, Zap, Image } from 'lucide-react';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'home' | 'templates' | 'editor'>('home');
+  const navigate = useNavigate();
 
   const handleSelectTemplate = (templateId: string) => {
     setCurrentView('editor');
@@ -113,7 +115,7 @@ const Index = () => {
               <Button 
                 variant="outline" 
                 size="lg" 
-                onClick={() => window.location.href = '/slides/title'}
+                onClick={() => navigate('/slides/title')}
                 className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-white/50 text-white/90 hover:bg-white/5 mr-4"
               >
                 <Presentation className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
@@ -123,7 +125,7 @@ const Index = () => {
               <Button 
                 variant="outline" 
                 size="lg" 
-                onClick={() => window.location.href = '/media'}
+                onClick={() => navigate('/media')}
                 className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-white/50 text-white/90 hover:bg-white/5"
               >
                 <Image className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
