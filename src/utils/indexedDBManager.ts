@@ -1,7 +1,8 @@
-// IndexedDB Manager for Media Storage
+// IndexedDB Manager for Media Storage and Slide Configurations
 const DB_NAME = 'LovableMediaDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'mediaFiles';
+const SLIDE_CONFIG_STORE = 'slideConfigurations';
 
 export interface MediaFile {
   id: string;
@@ -12,9 +13,18 @@ export interface MediaFile {
   size?: number;
 }
 
+export interface SlideConfiguration {
+  slideId: string;
+  imageId: string;
+  imageAlt?: string;
+  lastUpdated: string;
+}
+
 class IndexedDBManager {
   private db: IDBDatabase | null = null;
   private dbPromise: Promise<IDBDatabase> | null = null;
+  private initialized = false;
+  private initPromise: Promise<void> | null = null;
 
   private async openDB(): Promise<IDBDatabase> {
     if (this.db) {
@@ -40,16 +50,40 @@ class IndexedDBManager {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
         
-        // Create object store if it doesn't exist
+        // Create media files store if it doesn't exist
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
           store.createIndex('uploadDate', 'uploadDate', { unique: false });
           store.createIndex('size', 'size', { unique: false });
         }
+        
+        // Create slide configurations store if it doesn't exist
+        if (!db.objectStoreNames.contains(SLIDE_CONFIG_STORE)) {
+          const slideStore = db.createObjectStore(SLIDE_CONFIG_STORE, { keyPath: 'slideId' });
+          slideStore.createIndex('lastUpdated', 'lastUpdated', { unique: false });
+        }
       };
     });
 
     return this.dbPromise;
+  }
+
+  async initialize(): Promise<void> {
+    if (this.initialized) return;
+    
+    if (this.initPromise) return this.initPromise;
+    
+    this.initPromise = (async () => {
+      try {
+        await this.openDB();
+        this.initialized = true;
+      } catch (error) {
+        console.error('Failed to initialize IndexedDB:', error);
+        throw error;
+      }
+    })();
+    
+    return this.initPromise;
   }
 
   async getAllImages(): Promise<MediaFile[]> {
@@ -250,6 +284,161 @@ class IndexedDBManager {
       console.error('Error during cleanup:', error);
       return 0;
     }
+  }
+
+  // Slide Configuration Management
+  async getSlideConfiguration(slideId: string): Promise<SlideConfiguration | null> {
+    try {
+      await this.initialize();
+      const db = await this.openDB();
+      const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readonly');
+      const store = transaction.objectStore(SLIDE_CONFIG_STORE);
+      
+      return new Promise((resolve, reject) => {
+        const request = store.get(slideId);
+        
+        request.onsuccess = () => {
+          resolve(request.result || null);
+        };
+        
+        request.onerror = () => {
+          reject(new Error(`Error getting slide configuration: ${request.error?.message}`));
+        };
+      });
+    } catch (error) {
+      console.error('Error in getSlideConfiguration:', error);
+      return null;
+    }
+  }
+
+  async setSlideConfiguration(config: SlideConfiguration): Promise<void> {
+    await this.initialize();
+    const db = await this.openDB();
+    const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readwrite');
+    const store = transaction.objectStore(SLIDE_CONFIG_STORE);
+    
+    return new Promise((resolve, reject) => {
+      const request = store.put(config);
+      
+      request.onsuccess = () => {
+        resolve();
+      };
+      
+      request.onerror = () => {
+        reject(new Error(`Error setting slide configuration: ${request.error?.message}`));
+      };
+    });
+  }
+
+  async getAllSlideConfigurations(): Promise<SlideConfiguration[]> {
+    try {
+      await this.initialize();
+      const db = await this.openDB();
+      const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readonly');
+      const store = transaction.objectStore(SLIDE_CONFIG_STORE);
+      
+      return new Promise((resolve, reject) => {
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          resolve(request.result || []);
+        };
+        
+        request.onerror = () => {
+          reject(new Error(`Error getting all slide configurations: ${request.error?.message}`));
+        };
+      });
+    } catch (error) {
+      console.error('Error in getAllSlideConfigurations:', error);
+      return [];
+    }
+  }
+
+  async removeSlideConfiguration(slideId: string): Promise<void> {
+    await this.initialize();
+    const db = await this.openDB();
+    const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readwrite');
+    const store = transaction.objectStore(SLIDE_CONFIG_STORE);
+    
+    return new Promise((resolve, reject) => {
+      const request = store.delete(slideId);
+      
+      request.onsuccess = () => {
+        resolve();
+      };
+      
+      request.onerror = () => {
+        reject(new Error(`Error removing slide configuration: ${request.error?.message}`));
+      };
+    });
+  }
+
+  async clearAllSlideConfigurations(): Promise<void> {
+    await this.initialize();
+    const db = await this.openDB();
+    const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readwrite');
+    const store = transaction.objectStore(SLIDE_CONFIG_STORE);
+    
+    return new Promise((resolve, reject) => {
+      const request = store.clear();
+      
+      request.onsuccess = () => {
+        resolve();
+      };
+      
+      request.onerror = () => {
+        reject(new Error(`Error clearing slide configurations: ${request.error?.message}`));
+      };
+    });
+  }
+
+  // Migration from localStorage
+  async migrateFromLocalStorage(): Promise<{ migrated: number; errors: string[] }> {
+    const results = { migrated: 0, errors: [] };
+    
+    try {
+      await this.initialize();
+      
+      // Check for existing localStorage slide configurations
+      const SLIDE_CONFIG_KEY = 'slide-configurations';
+      const savedConfig = localStorage.getItem(SLIDE_CONFIG_KEY);
+      
+      if (savedConfig) {
+        try {
+          const parsedConfig = JSON.parse(savedConfig);
+          
+          // Convert localStorage format to IndexedDB format
+          for (const [slideId, slideData] of Object.entries(parsedConfig)) {
+            if (slideData && typeof slideData === 'object' && (slideData as any).imageId) {
+              const config: SlideConfiguration = {
+                slideId,
+                imageId: (slideData as any).imageId,
+                imageAlt: (slideData as any).imageAlt,
+                lastUpdated: new Date().toISOString()
+              };
+              
+              try {
+                await this.setSlideConfiguration(config);
+                results.migrated++;
+              } catch (error) {
+                results.errors.push(`Failed to migrate slide ${slideId}: ${error}`);
+              }
+            }
+          }
+          
+          // Remove old localStorage data after successful migration
+          if (results.migrated > 0) {
+            localStorage.removeItem(SLIDE_CONFIG_KEY);
+          }
+        } catch (error) {
+          results.errors.push(`Failed to parse localStorage data: ${error}`);
+        }
+      }
+    } catch (error) {
+      results.errors.push(`Migration failed: ${error}`);
+    }
+    
+    return results;
   }
 }
 

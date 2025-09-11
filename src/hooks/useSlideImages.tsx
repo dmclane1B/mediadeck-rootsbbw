@@ -17,87 +17,154 @@ export interface SlideConfiguration {
   };
 }
 
-const SLIDE_CONFIG_KEY = 'slide-configurations';
-
-// Clean configuration by removing invalid entries
-const cleanSlideConfiguration = (config: SlideConfiguration): SlideConfiguration => {
-  const cleanedConfig: SlideConfiguration = {};
-  
-  Object.entries(config).forEach(([slideId, slideData]) => {
-    if (slideData?.imageId) {
-      cleanedConfig[slideId] = slideData;
-    }
-  });
-  
-  return cleanedConfig;
-};
-
 export const useSlideImages = () => {
   const [slideConfig, setSlideConfig] = useState<SlideConfiguration>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    const savedConfig = localStorage.getItem(SLIDE_CONFIG_KEY);
-    if (savedConfig) {
+    const loadConfigurations = async () => {
       try {
-        const parsedConfig = JSON.parse(savedConfig);
-        const cleanedConfig = cleanSlideConfiguration(parsedConfig);
+        setLoading(true);
+        setError(null);
         
-        // If we had to clean invalid entries, save the cleaned version
-        if (Object.keys(cleanedConfig).length !== Object.keys(parsedConfig).length) {
-          console.log('Cleaned invalid image URLs from slide configuration');
-          localStorage.setItem(SLIDE_CONFIG_KEY, JSON.stringify(cleanedConfig));
+        // Initialize IndexedDB
+        await indexedDBManager.initialize();
+        
+        // Try migration from localStorage first
+        const migrationResult = await indexedDBManager.migrateFromLocalStorage();
+        if (migrationResult.migrated > 0) {
+          console.log(`Migrated ${migrationResult.migrated} slide configurations from localStorage`);
+        }
+        if (migrationResult.errors.length > 0) {
+          console.warn('Migration errors:', migrationResult.errors);
         }
         
-        setSlideConfig(cleanedConfig);
+        // Load configurations from IndexedDB
+        const configs = await indexedDBManager.getAllSlideConfigurations();
+        const configMap: SlideConfiguration = {};
+        
+        configs.forEach(config => {
+          configMap[config.slideId] = {
+            imageId: config.imageId,
+            imageAlt: config.imageAlt
+          };
+        });
+        
+        setSlideConfig(configMap);
       } catch (error) {
         console.error('Error loading slide configurations:', error);
+        setError(error instanceof Error ? error.message : 'Unknown error');
+        // Fallback to empty configuration
+        setSlideConfig({});
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
+    loadConfigurations();
   }, []);
 
-  const saveConfiguration = (config: SlideConfiguration) => {
+  const saveConfiguration = async (config: SlideConfiguration) => {
     setSlideConfig(config);
     try {
-      localStorage.setItem(SLIDE_CONFIG_KEY, JSON.stringify(config));
+      // Save each configuration to IndexedDB
+      for (const [slideId, slideData] of Object.entries(config)) {
+        if (slideData?.imageId) {
+          await indexedDBManager.setSlideConfiguration({
+            slideId,
+            imageId: slideData.imageId,
+            imageAlt: slideData.imageAlt,
+            lastUpdated: new Date().toISOString()
+          });
+        }
+      }
     } catch (error) {
       console.error('Failed to save slide configuration:', error);
-      if (error instanceof Error && error.name === 'QuotaExceededError') {
-        const quotaError = new Error('Storage quota exceeded');
-        quotaError.name = 'QuotaExceededError';
-        throw quotaError;
-      }
+      setError(error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   };
 
-  const setSlideImage = (slideId: string, image: SlideImage | null) => {
-    const newConfig = { ...slideConfig };
-    
-    if (image) {
-      newConfig[slideId] = {
-        imageId: image.id,
-        imageAlt: image.name
-      };
-    } else {
-      delete newConfig[slideId];
+  const setSlideImage = async (slideId: string, image: SlideImage | null) => {
+    try {
+      if (image) {
+        // Add/update slide configuration
+        await indexedDBManager.setSlideConfiguration({
+          slideId,
+          imageId: image.id,
+          imageAlt: image.name,
+          lastUpdated: new Date().toISOString()
+        });
+        
+        // Update local state
+        setSlideConfig(prev => ({
+          ...prev,
+          [slideId]: {
+            imageId: image.id,
+            imageAlt: image.name
+          }
+        }));
+      } else {
+        // Remove slide configuration
+        await indexedDBManager.removeSlideConfiguration(slideId);
+        
+        // Update local state
+        setSlideConfig(prev => {
+          const newConfig = { ...prev };
+          delete newConfig[slideId];
+          return newConfig;
+        });
+      }
+    } catch (error) {
+      console.error('Error setting slide image:', error);
+      setError(error instanceof Error ? error.message : 'Unknown error');
+      throw error;
     }
-    
-    saveConfiguration(newConfig);
   };
 
   const getSlideImage = (slideId: string) => {
     return slideConfig[slideId] || null;
   };
 
-  const clearAllConfigurations = () => {
-    setSlideConfig({});
-    localStorage.removeItem(SLIDE_CONFIG_KEY);
+  const clearAllConfigurations = async () => {
+    try {
+      await indexedDBManager.clearAllSlideConfigurations();
+      setSlideConfig({});
+    } catch (error) {
+      console.error('Error clearing configurations:', error);
+      setError(error instanceof Error ? error.message : 'Unknown error');
+      throw error;
+    }
   };
 
-  const cleanInvalidImages = () => {
-    const cleanedConfig = cleanSlideConfiguration(slideConfig);
-    saveConfiguration(cleanedConfig);
-    return Object.keys(slideConfig).length - Object.keys(cleanedConfig).length;
+  const cleanInvalidImages = async () => {
+    try {
+      // Get all images to validate configurations
+      const allImages = await indexedDBManager.getAllImages();
+      const validImageIds = new Set(allImages.map(img => img.id));
+      
+      let cleanedCount = 0;
+      const cleanedConfig: SlideConfiguration = {};
+      
+      // Check each configuration
+      for (const [slideId, slideData] of Object.entries(slideConfig)) {
+        if (slideData?.imageId && validImageIds.has(slideData.imageId)) {
+          cleanedConfig[slideId] = slideData;
+        } else {
+          // Remove invalid configuration
+          await indexedDBManager.removeSlideConfiguration(slideId);
+          cleanedCount++;
+        }
+      }
+      
+      setSlideConfig(cleanedConfig);
+      return cleanedCount;
+    } catch (error) {
+      console.error('Error cleaning invalid images:', error);
+      setError(error instanceof Error ? error.message : 'Unknown error');
+      return 0;
+    }
   };
 
   const cleanupUnusedImages = async (): Promise<number> => {
@@ -135,6 +202,8 @@ export const useSlideImages = () => {
 
   return {
     slideConfig,
+    loading,
+    error,
     setSlideImage,
     getSlideImage,
     clearAllConfigurations,
