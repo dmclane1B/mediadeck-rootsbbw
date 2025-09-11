@@ -46,5 +46,13 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Defer service worker registration to prevent render blocking -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/registerSW.js');
+        });
+      }
+    </script>
   </body>
 </html>
