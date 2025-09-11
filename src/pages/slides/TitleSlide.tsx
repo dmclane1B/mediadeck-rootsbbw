@@ -8,11 +8,12 @@ import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImages } from '@/hooks/useSlideImages';
 import { useSlideContent } from '@/hooks/useSlideContent';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const TitleSlide = () => {
   const navigate = useNavigate();
   const { getSlideImage } = useSlideImages();
-  const { getSlideContent } = useSlideContent();
+  const { getSlideContent, loading } = useSlideContent();
   const slideImage = getSlideImage('title');
   const slideContent = getSlideContent('title');
 
@@ -63,27 +64,40 @@ const TitleSlide = () => {
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 max-w-7xl mx-auto px-4 sm:px-8 animate-fade-in z-10 relative items-center">
         <div className="order-2 lg:order-1 lg:col-span-2">
-          <div className="mb-8 sm:mb-12">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-tight mb-4 sm:mb-8">
-              {slideContent?.title || 'ROOTS COMMUNITY HEALTH'}
-            </h1>
-            <div className="text-xl sm:text-2xl md:text-3xl text-primary font-inter mb-4 sm:mb-8">
-              {slideContent?.subtitle || 'HEALING OUR COMMUNITY FROM WITHIN'}
+          {loading ? (
+            <div className="mb-8 sm:mb-12 space-y-4">
+              <Skeleton className="h-16 w-full max-w-lg" />
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-1 w-32" />
+              <Skeleton className="h-6 w-full mt-8" />
+              <Skeleton className="h-6 w-5/6" />
+              <Skeleton className="h-12 w-48 mt-8" />
             </div>
-            <div className="w-20 sm:w-32 h-1 bg-primary animate-fade-in" style={{ animationDelay: '0.5s' }}></div>
-          </div>
-          
-          <div className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '1s' }}>
-            {slideContent?.description || 'Uplifting those impacted by systemic inequities and poverty through comprehensive medical and behavioral health care, health navigation, workforce enterprises, housing, outreach, and advocacy.'}
-          </div>
-          
-          <Button 
-            onClick={handleOverview}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 text-lg animate-fade-in shadow-lg"
-            style={{ animationDelay: '1.2s' }}
-          >
-            {slideContent?.buttonText || 'Learn About Our Services'}
-          </Button>
+          ) : (
+            <>
+              <div className="mb-8 sm:mb-12">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-tight mb-4 sm:mb-8">
+                  {slideContent?.title || 'ROOTS COMMUNITY HEALTH'}
+                </h1>
+                <div className="text-xl sm:text-2xl md:text-3xl text-primary font-inter mb-4 sm:mb-8">
+                  {slideContent?.subtitle || 'HEALING OUR COMMUNITY FROM WITHIN'}
+                </div>
+                <div className="w-20 sm:w-32 h-1 bg-primary animate-fade-in" style={{ animationDelay: '0.5s' }}></div>
+              </div>
+              
+              <div className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '1s' }}>
+                {slideContent?.description || 'Uplifting those impacted by systemic inequities and poverty through comprehensive medical and behavioral health care, health navigation, workforce enterprises, housing, outreach, and advocacy.'}
+              </div>
+              
+              <Button 
+                onClick={handleOverview}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 text-lg animate-fade-in shadow-lg"
+                style={{ animationDelay: '1.2s' }}
+              >
+                {slideContent?.buttonText || 'Learn About Our Services'}
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Image Showcase */}

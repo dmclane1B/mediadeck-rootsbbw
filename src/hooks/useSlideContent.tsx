@@ -25,6 +25,9 @@ export const useSlideContent = (): UseSlideContentReturn => {
     const loadContent = async () => {
       try {
         setLoading(true);
+        // Add small delay to prevent flash of loading state for cached content
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsedContent = JSON.parse(stored);
