@@ -11,7 +11,7 @@ import useSlideImages, { SlideImage } from '@/hooks/useSlideImages';
 import { useSlideImageValidation } from '@/hooks/useSlideImageValidation';
 import SlideImageStatus from '@/components/SlideImageStatus';
 import { MediaFile } from '@/hooks/useMediaLibrary';
-import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw, Play, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const MediaDashboard = () => {
@@ -20,6 +20,7 @@ const MediaDashboard = () => {
   const { slideConfig, setSlideImage, getSlideImage, clearAllConfigurations } = useSlideImages();
   const [selectedSlide, setSelectedSlide] = useState<string | null>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const slides = useMemo(() => [
     { id: 'title', name: 'Title Slide', route: '/' },
@@ -94,6 +95,26 @@ const MediaDashboard = () => {
     setSlideImage(slideId, null);
   };
 
+  const handleSave = async () => {
+    setIsSaving(true);
+    
+    // Simulate save process (data is already auto-saved to IndexedDB)
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const slidesWithImages = Object.keys(slideConfig).length;
+    
+    toast({
+      title: "Changes Saved",
+      description: `Successfully saved ${slidesWithImages} slide image assignments.`,
+    });
+    
+    setIsSaving(false);
+  };
+
+  const handleStartPresentation = () => {
+    navigate('/');
+  };
+
   const exportConfiguration = () => {
     const dataStr = JSON.stringify(slideConfig, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -148,6 +169,24 @@ const MediaDashboard = () => {
           </div>
           
           <div className="flex items-center gap-2">
+            {/* Primary Action Buttons */}
+            <Button onClick={handleStartPresentation} size="lg" className="mr-4">
+              <Play className="w-4 h-4 mr-2" />
+              Start Presentation
+            </Button>
+            
+            <Button 
+              onClick={handleSave} 
+              disabled={isSaving}
+              variant="secondary" 
+              size="lg" 
+              className="mr-4"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
+            
+            {/* Secondary Action Buttons */}
             {summary.invalidImages > 0 && (
               <Button variant="outline" onClick={validateAndCleanup} disabled={isValidating}>
                 <RotateCcw className="w-4 h-4 mr-2" />
