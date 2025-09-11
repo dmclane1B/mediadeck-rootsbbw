@@ -64,19 +64,17 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
         // Log detailed errors to console for debugging
         console.error('Upload errors:', errors);
         
-        // Show detailed errors in a more accessible way
-        if (errors.length <= 3) {
-          // Show individual errors for small numbers
-          errors.forEach((error, index) => {
-            setTimeout(() => {
-              toast({
-                variant: "destructive",
-                title: `Upload Error ${index + 1}`,
-                description: error,
-              });
-            }, (index + 1) * 1000);
-          });
-        }
+        // Show detailed errors in a more accessible way (first 3 errors)
+        const errorsToShow = errors.slice(0, 3);
+        errorsToShow.forEach((error, index) => {
+          setTimeout(() => {
+            toast({
+              variant: "destructive",
+              title: `Upload Error ${index + 1}`,
+              description: error,
+            });
+          }, (index + 1) * 1000);
+        });
       }
     } catch (error) {
       toast({
@@ -224,8 +222,11 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
             isDragOver ? 'text-primary' : 'text-muted-foreground'
           }`} />
           <h3 className="text-lg font-semibold mb-2">Upload Images</h3>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-2">
             {isDragOver ? 'Drop images here to upload' : 'Drag and drop images here, or click to browse'}
+          </p>
+          <p className="text-xs text-muted-foreground mb-4">
+            Up to 50 MB per file accepted. We'll compress to under 10 MB.
           </p>
           
           {/* Storage Info */}

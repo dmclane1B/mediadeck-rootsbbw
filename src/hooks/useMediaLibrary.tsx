@@ -21,7 +21,8 @@ export interface UploadProgress {
 }
 
 // Constants
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_INPUT_FILE_SIZE = 50 * 1024 * 1024; // 50MB input limit
+const MAX_FINAL_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB final compressed size
 const MAX_TOTAL_SIZE = 500 * 1024 * 1024; // 500MB total storage (IndexedDB)
 const SUPPORTED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
@@ -147,9 +148,9 @@ export const useMediaLibrary = () => {
         continue;
       }
 
-      // Validate file size
-      if (file.size > MAX_FILE_SIZE) {
-        errors.push(`${file.name}: File too large (${formatBytes(file.size)}). Maximum allowed: ${formatBytes(MAX_FILE_SIZE)}`);
+      // Validate input file size (before compression)
+      if (file.size > MAX_INPUT_FILE_SIZE) {
+        errors.push(`${file.name}: File too large (${formatBytes(file.size)}). Maximum input size: ${formatBytes(MAX_INPUT_FILE_SIZE)}`);
         continue;
       }
 
@@ -192,7 +193,7 @@ export const useMediaLibrary = () => {
         const available = quota - used;
         
         return {
-          hasSpace: available > (MAX_FILE_SIZE * 2), // Ensure we have space for at least 2 max-sized files
+          hasSpace: available > (MAX_FINAL_IMAGE_SIZE * 2), // Ensure we have space for at least 2 compressed files
           available,
           used
         };
@@ -251,7 +252,12 @@ export const useMediaLibrary = () => {
 
       while (compressionAttempts < maxCompressionAttempts) {
         try {
-          compressionResult = await compressImage(file, {}, (progress) => {
+          compressionResult = await compressImage(file, {
+            maxSizeBytes: MAX_FINAL_IMAGE_SIZE,
+            quality: 0.8,
+            maxWidth: 2048,
+            maxHeight: 2048
+          }, (progress) => {
             const scaledProgress = 30 + (progress * 0.3); // Scale progress from 30% to 60%
             progressArray[fileIndex].progress = scaledProgress;
             setUploadProgress([...progressArray]);
@@ -266,6 +272,11 @@ export const useMediaLibrary = () => {
           // Wait before retry
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
+      }
+
+      // Check if compression result meets size requirements
+      if (compressionResult && compressionResult.compressedSize > MAX_FINAL_IMAGE_SIZE) {
+        throw new Error(`Unable to compress ${file.name} to required size (${formatBytes(MAX_FINAL_IMAGE_SIZE)}). Final size: ${formatBytes(compressionResult.compressedSize)}`);
       }
 
       if (!compressionResult) {
@@ -397,7 +408,7 @@ export const useMediaLibrary = () => {
       remainingSize,
       usagePercent,
       imageCount: images.length,
-      maxFileSize: MAX_FILE_SIZE,
+      maxFileSize: MAX_FINAL_IMAGE_SIZE,
       maxTotalSize: MAX_TOTAL_SIZE
     };
   }, [images]);

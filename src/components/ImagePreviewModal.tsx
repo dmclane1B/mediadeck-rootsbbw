@@ -33,7 +33,7 @@ const ImagePreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl w-full h-[90vh] p-0 overflow-hidden">
+      <DialogContent className="max-w-5xl w-full h-[90vh] p-0 overflow-hidden" aria-describedby="image-preview-description">
         {/* Header */}
         <div className="absolute top-0 left-0 right-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4">
           <div className="flex items-center justify-between">
