@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { CloudMediaManager } from '@/utils/cloudMedia';
+import { useIndexedDBStorage } from '@/hooks/useIndexedDBStorage';
+import { useMediaLibrary } from '@/hooks/useMediaLibrary';
+import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -9,10 +13,10 @@ import {
   AlertTriangle, 
   AlertCircle, 
   RefreshCw,
-  Settings
+  Settings,
+  Cloud,
+  CloudOff
 } from 'lucide-react';
-import { useIndexedDBStorage } from '@/hooks/useIndexedDBStorage';
-import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -39,14 +43,30 @@ const StorageMonitor: React.FC<StorageMonitorProps> = ({ compact = false }) => {
     formatBytes 
   } = useIndexedDBStorage();
   
+  const { getCloudStorageInfo } = useMediaLibrary();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showCleanupDialog, setShowCleanupDialog] = useState(false);
+  const [cloudInfo, setCloudInfo] = useState<{ cloudFileCount: number; cloudError?: string; isCloudSynced: boolean } | null>(null);
+  
   const [cleanupOptions, setCleanupOptions] = useState({
     maxAge: 30,
     maxTotalSize: 400,
     keepRecentCount: 100
   });
+
+  // Load cloud info
+  React.useEffect(() => {
+    const loadCloudInfo = async () => {
+      try {
+        const info = await getCloudStorageInfo();
+        setCloudInfo(info);
+      } catch (error) {
+        console.error('Failed to load cloud info:', error);
+      }
+    };
+    loadCloudInfo();
+  }, [getCloudStorageInfo]);
 
   // Cloud restore function
   const handleCloudRestore = async () => {
@@ -77,6 +97,8 @@ const StorageMonitor: React.FC<StorageMonitorProps> = ({ compact = false }) => {
       setIsLoading(false);
     }
   };
+
+  const handleAutoCleanup = async () => {
     setIsLoading(true);
     try {
       const deletedCount = await autoCleanup();
