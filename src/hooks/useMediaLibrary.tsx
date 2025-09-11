@@ -65,6 +65,64 @@ export const useMediaLibrary = () => {
   const [loading, setLoading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
 
+  // Restore images from cloud storage
+  const restoreFromCloud = useCallback(async (): Promise<number> => {
+    console.log('[MediaLibrary] Starting cloud restore...');
+    
+    try {
+      // Check if cloud is available
+      const isCloudAvailable = await CloudMediaManager.isCloudAvailable();
+      if (!isCloudAvailable) {
+        console.log('[MediaLibrary] Cloud storage not available');
+        return 0;
+      }
+
+      // List cloud files
+      const cloudFiles = await CloudMediaManager.listCloudFiles();
+      console.log(`[MediaLibrary] Found ${cloudFiles.length} files in cloud storage`);
+      
+      if (cloudFiles.length === 0) {
+        return 0;
+      }
+
+      const restoredImages: MediaFile[] = [];
+      
+      // Convert cloud files to MediaFile objects
+      for (const cloudFile of cloudFiles) {
+        const mediaFile: MediaFile = {
+          id: crypto.randomUUID(), // Generate new ID for local storage
+          name: cloudFile.name,
+          url: cloudFile.publicUrl || cloudFile.url, // Use public URL as the display URL
+          uploadDate: cloudFile.uploadDate,
+          dimensions: cloudFile.dimensions,
+          size: cloudFile.size,
+          cloudPath: cloudFile.cloudPath,
+          publicUrl: cloudFile.publicUrl,
+          source: 'cloud'
+        };
+
+        // Save to IndexedDB
+        try {
+          await indexedDBManager.addImage(mediaFile);
+          restoredImages.push(mediaFile);
+          console.log(`[MediaLibrary] Restored ${cloudFile.name} from cloud`);
+        } catch (error) {
+          console.error(`[MediaLibrary] Failed to save restored image ${cloudFile.name}:`, error);
+        }
+      }
+
+      // Update local state
+      setImages(prev => [...prev, ...restoredImages]);
+      
+      console.log(`[MediaLibrary] Successfully restored ${restoredImages.length} images from cloud`);
+      return restoredImages.length;
+      
+    } catch (error) {
+      console.error('[MediaLibrary] Error during cloud restore:', error);
+      throw error;
+    }
+  }, []);
+
   // Load images from IndexedDB on mount with debugging and retry logic
   useEffect(() => {
     let retryCount = 0;
@@ -87,6 +145,23 @@ export const useMediaLibrary = () => {
         
         setImages(storedImages);
         setLoading(false);
+        
+        // Auto-restore from cloud if no local images exist
+        if (storedImages.length === 0) {
+          const restoreFlag = localStorage.getItem('cloud-restore-attempted');
+          if (!restoreFlag) {
+            console.log('[MediaLibrary] No local images found, attempting cloud restore...');
+            try {
+              const restoredCount = await restoreFromCloud();
+              localStorage.setItem('cloud-restore-attempted', 'true');
+              if (restoredCount > 0) {
+                console.log(`[MediaLibrary] Auto-restored ${restoredCount} images from cloud`);
+              }
+            } catch (error) {
+              console.error('[MediaLibrary] Auto-restore failed:', error);
+            }
+          }
+        }
         
         // Log storage info for debugging
         try {
@@ -124,7 +199,7 @@ export const useMediaLibrary = () => {
     };
 
     loadImages();
-  }, []);
+  }, [restoreFromCloud]);
 
   const addImages = async (
     files: FileList,
@@ -554,6 +629,7 @@ export const useMediaLibrary = () => {
     removeImage,
     updateImage,
     clearAll,
+    restoreFromCloud, // Add restore function
     getStorageInfo,
     getCloudStorageInfo
   };

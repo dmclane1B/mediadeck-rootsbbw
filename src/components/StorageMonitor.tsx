@@ -43,7 +43,7 @@ const StorageMonitor: React.FC<StorageMonitorProps> = ({ compact = false }) => {
     formatBytes 
   } = useIndexedDBStorage();
   
-  const { getCloudStorageInfo } = useMediaLibrary();
+  const { getCloudStorageInfo, restoreFromCloud } = useMediaLibrary();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showCleanupDialog, setShowCleanupDialog] = useState(false);
@@ -72,22 +72,22 @@ const StorageMonitor: React.FC<StorageMonitorProps> = ({ compact = false }) => {
   const handleCloudRestore = async () => {
     setIsLoading(true);
     try {
-      const cloudFiles = await CloudMediaManager.listCloudFiles();
-      if (cloudFiles.length > 0) {
+      const restoredCount = await restoreFromCloud();
+      await updateStorageInfo(); // Refresh storage info
+      
+      if (restoredCount > 0) {
         toast({
-          title: "Cloud Restore",
-          description: `Found ${cloudFiles.length} images in cloud storage. They will be restored automatically.`,
+          title: "Cloud Restore Complete",
+          description: `Successfully restored ${restoredCount} images from cloud storage.`,
         });
-        // Refresh the page to trigger the restore process
-        window.location.reload();
       } else {
         toast({
-          title: "No Cloud Backup",
-          description: "No images found in cloud storage.",
-          variant: "destructive"
+          title: "No Images to Restore",
+          description: "No images found in cloud storage to restore.",
         });
       }
     } catch (error) {
+      console.error('Cloud restore error:', error);
       toast({
         title: "Cloud Restore Failed",
         description: "Failed to restore images from cloud storage.",
@@ -242,6 +242,16 @@ const StorageMonitor: React.FC<StorageMonitorProps> = ({ compact = false }) => {
           >
             <Trash2 className="h-4 w-4 mr-2" />
             Auto Cleanup
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCloudRestore}
+            disabled={isLoading}
+          >
+            <Cloud className="h-4 w-4 mr-2" />
+            Restore from Cloud
           </Button>
           
           <Dialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>

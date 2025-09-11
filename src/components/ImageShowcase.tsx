@@ -47,7 +47,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const { images } = useMediaLibrary();
 
-  // Resolve image source - prioritize imageUrl, then fetch from media library by imageId
+  // Resolve image source - prioritize imageUrl, then fetch from media library by imageId, then fallback by name
   const resolvedImage = useMemo(() => {
     if (imageUrl && isValidImageUrl(imageUrl)) {
       return {
@@ -62,6 +62,20 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({
         return {
           url: foundImage.url,
           alt: imageAlt || foundImage.name || 'Slide image'
+        };
+      }
+    }
+    
+    // Fallback: search by name if imageAlt is provided (works when imageId wasn't found or wasn't provided)
+    if (imageAlt) {
+      const foundImageByName = images.find(img => 
+        img.name.toLowerCase() === imageAlt.toLowerCase()
+      );
+      if (foundImageByName && isValidImageUrl(foundImageByName.url)) {
+        console.log(`[ImageShowcase] Using fallback image by name: ${imageAlt} -> ${foundImageByName.id}`);
+        return {
+          url: foundImageByName.url,
+          alt: imageAlt || foundImageByName.name || 'Slide image'
         };
       }
     }
