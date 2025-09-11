@@ -101,11 +101,15 @@ export const compressImage = async (
           dimensions: { width, height }
         });
       } catch (error) {
-        reject(new Error('Compression failed'));
+        console.error('Image compression error:', error);
+        reject(new Error(`Compression failed: ${error instanceof Error ? error.message : 'Unknown error'}`));
       }
     };
     
-    img.onerror = () => reject(new Error('Failed to load image'));
+    img.onerror = () => {
+      console.error('Failed to load image for compression:', file.name);
+      reject(new Error(`Failed to load image: ${file.name}`));
+    };
     img.src = URL.createObjectURL(file);
   });
 };

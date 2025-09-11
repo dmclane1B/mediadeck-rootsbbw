@@ -53,11 +53,30 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
       }
       
       if (errors.length > 0) {
+        // Show detailed error information
+        const errorMessages = errors.join('\n\n');
         toast({
           variant: "destructive",
-          title: "Some uploads failed",
-          description: errors.length === 1 ? errors[0] : `${errors.length} files failed to upload.`
+          title: `Upload failed: ${errors.length} file(s)`,
+          description: errors.length === 1 ? errors[0] : `${errors.length} files failed. Check console for details.`
         });
+        
+        // Log detailed errors to console for debugging
+        console.error('Upload errors:', errors);
+        
+        // Show detailed errors in a more accessible way
+        if (errors.length <= 3) {
+          // Show individual errors for small numbers
+          errors.forEach((error, index) => {
+            setTimeout(() => {
+              toast({
+                variant: "destructive",
+                title: `Upload Error ${index + 1}`,
+                description: error,
+              });
+            }, (index + 1) * 1000);
+          });
+        }
       }
     } catch (error) {
       toast({

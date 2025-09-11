@@ -86,6 +86,25 @@ export const useMediaLibrary = () => {
       errors: []
     };
 
+    // Pre-upload validation
+    const preUploadErrors = await validateFilesBeforeUpload(fileArray);
+    if (preUploadErrors.length > 0) {
+      return { success: [], errors: preUploadErrors };
+    }
+
+    // Check storage quota before starting
+    try {
+      const storageCheck = await checkStorageQuota();
+      if (!storageCheck.hasSpace) {
+        return { 
+          success: [], 
+          errors: [`Storage quota exceeded. Available: ${formatBytes(storageCheck.available)}, Required: ${formatBytes(calculateTotalFileSize(fileArray))}`] 
+        };
+      }
+    } catch (error) {
+      console.error('Storage quota check failed:', error);
+    }
+
     // Initialize progress tracking
     const progressArray: UploadProgress[] = fileArray.map((file, index) => ({
       fileName: file.name,
@@ -98,98 +117,16 @@ export const useMediaLibrary = () => {
     setUploadProgress(progressArray);
     onProgress?.(progressArray);
 
-    for (let i = 0; i < fileArray.length; i++) {
-      const file = fileArray[i];
-      
-      try {
-        // Update progress to show processing
-        progressArray[i].progress = 10;
-        progressArray[i].stage = 'validating';
-        setUploadProgress([...progressArray]);
-        onProgress?.([...progressArray]);
+    // Process files in parallel (chunked to avoid overwhelming the system)
+    const chunkSize = 3; // Process 3 files at a time
+    for (let i = 0; i < fileArray.length; i += chunkSize) {
+      const chunk = fileArray.slice(i, i + chunkSize);
+      const chunkPromises = chunk.map(async (file, chunkIndex) => {
+        const fileIndex = i + chunkIndex;
+        return processFile(file, fileIndex, progressArray, onProgress, results);
+      });
 
-        // Validate file type
-        if (!SUPPORTED_TYPES.includes(file.type)) {
-          throw new Error(`Unsupported file type: ${file.type}`);
-        }
-
-        // Validate file size
-        if (file.size > MAX_FILE_SIZE) {
-          throw new Error(`File too large: ${(file.size / (1024 * 1024)).toFixed(1)}MB (max: ${MAX_FILE_SIZE / (1024 * 1024)}MB)`);
-        }
-
-        // Check total storage limit
-        const currentSize = calculateTotalSize(images);
-        if (currentSize + file.size > MAX_TOTAL_SIZE) {
-          throw new Error('Storage limit exceeded. Please delete some images first.');
-        }
-
-        // Update progress to show compression
-        progressArray[i].progress = 30;
-        progressArray[i].stage = 'compressing';
-        setUploadProgress([...progressArray]);
-        onProgress?.([...progressArray]);
-
-        // Compress image
-        const compressionResult = await compressImage(file);
-        
-        // Update progress to show conversion
-        progressArray[i].progress = 60;
-        progressArray[i].stage = 'processing';
-        setUploadProgress([...progressArray]);
-        onProgress?.([...progressArray]);
-
-        // Get base64 from compression result
-        const base64 = compressionResult.compressedFile;
-        
-        // Update progress to show dimension calculation
-        progressArray[i].progress = 80;
-        progressArray[i].stage = 'analyzing';
-        setUploadProgress([...progressArray]);
-        onProgress?.([...progressArray]);
-
-        // Get dimensions
-        const dimensions = compressionResult.dimensions;
-
-        // Create media file
-        const mediaFile: MediaFile = {
-          id: crypto.randomUUID(),
-          name: file.name,
-          url: base64,
-          uploadDate: new Date().toISOString(),
-          dimensions,
-          size: compressionResult.compressedSize
-        };
-
-        // Update progress to show saving
-        progressArray[i].progress = 90;
-        progressArray[i].stage = 'saving';
-        setUploadProgress([...progressArray]);
-        onProgress?.([...progressArray]);
-
-        // Save to IndexedDB
-        await indexedDBManager.addImage(mediaFile);
-        
-        // Add to local state
-        setImages(prev => [...prev, mediaFile]);
-        results.success.push(mediaFile);
-
-        // Mark as completed
-        progressArray[i].progress = 100;
-        progressArray[i].completed = true;
-        progressArray[i].stage = 'completed';
-        setUploadProgress([...progressArray]);
-        onProgress?.([...progressArray]);
-
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        results.errors.push(`${file.name}: ${errorMessage}`);
-        
-        progressArray[i].error = errorMessage;
-        progressArray[i].completed = true;
-        setUploadProgress([...progressArray]);
-        onProgress?.([...progressArray]);
-      }
+      await Promise.allSettled(chunkPromises);
     }
 
     // Clear progress after a delay
@@ -198,6 +135,224 @@ export const useMediaLibrary = () => {
     }, 3000);
 
     return results;
+  };
+
+  const validateFilesBeforeUpload = async (files: File[]): Promise<string[]> => {
+    const errors: string[] = [];
+    
+    for (const file of files) {
+      // Validate file type
+      if (!SUPPORTED_TYPES.includes(file.type)) {
+        errors.push(`${file.name}: Unsupported file type (${file.type}). Supported: ${SUPPORTED_TYPES.join(', ')}`);
+        continue;
+      }
+
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        errors.push(`${file.name}: File too large (${formatBytes(file.size)}). Maximum allowed: ${formatBytes(MAX_FILE_SIZE)}`);
+        continue;
+      }
+
+      // Check if file is corrupted by trying to read it
+      try {
+        await validateImageFile(file);
+      } catch (error) {
+        errors.push(`${file.name}: File appears to be corrupted or invalid`);
+      }
+    }
+
+    return errors;
+  };
+
+  const validateImageFile = (file: File): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve();
+      };
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Invalid image file'));
+      };
+      
+      img.src = url;
+    });
+  };
+
+  const checkStorageQuota = async (): Promise<{ hasSpace: boolean; available: number; used: number }> => {
+    try {
+      if ('storage' in navigator && 'estimate' in navigator.storage) {
+        const estimate = await navigator.storage.estimate();
+        const used = estimate.usage || 0;
+        const quota = estimate.quota || MAX_TOTAL_SIZE;
+        const available = quota - used;
+        
+        return {
+          hasSpace: available > (MAX_FILE_SIZE * 2), // Ensure we have space for at least 2 max-sized files
+          available,
+          used
+        };
+      }
+    } catch (error) {
+      console.error('Failed to check storage quota:', error);
+    }
+    
+    // Fallback to IndexedDB calculation
+    const currentSize = calculateTotalSize(images);
+    return {
+      hasSpace: currentSize < MAX_TOTAL_SIZE * 0.9,
+      available: MAX_TOTAL_SIZE - currentSize,
+      used: currentSize
+    };
+  };
+
+  const calculateTotalFileSize = (files: File[]): number => {
+    return files.reduce((total, file) => total + file.size, 0);
+  };
+
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const processFile = async (
+    file: File, 
+    fileIndex: number, 
+    progressArray: UploadProgress[], 
+    onProgress?: (progress: UploadProgress[]) => void,
+    results?: { success: MediaFile[], errors: string[] }
+  ): Promise<void> => {
+    if (!results) return;
+    
+    try {
+      // Update progress to show processing
+      progressArray[fileIndex].progress = 10;
+      progressArray[fileIndex].stage = 'validating';
+      setUploadProgress([...progressArray]);
+      onProgress?.([...progressArray]);
+
+      // Update progress to show compression
+      progressArray[fileIndex].progress = 30;
+      progressArray[fileIndex].stage = 'compressing';
+      setUploadProgress([...progressArray]);
+      onProgress?.([...progressArray]);
+
+      // Compress image with retry logic
+      let compressionResult;
+      let compressionAttempts = 0;
+      const maxCompressionAttempts = 3;
+
+      while (compressionAttempts < maxCompressionAttempts) {
+        try {
+          compressionResult = await compressImage(file, {}, (progress) => {
+            const scaledProgress = 30 + (progress * 0.3); // Scale progress from 30% to 60%
+            progressArray[fileIndex].progress = scaledProgress;
+            setUploadProgress([...progressArray]);
+            onProgress?.([...progressArray]);
+          });
+          break;
+        } catch (error) {
+          compressionAttempts++;
+          if (compressionAttempts >= maxCompressionAttempts) {
+            throw new Error(`Compression failed after ${maxCompressionAttempts} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+          // Wait before retry
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      if (!compressionResult) {
+        throw new Error('Compression failed');
+      }
+      
+      // Update progress to show processing
+      progressArray[fileIndex].progress = 70;
+      progressArray[fileIndex].stage = 'processing';
+      setUploadProgress([...progressArray]);
+      onProgress?.([...progressArray]);
+
+      // Get base64 from compression result
+      const base64 = compressionResult.compressedFile;
+      const dimensions = compressionResult.dimensions;
+
+      // Create media file
+      const mediaFile: MediaFile = {
+        id: crypto.randomUUID(),
+        name: file.name,
+        url: base64,
+        uploadDate: new Date().toISOString(),
+        dimensions,
+        size: compressionResult.compressedSize
+      };
+
+      // Update progress to show saving
+      progressArray[fileIndex].progress = 90;
+      progressArray[fileIndex].stage = 'saving';
+      setUploadProgress([...progressArray]);
+      onProgress?.([...progressArray]);
+
+      // Save to IndexedDB with retry logic
+      let saveAttempts = 0;
+      const maxSaveAttempts = 3;
+
+      while (saveAttempts < maxSaveAttempts) {
+        try {
+          await indexedDBManager.addImage(mediaFile);
+          break;
+        } catch (error) {
+          saveAttempts++;
+          
+          if (error instanceof Error && error.name === 'QuotaExceededError') {
+            throw new Error('Storage quota exceeded. Please delete some images and try again.');
+          }
+          
+          if (saveAttempts >= maxSaveAttempts) {
+            throw new Error(`Database save failed after ${maxSaveAttempts} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+          
+          // Wait before retry
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+      
+      // Add to local state
+      setImages(prev => [...prev, mediaFile]);
+      results.success.push(mediaFile);
+
+      // Mark as completed
+      progressArray[fileIndex].progress = 100;
+      progressArray[fileIndex].completed = true;
+      progressArray[fileIndex].stage = 'completed';
+      setUploadProgress([...progressArray]);
+      onProgress?.([...progressArray]);
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const detailedError = `${file.name}: ${errorMessage}`;
+      
+      console.error('File upload error:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        error: errorMessage,
+        stage: progressArray[fileIndex].stage
+      });
+      
+      results.errors.push(detailedError);
+      
+      progressArray[fileIndex].error = errorMessage;
+      progressArray[fileIndex].completed = true;
+      progressArray[fileIndex].stage = 'failed';
+      setUploadProgress([...progressArray]);
+      onProgress?.([...progressArray]);
+    }
   };
 
   const removeImage = useCallback(async (id: string) => {
