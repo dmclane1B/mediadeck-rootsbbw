@@ -788,6 +788,18 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_safe_profile_data: {
+        Args: { profile_user_id?: string }
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          role: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
