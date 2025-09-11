@@ -50,7 +50,7 @@ const TitleSlide = () => {
       
       {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <img src="/src/assets/roots-logo.png" alt="Roots Community Health Logo" className="h-10 w-auto ml-auto mb-2" />
+        <img src="/lovable-uploads/8f771217-3f89-469e-9a26-608410b785c2.png" alt="Roots Community Health Logo" className="h-10 w-auto ml-auto mb-2" />
         <div className="text-muted-foreground text-xl font-space font-bold">01</div>
       </div>
 
