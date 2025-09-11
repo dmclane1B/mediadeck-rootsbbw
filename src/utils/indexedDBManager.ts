@@ -7,10 +7,14 @@ const SLIDE_CONFIG_STORE = 'slideConfigurations';
 export interface MediaFile {
   id: string;
   name: string;
-  url: string; // base64 data URL
+  url: string; // base64 data URL for local storage
   uploadDate: string;
   dimensions?: { width: number; height: number };
   size?: number;
+  // Cloud sync fields
+  cloudPath?: string; // path in Supabase storage
+  publicUrl?: string; // public URL from Supabase
+  source: 'local' | 'cloud' | 'synced'; // track sync status
 }
 
 export interface SlideConfiguration {

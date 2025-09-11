@@ -48,7 +48,35 @@ const StorageMonitor: React.FC<StorageMonitorProps> = ({ compact = false }) => {
     keepRecentCount: 100
   });
 
-  const handleAutoCleanup = async () => {
+  // Cloud restore function
+  const handleCloudRestore = async () => {
+    setIsLoading(true);
+    try {
+      const cloudFiles = await CloudMediaManager.listCloudFiles();
+      if (cloudFiles.length > 0) {
+        toast({
+          title: "Cloud Restore",
+          description: `Found ${cloudFiles.length} images in cloud storage. They will be restored automatically.`,
+        });
+        // Refresh the page to trigger the restore process
+        window.location.reload();
+      } else {
+        toast({
+          title: "No Cloud Backup",
+          description: "No images found in cloud storage.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Cloud Restore Failed",
+        description: "Failed to restore images from cloud storage.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
     setIsLoading(true);
     try {
       const deletedCount = await autoCleanup();

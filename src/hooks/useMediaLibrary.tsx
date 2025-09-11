@@ -1,14 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { compressImage } from '@/utils/imageCompression';
 import { indexedDBManager } from '@/utils/indexedDBManager';
+import { CloudMediaManager, MediaFile as CloudMediaFile } from '@/utils/cloudMedia';
 
 export interface MediaFile {
   id: string;
   name: string;
-  url: string; // base64 data URL
+  url: string; // base64 data URL for local storage
   uploadDate: string;
   dimensions?: { width: number; height: number };
   size?: number;
+  // Cloud sync fields
+  cloudPath?: string; // path in Supabase storage
+  publicUrl?: string; // public URL from Supabase
+  source: 'local' | 'cloud' | 'synced'; // track sync status
 }
 
 export interface UploadProgress {
@@ -344,14 +349,39 @@ export const useMediaLibrary = () => {
         url: base64,
         uploadDate: new Date().toISOString(),
         dimensions,
-        size: compressionResult.compressedSize
+        size: compressionResult.compressedSize,
+        source: 'local'
       };
 
-      // Update progress to show saving
+      // Update progress to show cloud sync
       progressArray[fileIndex].progress = 90;
-      progressArray[fileIndex].stage = 'saving';
+      progressArray[fileIndex].stage = 'syncing to cloud';
       setUploadProgress([...progressArray]);
       onProgress?.([...progressArray]);
+
+      // Upload to cloud in background
+      try {
+        const isCloudAvailable = await CloudMediaManager.isCloudAvailable();
+        if (isCloudAvailable) {
+          console.log(`[MediaLibrary] Uploading ${file.name} to cloud...`);
+          const syncResult = await CloudMediaManager.uploadBase64ToCloud(base64, file.name);
+          
+          if (syncResult.success && syncResult.cloudPath && syncResult.publicUrl) {
+            // Update media file with cloud info
+            mediaFile.cloudPath = syncResult.cloudPath;
+            mediaFile.publicUrl = syncResult.publicUrl;
+            mediaFile.source = 'synced';
+            
+            console.log(`[MediaLibrary] Successfully uploaded ${file.name} to cloud`);
+          } else {
+            console.warn(`[MediaLibrary] Failed to upload ${file.name} to cloud:`, syncResult.error);
+          }
+        } else {
+          console.log('[MediaLibrary] Cloud storage not available, saved locally only');
+        }
+      } catch (error) {
+        console.warn(`[MediaLibrary] Error uploading ${file.name} to cloud:`, error);
+      }
 
       // Save to IndexedDB with retry logic
       let saveAttempts = 0;
@@ -411,14 +441,34 @@ export const useMediaLibrary = () => {
   };
 
   const removeImage = useCallback(async (id: string) => {
+    console.log(`[MediaLibrary] Removing image with ID: ${id}`);
+    
     try {
+      // Find the image to get cloud path if it exists
+      const imageToRemove = images.find(img => img.id === id);
+      
+      // Remove from IndexedDB
       await indexedDBManager.removeImage(id);
+      
+      // Remove from cloud if it has a cloud path
+      if (imageToRemove?.cloudPath) {
+        console.log(`[MediaLibrary] Removing ${imageToRemove.name} from cloud storage...`);
+        const cloudRemoved = await CloudMediaManager.deleteFromCloud(imageToRemove.cloudPath);
+        if (cloudRemoved) {
+          console.log(`[MediaLibrary] Successfully removed ${imageToRemove.name} from cloud`);
+        } else {
+          console.warn(`[MediaLibrary] Failed to remove ${imageToRemove.name} from cloud`);
+        }
+      }
+      
+      // Update local state
       setImages(prev => prev.filter(image => image.id !== id));
+      console.log(`[MediaLibrary] Successfully removed image: ${id}`);
     } catch (error) {
-      console.error('Error removing image:', error);
+      console.error(`[MediaLibrary] Error removing image ${id}:`, error);
       throw error;
     }
-  }, []);
+  }, [images]);
 
   const updateImage = useCallback(async (id: string, updates: Partial<MediaFile>) => {
     try {
@@ -433,14 +483,36 @@ export const useMediaLibrary = () => {
   }, []);
 
   const clearAll = useCallback(async () => {
+    console.log('[MediaLibrary] Clearing all images...');
+    
     try {
+      // Get all images with cloud paths for cleanup
+      const cloudImages = images.filter(img => img.cloudPath);
+      
+      // Clear from IndexedDB
       await indexedDBManager.clearAll();
+      
+      // Clear from cloud storage
+      if (cloudImages.length > 0) {
+        console.log(`[MediaLibrary] Removing ${cloudImages.length} images from cloud storage...`);
+        for (const image of cloudImages) {
+          try {
+            await CloudMediaManager.deleteFromCloud(image.cloudPath!);
+            console.log(`[MediaLibrary] Removed ${image.name} from cloud`);
+          } catch (error) {
+            console.warn(`[MediaLibrary] Failed to remove ${image.name} from cloud:`, error);
+          }
+        }
+      }
+      
+      // Update local state
       setImages([]);
+      console.log('[MediaLibrary] Successfully cleared all images');
     } catch (error) {
-      console.error('Error clearing all images:', error);
+      console.error('[MediaLibrary] Error clearing images:', error);
       throw error;
     }
-  }, []);
+  }, [images]);
 
   const getStorageInfo = useCallback(() => {
     const totalSize = calculateTotalSize(images);
@@ -457,6 +529,23 @@ export const useMediaLibrary = () => {
     };
   }, [images]);
 
+  const getCloudStorageInfo = useCallback(async () => {
+    try {
+      const cloudInfo = await CloudMediaManager.getCloudStorageInfo();
+      return {
+        cloudFileCount: cloudInfo.fileCount,
+        cloudError: cloudInfo.error,
+        isCloudSynced: images.some(img => img.source === 'synced' || img.source === 'cloud')
+      };
+    } catch (error) {
+      return {
+        cloudFileCount: 0,
+        cloudError: 'Error accessing cloud storage',
+        isCloudSynced: false
+      };
+    }
+  }, [images]);
+
   return {
     images,
     loading,
@@ -465,6 +554,7 @@ export const useMediaLibrary = () => {
     removeImage,
     updateImage,
     clearAll,
-    getStorageInfo
+    getStorageInfo,
+    getCloudStorageInfo
   };
 };
