@@ -26,8 +26,29 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
   const [newName, setNewName] = useState('');
   const [previewImage, setPreviewImage] = useState<MediaFile | null>(null);
   const [currentProgress, setCurrentProgress] = useState<UploadProgress[]>([]);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Add debugging effect to monitor state changes
+  React.useEffect(() => {
+    console.log('[MediaLibrary] State updated:', {
+      imageCount: images.length,
+      loading,
+      isUploading,
+      hasImages: images.length > 0,
+      filteredCount: filteredImages.length
+    });
+
+    // Show debug info if no images but not loading
+    if (!loading && images.length === 0) {
+      const info = `No images found. Loading: ${loading}, Images array length: ${images.length}`;
+      setDebugInfo(info);
+      console.log('[MediaLibrary] Debug info:', info);
+    } else {
+      setDebugInfo(null);
+    }
+  }, [images, loading, isUploading]);
 
   const storageInfo = getStorageInfo();
 
@@ -365,8 +386,15 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
       )}
 
       {!loading && filteredImages.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
-          {searchTerm ? 'No images match your search.' : 'No images uploaded yet.'}
+        <div className="text-center py-12 text-muted-foreground space-y-2">
+          <div>
+            {searchTerm ? 'No images match your search.' : 'No images uploaded yet.'}
+          </div>
+          {debugInfo && (
+            <div className="text-xs bg-muted p-2 rounded font-mono">
+              Debug: {debugInfo}
+            </div>
+          )}
         </div>
       )}
 

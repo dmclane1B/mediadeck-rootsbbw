@@ -60,17 +60,61 @@ export const useMediaLibrary = () => {
   const [loading, setLoading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
 
-  // Load images from IndexedDB on mount
+  // Load images from IndexedDB on mount with debugging and retry logic
   useEffect(() => {
-    const loadImages = async () => {
+    let retryCount = 0;
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1 second
+
+    const loadImages = async (attempt: number = 0): Promise<void> => {
+      console.log(`[MediaLibrary] Loading images from IndexedDB (attempt ${attempt + 1}/${maxRetries + 1})`);
+      
       try {
+        // Initialize IndexedDB first
+        console.log('[MediaLibrary] Initializing IndexedDB...');
+        await indexedDBManager.initialize();
+        console.log('[MediaLibrary] IndexedDB initialized successfully');
+        
+        // Load images
+        console.log('[MediaLibrary] Fetching images...');
         const storedImages = await indexedDBManager.getAllImages();
+        console.log(`[MediaLibrary] Successfully loaded ${storedImages.length} images from IndexedDB`, storedImages);
+        
         setImages(storedImages);
-      } catch (error) {
-        console.error('Error loading images from IndexedDB:', error);
-        setImages([]);
-      } finally {
         setLoading(false);
+        
+        // Log storage info for debugging
+        try {
+          const storageUsage = await indexedDBManager.getStorageUsage();
+          console.log('[MediaLibrary] Storage usage:', storageUsage);
+        } catch (storageError) {
+          console.warn('[MediaLibrary] Could not get storage usage:', storageError);
+        }
+        
+      } catch (error) {
+        console.error(`[MediaLibrary] Error loading images from IndexedDB (attempt ${attempt + 1}):`, error);
+        
+        if (attempt < maxRetries) {
+          console.log(`[MediaLibrary] Retrying in ${retryDelay}ms... (${maxRetries - attempt} attempts remaining)`);
+          setTimeout(() => {
+            loadImages(attempt + 1);
+          }, retryDelay * (attempt + 1)); // Exponential backoff
+        } else {
+          console.error('[MediaLibrary] All retry attempts failed. Setting images to empty array.');
+          setImages([]);
+          setLoading(false);
+          
+          // Try to provide helpful debugging info
+          console.log('[MediaLibrary] Browser storage check:');
+          console.log('- IndexedDB supported:', 'indexedDB' in window);
+          console.log('- Local storage available:', typeof(Storage) !== "undefined");
+          
+          if ('storage' in navigator && 'estimate' in navigator.storage) {
+            navigator.storage.estimate().then(estimate => {
+              console.log('- Storage estimate:', estimate);
+            }).catch(e => console.log('- Storage estimate failed:', e));
+          }
+        }
       }
     };
 

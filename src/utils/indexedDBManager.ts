@@ -69,16 +69,46 @@ class IndexedDBManager {
   }
 
   async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {
+      console.log('[IndexedDB] Already initialized');
+      return;
+    }
     
-    if (this.initPromise) return this.initPromise;
+    if (this.initPromise) {
+      console.log('[IndexedDB] Initialization in progress, waiting...');
+      return this.initPromise;
+    }
     
     this.initPromise = (async () => {
       try {
+        console.log('[IndexedDB] Starting initialization...');
+        
+        // Check if IndexedDB is available
+        if (!window.indexedDB) {
+          throw new Error('IndexedDB not supported in this browser');
+        }
+        
         await this.openDB();
         this.initialized = true;
+        console.log('[IndexedDB] Successfully initialized');
+        
+        // Perform migration if needed
+        try {
+          const migrationResult = await this.migrateFromLocalStorage();
+          if (migrationResult.migrated > 0) {
+            console.log(`[IndexedDB] Migrated ${migrationResult.migrated} slide configurations from localStorage`);
+          }
+          if (migrationResult.errors.length > 0) {
+            console.warn('[IndexedDB] Migration errors:', migrationResult.errors);
+          }
+        } catch (migrationError) {
+          console.warn('[IndexedDB] Migration failed, but continuing:', migrationError);
+        }
+        
       } catch (error) {
-        console.error('Failed to initialize IndexedDB:', error);
+        console.error('[IndexedDB] Failed to initialize:', error);
+        this.initialized = false;
+        this.initPromise = null;
         throw error;
       }
     })();
@@ -88,6 +118,11 @@ class IndexedDBManager {
 
   async getAllImages(): Promise<MediaFile[]> {
     try {
+      console.log('[IndexedDB] Getting all images...');
+      
+      // Ensure we're initialized first
+      await this.initialize();
+      
       const db = await this.openDB();
       const transaction = db.transaction([STORE_NAME], 'readonly');
       const store = transaction.objectStore(STORE_NAME);
@@ -96,15 +131,55 @@ class IndexedDBManager {
         const request = store.getAll();
         
         request.onsuccess = () => {
-          resolve(request.result || []);
+          const result = request.result || [];
+          console.log(`[IndexedDB] Retrieved ${result.length} images from database`);
+          
+          // Log each image for debugging
+          result.forEach((img, index) => {
+            console.log(`[IndexedDB] Image ${index + 1}:`, {
+              id: img.id,
+              name: img.name,
+              uploadDate: img.uploadDate,
+              size: img.size,
+              urlLength: img.url?.length || 0
+            });
+          });
+          
+          resolve(result);
         };
         
         request.onerror = () => {
-          reject(new Error(`Error retrieving images: ${request.error?.message}`));
+          const errorMsg = `Error retrieving images: ${request.error?.message}`;
+          console.error('[IndexedDB]', errorMsg);
+          reject(new Error(errorMsg));
+        };
+        
+        // Add transaction error handling
+        transaction.onerror = () => {
+          const errorMsg = `Transaction error in getAllImages: ${transaction.error?.message}`;
+          console.error('[IndexedDB]', errorMsg);
+          reject(new Error(errorMsg));
+        };
+        
+        transaction.onabort = () => {
+          const errorMsg = 'Transaction aborted in getAllImages';
+          console.error('[IndexedDB]', errorMsg);
+          reject(new Error(errorMsg));
         };
       });
     } catch (error) {
-      console.error('Error in getAllImages:', error);
+      console.error('[IndexedDB] Error in getAllImages:', error);
+      
+      // Provide detailed error information
+      if (error instanceof Error) {
+        console.error('[IndexedDB] Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+      }
+      
+      // Return empty array as fallback
       return [];
     }
   }
