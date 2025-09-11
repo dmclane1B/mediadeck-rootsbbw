@@ -17,17 +17,17 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* DX-Play inspired color palette */
-    --primary: 100 45% 20%;  /* Deep green */
+    /* Roots Community Health color palette */
+    --primary: 340 45% 35%;  /* Deep maroon/burgundy */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 100 40% 35%; /* Medium green */
+    --secondary: 150 35% 40%; /* Natural green from tree logo */
     --secondary-foreground: 0 0% 100%;
 
-    --accent: 210 100% 50%; /* Vibrant blue */
+    --accent: 170 45% 55%; /* Healing teal accent */
     --accent-foreground: 0 0% 100%;
 
-    --success: 100 60% 45%; /* Bright green */
+    --success: 150 50% 45%; /* Community green */
     --success-foreground: 0 0% 100%;
 
     --muted: 210 40% 96.1%;
@@ -38,7 +38,7 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 100 45% 20%;
+    --ring: 340 45% 35%;
 
     /* Design system tokens */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));

@@ -24,56 +24,67 @@ const ContactSlide = () => {
     onNext: handleNext,
     onHome: handleHome
   });
-  const contactInfo = [{
-    type: 'Email',
-    value: 'contact@dx1.io',
-    description: 'For general inquiries and partnerships',
-    icon: Mail,
-    action: 'mailto:contact@dx1.io'
-  }, {
-    type: 'Investment Inquiries',
-    value: 'investors@dx1.io',
-    description: 'For funding and investment opportunities',
-    icon: Building2,
-    action: 'mailto:investors@dx1.io'
-  }, {
-    type: 'Phone',
-    value: '+1 (555) 123-4567',
-    description: 'Direct line for immediate assistance',
-    icon: Phone,
-    action: 'tel:+15551234567'
-  }, {
-    type: 'LinkedIn',
-    value: 'linkedin.com/company/dx1-io',
-    description: 'Connect with us professionally',
-    icon: Linkedin,
-    action: 'https://linkedin.com/company/dx1-io'
-  }, {
-    type: 'Website',
-    value: 'www.dx1.io',
-    description: 'Learn more about our platform',
-    icon: Globe,
-    action: 'https://www.dx1.io'
-  }, {
-    type: 'Schedule Meeting',
-    value: 'Book a Demo',
-    description: 'Schedule a personalized demo',
-    icon: Calendar,
-    action: 'https://calendly.com/dx1-demo'
-  }];
-  const teamContacts = [{
-    name: 'Leadership Team',
-    description: 'Connect with our founding team for strategic discussions',
-    icon: Users
-  }, {
-    name: 'Technical Team',
-    description: 'Discuss integration and technical requirements',
-    icon: MessageSquare
-  }, {
-    name: 'Business Development',
-    description: 'Explore partnership and collaboration opportunities',
-    icon: Building2
-  }];
+  const contactInfo = [
+    {
+      type: 'Main Office',
+      value: '8972 MacArthur Blvd, Oakland, CA 94605',
+      description: 'Visit us at our East Oakland location',
+      icon: MapPin,
+      action: 'https://goo.gl/maps/RootsCommunityHealth'
+    },
+    {
+      type: 'Phone',
+      value: '(510) 777-2777',
+      description: 'Call us for appointments and inquiries',
+      icon: Phone,
+      action: 'tel:+15107772777'
+    },
+    {
+      type: 'Email',
+      value: 'info@rootscommunityhealth.org',
+      description: 'General inquiries and information',
+      icon: Mail,
+      action: 'mailto:info@rootscommunityhealth.org'
+    },
+    {
+      type: 'Website',
+      value: 'rootscommunityhealth.org',
+      description: 'Learn more about our services',
+      icon: Globe,
+      action: 'https://rootscommunityhealth.org'
+    },
+    {
+      type: 'Schedule Appointment',
+      value: 'Book Care Today',
+      description: 'Schedule medical or behavioral health care',
+      icon: Calendar,
+      action: 'tel:+15107772777'
+    },
+    {
+      type: 'Community Resources',
+      value: 'Find Help & Support',
+      description: 'Access navigation and community services',
+      icon: Users,
+      action: 'https://rootscommunityhealth.org'
+    }
+  ];
+  const teamContacts = [
+    {
+      name: 'Medical Care Team',
+      description: 'Primary care, family medicine, and specialized health services',
+      icon: Users
+    },
+    {
+      name: 'Behavioral Health Team',
+      description: 'Mental health counseling and behavioral support services',
+      icon: MessageSquare
+    },
+    {
+      name: 'Community Navigation',
+      description: 'Health navigation, housing support, and community resources',
+      icon: Building2
+    }
+  ];
   return <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 flex flex-col relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -93,9 +104,9 @@ const ContactSlide = () => {
         </Button>
       </div>
 
-      {/* DX1 Branding */}
+      {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <img src="/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png" alt="DX1 Logo" className="h-8 w-auto ml-auto mb-2" />
+        <img src="/src/assets/roots-logo.png" alt="Roots Community Health Logo" className="h-10 w-auto ml-auto mb-2" />
         <div className="text-foreground text-xl font-space font-bold">14</div>
       </div>
 
@@ -104,10 +115,10 @@ const ContactSlide = () => {
         <div className="max-w-6xl mx-auto text-center mb-8">
           <div className="mb-8">
             <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-              GET IN TOUCH
+              CONNECT WITH US
             </h1>
             <p className="text-xl text-foreground/80 max-w-3xl mx-auto">
-              Ready to transform your industry? Let's connect and explore how DX1 can drive your digital transformation.
+              Ready to access comprehensive community health services? Connect with Roots Community Health and let us help you on your wellness journey.
             </p>
           </div>
 
@@ -141,7 +152,7 @@ const ContactSlide = () => {
 
           {/* Team Contact Sections */}
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Connect with Our Teams</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Our Health Services</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {teamContacts.map((team, index) => {
               const IconComponent = team.icon;

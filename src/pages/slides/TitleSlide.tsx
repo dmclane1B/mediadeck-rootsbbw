@@ -42,7 +42,7 @@ const TitleSlide = () => {
       
       {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <div className="text-primary text-2xl font-space font-bold mb-2">ROOTS</div>
+        <img src="/src/assets/roots-logo.png" alt="Roots Community Health Logo" className="h-10 w-auto ml-auto mb-2" />
         <div className="text-muted-foreground text-xl font-space font-bold">01</div>
       </div>
 
@@ -62,16 +62,16 @@ const TitleSlide = () => {
         <div className="order-2 lg:order-1">
           <div className="mb-8 sm:mb-12">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-tight mb-4 sm:mb-8">
-              BLACK BREASTFEEDING WEEK
+              ROOTS COMMUNITY HEALTH
             </h1>
             <div className="text-xl sm:text-2xl md:text-3xl text-primary font-inter mb-4 sm:mb-8">
-              AUGUST 25-31, 2025
+              HEALING OUR COMMUNITY FROM WITHIN
             </div>
             <div className="w-20 sm:w-32 h-1 bg-primary animate-fade-in" style={{ animationDelay: '0.5s' }}></div>
           </div>
           
           <div className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '1s' }}>
-            Join Roots Community Health in celebrating and promoting Black Breastfeeding Week! A week dedicated to raising awareness about the importance of breastfeeding, particularly within our community.
+            Uplifting those impacted by systemic inequities and poverty through comprehensive medical and behavioral health care, health navigation, workforce enterprises, housing, outreach, and advocacy.
           </div>
           
           <Button 
@@ -79,7 +79,7 @@ const TitleSlide = () => {
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 text-lg animate-fade-in shadow-lg"
             style={{ animationDelay: '1.2s' }}
           >
-            View Week Overview
+            Learn About Our Services
           </Button>
         </div>
 

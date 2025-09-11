@@ -1,24 +1,24 @@
 {
-  "name": "DX1 - Elevate Your Game",
-  "short_name": "DX1",
-  "description": "Revolutionary sports communication platform with RF-enabled wearable technology",
+  "name": "Roots Community Health - Healing Our Community From Within",
+  "short_name": "Roots Health",
+  "description": "Community health organization uplifting those impacted by systemic inequities through comprehensive care",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a4d33",
-  "theme_color": "#1a4d33",
+  "background_color": "#7d2c59",
+  "theme_color": "#7d2c59",
   "orientation": "any",
-  "categories": ["business", "sports", "productivity"],
+  "categories": ["medical", "health", "community", "social"],
   "lang": "en",
   "dir": "ltr",
   "icons": [
     {
-      "src": "/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png",
+      "src": "/src/assets/roots-logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png",
+      "src": "/src/assets/roots-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -26,7 +26,7 @@
   ],
   "screenshots": [
     {
-      "src": "/lovable-uploads/bcb3b88f-d227-437e-af8d-ddc0c670649e.png",
+      "src": "/src/assets/roots-logo.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide"
