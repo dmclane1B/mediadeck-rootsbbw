@@ -10,12 +10,14 @@ import { useSlideContent } from '@/hooks/useSlideContent';
 import { SlideContent } from '@/data/slideContent';
 import { Edit, Save, RotateCcw, Download, Upload, Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import SlideImagePreview from '@/components/SlideImagePreview';
 
 interface SlideContentEditorProps {
   slides: Array<{ id: string; name: string; route: string }>;
+  onNavigateToImages?: () => void;
 }
 
-const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slides }) => {
+const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slides, onNavigateToImages }) => {
   const { 
     getSlideContent, 
     updateSlideContent, 
@@ -193,9 +195,9 @@ const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slides }) => {
         {slides.map((slide) => (
           <TabsContent key={slide.id} value={slide.id} className="space-y-6">
             <Card className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Basic Fields */}
-                <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Basic Fields - Takes 2 columns */}
+                <div className="lg:col-span-2 space-y-4">
                   <div>
                     <Label htmlFor="title">Title</Label>
                     <Input
@@ -240,60 +242,70 @@ const SlideContentEditor: React.FC<SlideContentEditorProps> = ({ slides }) => {
                       />
                     </div>
                   )}
+
+                  {/* Sections */}
+                  <div className="space-y-4 pt-4">
+                    <div className="flex items-center justify-between">
+                      <Label>Content Sections</Label>
+                      <Button size="sm" onClick={addSection}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Section
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {currentContent?.sections?.map((section, index) => (
+                        <Card key={index} className="p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <Input
+                              value={section.title}
+                              onChange={(e) => handleSectionUpdate(index, 'title', e.target.value)}
+                              placeholder="Section title"
+                              className="flex-1 mr-2"
+                            />
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => removeSection(index)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          
+                          {Array.isArray(section.content) ? (
+                            <Textarea
+                              value={section.content.join('\n')}
+                              onChange={(e) => handleArrayContentChange(index, e.target.value)}
+                              placeholder="Enter each item on a new line"
+                              className="min-h-[80px]"
+                            />
+                          ) : (
+                            <Textarea
+                              value={section.content}
+                              onChange={(e) => handleSectionUpdate(index, 'content', e.target.value)}
+                              placeholder="Section content"
+                              className="min-h-[80px]"
+                            />
+                          )}
+                        </Card>
+                      ))}
+                      
+                      {(!currentContent?.sections || currentContent.sections.length === 0) && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <p>No content sections</p>
+                          <p className="text-sm">Click "Add Section" to create content blocks</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Sections */}
+                {/* Image Preview - Takes 1 column */}
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label>Content Sections</Label>
-                    <Button size="sm" onClick={addSection}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Section
-                    </Button>
-                  </div>
-                  
-                  {currentContent?.sections?.map((section, index) => (
-                    <Card key={index} className="p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <Input
-                          value={section.title}
-                          onChange={(e) => handleSectionUpdate(index, 'title', e.target.value)}
-                          placeholder="Section title"
-                          className="flex-1 mr-2"
-                        />
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => removeSection(index)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      
-                      {Array.isArray(section.content) ? (
-                        <Textarea
-                          value={section.content.join('\n')}
-                          onChange={(e) => handleArrayContentChange(index, e.target.value)}
-                          placeholder="Enter each item on a new line"
-                          className="min-h-[80px]"
-                        />
-                      ) : (
-                        <Textarea
-                          value={section.content}
-                          onChange={(e) => handleSectionUpdate(index, 'content', e.target.value)}
-                          placeholder="Section content"
-                          className="min-h-[80px]"
-                        />
-                      )}
-                    </Card>
-                  ))}
-                  
-                  {(!currentContent?.sections || currentContent.sections.length === 0) && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <p>No content sections</p>
-                      <p className="text-sm">Click "Add Section" to create content blocks</p>
-                    </div>
-                  )}
+                  <SlideImagePreview 
+                    slideId={slide.id} 
+                    onNavigateToImages={onNavigateToImages}
+                  />
                 </div>
               </div>
             </Card>

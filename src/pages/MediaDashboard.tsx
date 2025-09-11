@@ -22,6 +22,7 @@ const MediaDashboard = () => {
   const [selectedSlide, setSelectedSlide] = useState<string | null>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("slides");
 
   const slides = useMemo(() => [
     { id: 'title', name: 'Title Slide', route: '/' },
@@ -206,7 +207,7 @@ const MediaDashboard = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="slides" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 max-w-2xl">
             <TabsTrigger value="slides" className="flex items-center gap-2">
               <Presentation className="w-4 h-4" />
@@ -289,7 +290,10 @@ const MediaDashboard = () => {
 
           <TabsContent value="content">
             <Card className="p-6">
-              <SlideContentEditor slides={slides} />
+              <SlideContentEditor 
+                slides={slides} 
+                onNavigateToImages={() => setActiveTab("slides")}
+              />
             </Card>
           </TabsContent>
 
