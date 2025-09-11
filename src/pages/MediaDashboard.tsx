@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,7 +21,7 @@ const MediaDashboard = () => {
   const [selectedSlide, setSelectedSlide] = useState<string | null>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
 
-  const slides = [
+  const slides = useMemo(() => [
     { id: 'title', name: 'Title Slide', route: '/' },
     { id: 'overview', name: 'Overview', route: '/slides/overview' },
     { id: 'challenges', name: 'Challenges', route: '/slides/challenges' },
@@ -35,10 +35,10 @@ const MediaDashboard = () => {
     { id: 'roadmap', name: 'Roadmap', route: '/slides/roadmap' },
     { id: 'ask', name: 'Ask', route: '/slides/ask' },
     { id: 'contact', name: 'Contact', route: '/slides/contact' }
-  ];
+  ], []);
 
-  // Add validation for slide images
-  const slideIds = slides.map(slide => slide.id);
+  // Add validation for slide images - memoize slideIds to prevent infinite re-renders
+  const slideIds = useMemo(() => slides.map(slide => slide.id), [slides]);
   const { validations, isValidating, validateAndCleanup, getValidationSummary } = useSlideImageValidation(slideIds);
   const summary = getValidationSummary();
 

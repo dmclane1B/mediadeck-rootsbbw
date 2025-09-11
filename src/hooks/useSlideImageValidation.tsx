@@ -17,6 +17,8 @@ export const useSlideImageValidation = (slideIds: string[]) => {
   const [isValidating, setIsValidating] = useState(false);
 
   useEffect(() => {
+    if (slideIds.length === 0) return;
+    
     const validateSlideImages = () => {
       const results: SlideImageValidation[] = slideIds.map(slideId => {
         const slideImage = slideConfig[slideId];
