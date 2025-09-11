@@ -89,7 +89,7 @@ const TitleSlide = () => {
                 <div className="w-20 sm:w-32 h-1 bg-primary animate-fade-in" style={{ animationDelay: '0.5s' }}></div>
               </div>
               
-              <div className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '1s' }}>
+              <div className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fade-in">
                 {slideContent?.description || 'Uplifting those impacted by systemic inequities and poverty through comprehensive medical and behavioral health care, health navigation, workforce enterprises, housing, outreach, and advocacy.'}
               </div>
               
