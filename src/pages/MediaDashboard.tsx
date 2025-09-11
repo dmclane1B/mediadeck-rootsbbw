@@ -8,8 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import MediaLibrary from '@/components/MediaLibrary';
 import ImageShowcase from '@/components/ImageShowcase';
 import useSlideImages, { SlideImage } from '@/hooks/useSlideImages';
+import { useSlideImageValidation } from '@/hooks/useSlideImageValidation';
+import SlideImageStatus from '@/components/SlideImageStatus';
 import { MediaFile } from '@/hooks/useMediaLibrary';
-import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive } from 'lucide-react';
+import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const MediaDashboard = () => {
@@ -34,6 +36,12 @@ const MediaDashboard = () => {
     { id: 'ask', name: 'Ask', route: '/slides/ask' },
     { id: 'contact', name: 'Contact', route: '/slides/contact' }
   ];
+
+  // Add validation for slide images
+  const slideIds = slides.map(slide => slide.id);
+  const { validations, isValidating, validateAndCleanup, getValidationSummary } = useSlideImageValidation(slideIds);
+  const summary = getValidationSummary();
+
 
   // Convert MediaFile to SlideImage format
   const convertMediaFileToSlideImage = (mediaFile: MediaFile): SlideImage => {
@@ -113,10 +121,40 @@ const MediaDashboard = () => {
               <p className="text-muted-foreground">
                 Manage your slide images and media library
               </p>
+              
+              {/* Validation Summary */}
+              <div className="flex items-center gap-4 mt-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm text-muted-foreground">
+                    {summary.validImages}/{summary.totalSlides} slides have images
+                  </span>
+                </div>
+                
+                {summary.invalidImages > 0 && (
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm text-amber-600">
+                      {summary.invalidImages} invalid references
+                    </span>
+                  </div>
+                )}
+                
+                <div className="text-sm text-muted-foreground">
+                  {summary.completionPercentage}% complete
+                </div>
+              </div>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
+            {summary.invalidImages > 0 && (
+              <Button variant="outline" onClick={validateAndCleanup} disabled={isValidating}>
+                <RotateCcw className="w-4 h-4 mr-2" />
+                {isValidating ? 'Cleaning...' : 'Cleanup Invalid'}
+              </Button>
+            )}
+            
             <Button variant="outline" onClick={exportConfiguration}>
               <Download className="w-4 h-4 mr-2" />
               Export Config
@@ -152,7 +190,16 @@ const MediaDashboard = () => {
                 return (
                   <Card key={slide.id} className="p-6 space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-lg">{slide.name}</h3>
+                      <div>
+                        <h3 className="font-semibold text-lg">{slide.name}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-sm text-muted-foreground">Slide {slide.id}</span>
+                          <SlideImageStatus 
+                            hasImage={!!slideImage} 
+                            error={validations.find(v => v.slideId === slide.id)?.error}
+                          />
+                        </div>
+                      </div>
                       <Button
                         variant="outline"
                         size="sm"
@@ -167,6 +214,7 @@ const MediaDashboard = () => {
                       imageAlt={slideImage?.imageAlt}
                       variant="compact"
                       onImageSelect={() => openImageSelector(slide.id)}
+                      showPlaceholder={!slideImage}
                     />
                     
                     <div className="flex gap-2">

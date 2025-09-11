@@ -1,45 +1,28 @@
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Image, Upload, Eye } from 'lucide-react';
-import LazyImage from '@/components/LazyImage';
-import ImagePreviewModal from '@/components/ImagePreviewModal';
+import { Upload, Plus, Eye, Image } from 'lucide-react';
+import LazyImage from './LazyImage';
+import ImagePreviewModal from './ImagePreviewModal';
 import { useMediaLibrary } from '@/hooks/useMediaLibrary';
 
-// Enhanced URL validation utility with better base64 support
+// Helper function to validate image URLs
 const isValidImageUrl = (url: string): boolean => {
   if (!url || typeof url !== 'string') return false;
   
-  const trimmedUrl = url.trim();
-  if (!trimmedUrl) return false;
+  // Data URLs (base64)
+  if (url.startsWith('data:image/')) return true;
   
-  // Check for common invalid patterns
-  const invalidPatterns = ['undefined', 'null', '[object Object]', 'NaN'];
-  if (invalidPatterns.includes(trimmedUrl)) return false;
+  // Blob URLs
+  if (url.startsWith('blob:')) return true;
   
-  // Handle data URLs (base64) with regex - more reliable for long strings
-  if (trimmedUrl.startsWith('data:')) {
-    const dataUrlPattern = /^data:image\/(jpeg|jpg|png|gif|webp|svg\+xml);base64,[A-Za-z0-9+/]+=*$/;
-    return dataUrlPattern.test(trimmedUrl);
-  }
+  // Relative paths
+  if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) return true;
   
-  // Handle blob URLs
-  if (trimmedUrl.startsWith('blob:')) {
-    return true;
-  }
+  // Absolute URLs
+  if (url.match(/^https?:\/\//)) return true;
   
-  // Handle relative paths
-  if (trimmedUrl.match(/^[./]/) || trimmedUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-    return true;
-  }
-  
-  // Handle http/https URLs with URL constructor
-  try {
-    const urlObj = new URL(trimmedUrl);
-    return ['http:', 'https:'].includes(urlObj.protocol);
-  } catch {
-    return false;
-  }
+  return false;
 };
 
 interface ImageShowcaseProps {
@@ -52,30 +35,41 @@ interface ImageShowcaseProps {
   showPlaceholder?: boolean;
 }
 
-const ImageShowcase = ({ 
-  imageUrl, 
+const ImageShowcase: React.FC<ImageShowcaseProps> = ({
+  imageUrl,
   imageId,
-  imageAlt = 'Slide image', 
-  onImageSelect, 
+  imageAlt,
+  onImageSelect,
   className = '',
   variant = 'standard',
-  showPlaceholder = true 
-}: ImageShowcaseProps) => {
+  showPlaceholder = true
+}) => {
   const [showPreview, setShowPreview] = useState(false);
   const { images } = useMediaLibrary();
-  
-  // Get image from media library if imageId is provided
+
+  // Resolve image source - prioritize imageUrl, then fetch from media library by imageId
   const resolvedImage = useMemo(() => {
-    if (imageUrl) {
-      return { url: imageUrl, alt: imageAlt };
+    if (imageUrl && isValidImageUrl(imageUrl)) {
+      return {
+        url: imageUrl,
+        alt: imageAlt || 'Slide image'
+      };
     }
+    
     if (imageId) {
-      const mediaImage = images.find(img => img.id === imageId);
-      return mediaImage ? { url: mediaImage.url, alt: mediaImage.name } : null;
+      const foundImage = images.find(img => img.id === imageId);
+      if (foundImage && isValidImageUrl(foundImage.url)) {
+        return {
+          url: foundImage.url,
+          alt: imageAlt || foundImage.name || 'Slide image'
+        };
+      }
     }
+    
     return null;
   }, [imageUrl, imageId, imageAlt, images]);
-  
+
+  // Get variant-specific classes for height
   const getVariantClasses = () => {
     switch (variant) {
       case 'hero':
@@ -90,7 +84,7 @@ const ImageShowcase = ({
 
   const baseClasses = `relative w-full overflow-hidden rounded-xl ${getVariantClasses()}`;
 
-  // Only render image if we have resolved image data
+  // Show image if available and valid
   if (resolvedImage && isValidImageUrl(resolvedImage.url)) {
     return (
       <>
@@ -100,7 +94,15 @@ const ImageShowcase = ({
             alt={resolvedImage.alt}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
             fallbackToPlaceholder={true}
+            onError={() => {
+              console.warn('Failed to load slide image:', resolvedImage.url);
+            }}
           />
+          
+          {/* Image Status Indicator */}
+          <div className="absolute top-2 right-2 bg-green-500/80 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+            ✓ Image Set
+          </div>
           
           {/* Overlay for interaction */}
           <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
@@ -140,12 +142,36 @@ const ImageShowcase = ({
     );
   }
 
+  // Show placeholder if no image and placeholder is enabled
+  if (showPlaceholder && onImageSelect) {
+    return (
+      <div 
+        className={`${baseClasses} border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 transition-colors cursor-pointer ${className}`}
+        onClick={onImageSelect}
+      >
+        <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 hover:text-primary transition-colors">
+          <Upload className="w-12 h-12 mb-4 opacity-50" />
+          <h3 className="text-lg font-medium mb-2">No Image Set</h3>
+          <p className="text-sm text-center mb-4 max-w-xs">
+            Click to add an image for this slide from your media library
+          </p>
+          <Button variant="outline" className="hover:bg-primary hover:text-primary-foreground">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Image
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Return empty state if no placeholder should be shown
   if (!showPlaceholder) {
     return null;
   }
 
+  // Fallback placeholder (when no onImageSelect is provided)
   return (
-    <Card className={`${baseClasses} ${className} border-2 border-dashed border-border hover:border-primary/50 transition-colors`}>
+    <Card className={`${baseClasses} ${className} border-2 border-dashed border-border`}>
       <div className="flex items-center justify-center h-full bg-muted/30">
         <div className="text-center p-6">
           <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
@@ -157,12 +183,6 @@ const ImageShowcase = ({
           <p className="text-sm text-muted-foreground mb-4">
             Upload an image to showcase on this slide
           </p>
-          {onImageSelect && (
-            <Button onClick={onImageSelect} variant="outline">
-              <Upload className="w-4 h-4 mr-2" />
-              Choose Image
-            </Button>
-          )}
         </div>
       </div>
     </Card>
