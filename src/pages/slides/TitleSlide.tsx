@@ -7,11 +7,14 @@ import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideContent } from '@/hooks/useSlideContent';
 
 const TitleSlide = () => {
   const navigate = useNavigate();
   const { getSlideImage } = useSlideImages();
+  const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImage('title');
+  const slideContent = getSlideContent('title');
 
   const handleNext = () => navigate('/slides/overview');
   const handleOverview = () => navigate('/slides/overview');
@@ -62,16 +65,16 @@ const TitleSlide = () => {
         <div className="order-2 lg:order-1 lg:col-span-2">
           <div className="mb-8 sm:mb-12">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-tight mb-4 sm:mb-8">
-              ROOTS COMMUNITY HEALTH
+              {slideContent?.title || 'ROOTS COMMUNITY HEALTH'}
             </h1>
             <div className="text-xl sm:text-2xl md:text-3xl text-primary font-inter mb-4 sm:mb-8">
-              HEALING OUR COMMUNITY FROM WITHIN
+              {slideContent?.subtitle || 'HEALING OUR COMMUNITY FROM WITHIN'}
             </div>
             <div className="w-20 sm:w-32 h-1 bg-primary animate-fade-in" style={{ animationDelay: '0.5s' }}></div>
           </div>
           
           <div className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '1s' }}>
-            Uplifting those impacted by systemic inequities and poverty through comprehensive medical and behavioral health care, health navigation, workforce enterprises, housing, outreach, and advocacy.
+            {slideContent?.description || 'Uplifting those impacted by systemic inequities and poverty through comprehensive medical and behavioral health care, health navigation, workforce enterprises, housing, outreach, and advocacy.'}
           </div>
           
           <Button 
@@ -79,7 +82,7 @@ const TitleSlide = () => {
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 text-lg animate-fade-in shadow-lg"
             style={{ animationDelay: '1.2s' }}
           >
-            Learn About Our Services
+            {slideContent?.buttonText || 'Learn About Our Services'}
           </Button>
         </div>
 

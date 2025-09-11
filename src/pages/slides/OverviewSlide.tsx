@@ -8,6 +8,7 @@ import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideContent } from '@/hooks/useSlideContent';
 
 const slides = [
   {
@@ -127,7 +128,9 @@ const slides = [
 const OverviewSlide = () => {
   const navigate = useNavigate();
   const { getSlideImage } = useSlideImages();
+  const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImage('overview');
+  const slideContent = getSlideContent('overview');
 
   const handleNext = () => navigate('/slides/challenges');
   const handlePrevious = () => navigate('/');
@@ -184,10 +187,10 @@ const OverviewSlide = () => {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 font-space">
-              BLACK BREASTFEEDING WEEK
+              {slideContent?.title || 'BLACK BREASTFEEDING WEEK'}
             </h1>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-6">
-              A comprehensive week of events, education, and community support celebrating and promoting breastfeeding in the Black community
+              {slideContent?.description || 'A comprehensive week of events, education, and community support celebrating and promoting breastfeeding in the Black community'}
             </p>
             <div className="w-32 h-1 bg-primary mx-auto"></div>
           </div>
@@ -245,7 +248,7 @@ const OverviewSlide = () => {
           {/* Estimated Duration */}
           <div className="text-center mt-12">
             <p className="text-slate-500">
-              <strong>Event Week:</strong> August 25-31, 2025 | <strong>Location:</strong> Community & Virtual Events
+              <strong>Event Week:</strong> {slideContent?.customFields?.eventDetails || 'August 25-31, 2025 | Location: Community & Virtual Events'}
             </p>
           </div>
         </div>

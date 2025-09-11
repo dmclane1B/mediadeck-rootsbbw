@@ -6,11 +6,14 @@ import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideContent } from '@/hooks/useSlideContent';
 
 const ChallengesSlide = () => {
   const navigate = useNavigate();
   const { getSlideImage } = useSlideImages();
+  const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImage('challenges');
+  const slideContent = getSlideContent('challenges');
 
   const handleNext = () => navigate('/slides/product-glimpse');
   const handlePrevious = () => navigate('/slides/overview');
@@ -70,16 +73,16 @@ const ChallengesSlide = () => {
           <div className="space-y-8 animate-fade-in lg:col-span-2">
             <div>
               <h1 className="text-5xl md:text-7xl font-black text-foreground mb-4 font-space leading-tight">
-                WHY THIS
+                {slideContent?.title?.split(' ')[0] || 'WHY'}
               </h1>
               <h1 className="text-5xl md:text-7xl font-black text-accent mb-4 font-space leading-tight animate-slide-in">
-                MATTERS
+                {slideContent?.title?.split(' ').slice(1).join(' ') || 'THIS MATTERS'}
               </h1>
               <div className="w-32 h-1 bg-gradient-to-r from-accent to-primary animate-scale-in"></div>
             </div>
             
             <p className="text-xl text-muted-foreground leading-relaxed font-inter animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              Black Breastfeeding Week addresses critical health disparities in our community. Here are the <span className="font-semibold text-accent">key challenges</span> we're working to overcome:
+              {slideContent?.description || 'Addressing critical challenges in our community'}. Here are the <span className="font-semibold text-accent">key challenges</span> we're working to overcome:
             </p>
             
             {/* Problem Statement */}

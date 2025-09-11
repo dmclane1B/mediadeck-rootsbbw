@@ -11,8 +11,9 @@ import useSlideImages, { SlideImage } from '@/hooks/useSlideImages';
 import { useSlideImageValidation } from '@/hooks/useSlideImageValidation';
 import SlideImageStatus from '@/components/SlideImageStatus';
 import { MediaFile } from '@/hooks/useMediaLibrary';
-import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw, Play, Save } from 'lucide-react';
+import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw, Play, Save, Type } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import SlideContentEditor from '@/components/SlideContentEditor';
 
 const MediaDashboard = () => {
   const navigate = useNavigate();
@@ -206,10 +207,14 @@ const MediaDashboard = () => {
         </div>
 
         <Tabs defaultValue="slides" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-lg">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
             <TabsTrigger value="slides" className="flex items-center gap-2">
               <Presentation className="w-4 h-4" />
               Slide Images
+            </TabsTrigger>
+            <TabsTrigger value="content" className="flex items-center gap-2">
+              <Type className="w-4 h-4" />
+              Text Content
             </TabsTrigger>
             <TabsTrigger value="library" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
@@ -280,6 +285,12 @@ const MediaDashboard = () => {
                 );
               })}
             </div>
+          </TabsContent>
+
+          <TabsContent value="content">
+            <Card className="p-6">
+              <SlideContentEditor slides={slides} />
+            </Card>
           </TabsContent>
 
           <TabsContent value="library">
