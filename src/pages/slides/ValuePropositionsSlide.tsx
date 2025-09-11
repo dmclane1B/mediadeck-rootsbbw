@@ -87,12 +87,12 @@ const ValuePropositionsSlide = () => {
 
             {/* Image Showcase */}
             <div className="mb-8 sm:mb-12 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <ImageShowcase
-                imageId={slideImage?.imageId}
-                imageAlt={slideImage?.imageAlt}
-                onImageSelect={() => navigate('/media')}
-                variant="standard"
-              />
+            <ImageShowcase
+              imageId={slideImage?.imageId}
+              imageAlt={slideImage?.imageAlt}
+              onImageSelect={() => navigate('/media')}
+              variant="hero"
+            />
             </div>
 
             {/* Value Propositions Grid */}

@@ -58,12 +58,12 @@ const TeamLeadershipSlide = () => {
 
         {/* Image Showcase */}
         <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <ImageShowcase
-            imageId={slideImage?.imageId}
-            imageAlt={slideImage?.imageAlt}
-            onImageSelect={() => navigate('/media')}
-            variant="standard"
-          />
+            <ImageShowcase
+              imageId={slideImage?.imageId}
+              imageAlt={slideImage?.imageAlt}
+              onImageSelect={() => navigate('/media')}
+              variant="hero"
+            />
         </div>
 
         <div className="max-w-6xl mx-auto">

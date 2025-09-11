@@ -58,8 +58,8 @@ const TitleSlide = () => {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto px-4 sm:px-8 animate-fade-in z-10 relative items-center">
-        <div className="order-2 lg:order-1">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 max-w-7xl mx-auto px-4 sm:px-8 animate-fade-in z-10 relative items-center">
+        <div className="order-2 lg:order-1 lg:col-span-2">
           <div className="mb-8 sm:mb-12">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-tight mb-4 sm:mb-8">
               ROOTS COMMUNITY HEALTH
@@ -84,12 +84,12 @@ const TitleSlide = () => {
         </div>
 
         {/* Image Showcase */}
-        <div className="order-1 lg:order-2">
+        <div className="order-1 lg:order-2 lg:col-span-3">
           <ImageShowcase
             imageId={slideImage?.imageId}
             imageAlt={slideImage?.imageAlt}
             onImageSelect={() => navigate('/media')}
-            variant="hero"
+            variant="featured"
             className="animate-fade-in"
           />
         </div>

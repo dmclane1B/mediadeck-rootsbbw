@@ -48,12 +48,11 @@ const ProofDemandSlide = () => {
         </div>
 
         {/* Image Showcase */}
-        <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        <div className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
           <ImageShowcase
             imageId={slideImage?.imageId}
             imageAlt={slideImage?.imageAlt || 'Proof of Demand'}
-            variant="hero"
-            className="mx-auto max-w-4xl"
+            variant="featured"
           />
         </div>
 

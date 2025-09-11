@@ -65,9 +65,9 @@ const ChallengesSlide = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 items-start mb-16">
           {/* Left Column - Title */}
-          <div className="space-y-8 animate-fade-in">
+          <div className="space-y-8 animate-fade-in lg:col-span-2">
             <div>
               <h1 className="text-5xl md:text-7xl font-black text-foreground mb-4 font-space leading-tight">
                 WHY THIS
@@ -90,12 +90,12 @@ const ChallengesSlide = () => {
           </div>
 
           {/* Right Column - Image */}
-          <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="animate-fade-in lg:col-span-3" style={{ animationDelay: '0.4s' }}>
             <ImageShowcase
               imageId={slideImage?.imageId}
               imageAlt={slideImage?.imageAlt}
               onImageSelect={() => navigate('/media')}
-              variant="standard"
+              variant="hero"
             />
           </div>
         </div>

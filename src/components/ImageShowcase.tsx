@@ -31,7 +31,7 @@ interface ImageShowcaseProps {
   imageAlt?: string;
   onImageSelect?: () => void;
   className?: string;
-  variant?: 'hero' | 'standard' | 'compact';
+  variant?: 'featured' | 'hero' | 'standard' | 'compact';
   showPlaceholder?: boolean;
 }
 
@@ -72,13 +72,15 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({
   // Get variant-specific classes for height
   const getVariantClasses = () => {
     switch (variant) {
+      case 'featured':
+        return 'h-[24rem] md:h-[32rem] lg:h-[40rem] xl:h-[48rem]';
       case 'hero':
-        return 'h-80 md:h-96 lg:h-[32rem]';
+        return 'h-96 md:h-[28rem] lg:h-[36rem] xl:h-[42rem]';
       case 'compact':
         return 'h-48 md:h-64';
       case 'standard':
       default:
-        return 'h-64 md:h-80 lg:h-96';
+        return 'h-80 md:h-96 lg:h-[28rem] xl:h-[32rem]';
     }
   };
 

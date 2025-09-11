@@ -193,12 +193,12 @@ const OverviewSlide = () => {
           </div>
 
           {/* Image Showcase */}
-          <div className="mb-12">
+          <div className="mb-16">
             <ImageShowcase
               imageId={slideImage?.imageId}
               imageAlt={slideImage?.imageAlt}
               onImageSelect={() => navigate('/media')}
-              variant="standard"
+              variant="hero"
               className="animate-fade-in"
             />
           </div>
