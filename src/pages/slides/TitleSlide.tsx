@@ -36,11 +36,15 @@ const TitleSlide = () => {
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="/lovable-uploads/bcb3b88f-d227-437e-af8d-ddc0c670649e.png" 
-          alt="UCLA Softball Player" 
-          className="w-full h-full object-cover opacity-10"
-        />
+        <picture>
+          <source srcSet="/src/assets/background-community-optimized.webp" type="image/webp" />
+          <img 
+            src="/src/assets/background-community.png" 
+            alt="UCLA Softball Player" 
+            className="w-full h-full object-cover opacity-10"
+            loading="lazy"
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-br from-background/95 to-muted/95"></div>
       </div>
       
