@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { CDNImageOptimizer, CACHE_CONFIG } from './cdnOptimization';
 
 export interface MediaFile {
   id: string;
@@ -25,7 +26,7 @@ export class CloudMediaManager {
   private static readonly FOLDER_PREFIX = 'images/';
 
   /**
-   * Upload a file to Supabase storage
+   * Upload a file to Supabase storage with CDN optimization
    */
   static async uploadToCloud(file: File | Blob, fileName: string): Promise<CloudSyncResult> {
     try {
@@ -33,11 +34,17 @@ export class CloudMediaManager {
       
       const filePath = `${this.FOLDER_PREFIX}${Date.now()}-${fileName}`;
       
+      // Enhanced cache control for better CDN performance
+      const cacheControl = file instanceof File && file.type.startsWith('image/') 
+        ? `max-age=${365 * 24 * 3600}, s-maxage=${365 * 24 * 3600}, immutable` // 1 year for images
+        : 'max-age=3600'; // 1 hour for other files
+      
       const { data, error } = await supabase.storage
         .from(this.BUCKET_NAME)
         .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
+          cacheControl,
+          upsert: false,
+          contentType: file instanceof File ? file.type : 'application/octet-stream'
         });
 
       if (error) {
@@ -45,17 +52,25 @@ export class CloudMediaManager {
         return { success: false, error: error.message };
       }
 
-      // Get public URL
+      // Get optimized public URL for images
       const { data: urlData } = supabase.storage
         .from(this.BUCKET_NAME)
         .getPublicUrl(data.path);
+
+      // For images, generate an optimized URL as the default
+      let optimizedUrl = urlData.publicUrl;
+      if (file instanceof File && file.type.startsWith('image/')) {
+        optimizedUrl = CDNImageOptimizer.getOptimizedUrl(data.path, {
+          quality: 85
+        });
+      }
 
       console.log(`[CloudMedia] Successfully uploaded ${fileName} to ${data.path}`);
       
       return {
         success: true,
         cloudPath: data.path,
-        publicUrl: urlData.publicUrl
+        publicUrl: optimizedUrl
       };
     } catch (error) {
       console.error('[CloudMedia] Upload exception:', error);

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ImagePerformanceManager } from '@/utils/imagePerformance';
 
 interface LazyImageProps {
   src: string;
@@ -31,9 +32,12 @@ const LazyImage = ({
         if (entry.isIntersecting) {
           setIsInView(true);
           observer.unobserve(entry.target);
+          
+          // Measure performance
+          ImagePerformanceManager.measureImageLoadingPerformance(src);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '50px' } // Added root margin for better UX
     );
 
     if (imgRef.current) {
@@ -41,7 +45,7 @@ const LazyImage = ({
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [src]);
 
   const handleLoad = () => {
     setIsLoading(false);
