@@ -25,6 +25,22 @@ export class CloudMediaManager {
   private static readonly BUCKET_NAME = 'media';
   private static readonly FOLDER_PREFIX = 'images/';
 
+  // Sanitize filenames for Supabase Storage keys
+  private static sanitizeFileName(name: string): string {
+    const dotIndex = name.lastIndexOf('.');
+    const base = (dotIndex > 0 ? name.slice(0, dotIndex) : name)
+      .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[\u00A0\u202F]/g, ' ')
+      .replace(/\s+/g, '-')
+      .replace(/[^a-zA-Z0-9._-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^[\-_.]+|[\-_.]+$/g, '')
+      .toLowerCase()
+      .slice(0, 80);
+    const ext = dotIndex > 0 ? name.slice(dotIndex).toLowerCase().replace(/[^a-z0-9.]/g, '') : '';
+    return `${base}${ext || ''}` || `file-${Date.now()}`;
+  }
+
   /**
    * Upload a file to Supabase storage with CDN optimization
    */
@@ -32,7 +48,8 @@ export class CloudMediaManager {
     try {
       console.log(`[CloudMedia] Uploading ${fileName} to cloud storage...`);
       
-      const filePath = `${this.FOLDER_PREFIX}${Date.now()}-${fileName}`;
+      const safeName = this.sanitizeFileName(fileName);
+      const filePath = `${this.FOLDER_PREFIX}${Date.now()}-${safeName}`;
       
       // Enhanced cache control for better CDN performance
       const cacheControl = file instanceof File && file.type.startsWith('image/') 

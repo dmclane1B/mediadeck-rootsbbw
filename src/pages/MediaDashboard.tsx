@@ -27,7 +27,8 @@ const MediaDashboard = () => {
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("slides");
-
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+ 
   const slides = useMemo(() => [
     { id: 'title', name: 'Title Slide', route: '/' },
     { id: 'overview', name: 'Overview', route: '/slides/overview' },
@@ -132,6 +133,7 @@ const MediaDashboard = () => {
           title: "Slides Published Successfully!",
           description: "Your slides are now live and accessible from any device.",
         });
+        setShowSuccessDialog(true);
       } else {
         toast({
           title: "Publishing Incomplete",
@@ -361,6 +363,32 @@ const MediaDashboard = () => {
             onSelectImage={handleImageSelect}
             compact={false}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Publish Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Publish Complete</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="font-medium">Slides published successfully</span>
+            </div>
+            <p className="text-muted-foreground">
+              Your slides are now live and accessible from any device.
+            </p>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setShowSuccessDialog(false)}>
+                Close
+              </Button>
+              <Button onClick={() => { setShowSuccessDialog(false); handleStartPresentation(); }}>
+                Start Presentation
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
