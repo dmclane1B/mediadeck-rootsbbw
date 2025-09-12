@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import MarketChart from '@/components/MarketChart';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 
 const MarketOverviewSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
-  const slideImage = getSlideImage('market-overview');
+  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const slideImage = getSlideImageForDisplay('market-overview');
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
@@ -75,8 +75,8 @@ const MarketOverviewSlide = () => {
         {/* Image Showcase */}
         <div className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
           <ImageShowcase
-            imageId={slideImage?.imageId}
-            imageAlt={slideImage?.imageAlt}
+            imageUrl={slideImage?.url}
+            imageAlt={slideImage?.alt}
             onImageSelect={() => navigate('/media')}
             variant="hero"
           />

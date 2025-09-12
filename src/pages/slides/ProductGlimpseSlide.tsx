@@ -5,12 +5,12 @@ import { Shield, Users, Zap, Settings, ChevronRight, Smartphone } from 'lucide-r
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 
 const ProductGlimpseSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
-  const slideImage = getSlideImage('product-glimpse');
+  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const slideImage = getSlideImageForDisplay('product-glimpse');
 
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center relative">
@@ -61,8 +61,8 @@ const ProductGlimpseSlide = () => {
         {/* Image Showcase */}
         <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <ImageShowcase
-            imageId={slideImage?.imageId}
-            imageAlt={slideImage?.imageAlt}
+            imageUrl={slideImage?.url}
+            imageAlt={slideImage?.alt}
             onImageSelect={() => navigate('/media')}
             variant="standard"
           />

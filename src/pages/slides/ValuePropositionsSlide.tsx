@@ -8,12 +8,12 @@ import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 
 const ValuePropositionsSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
-  const slideImage = getSlideImage('value-propositions');
+  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const slideImage = getSlideImageForDisplay('value-propositions');
 
   const handlePrevious = () => navigate('/slides/market-overview');
   const handleNext = () => navigate('/slides/ask');
@@ -88,8 +88,8 @@ const ValuePropositionsSlide = () => {
             {/* Image Showcase */}
             <div className="mb-8 sm:mb-12 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <ImageShowcase
-              imageId={slideImage?.imageId}
-              imageAlt={slideImage?.imageAlt}
+              imageUrl={slideImage?.url}
+              imageAlt={slideImage?.alt}
               onImageSelect={() => navigate('/media')}
               variant="hero"
             />

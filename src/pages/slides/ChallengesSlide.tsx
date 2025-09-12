@@ -5,14 +5,14 @@ import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
 
 const ChallengesSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
+  const { getSlideImageForDisplay } = useSlideImageResolver();
   const { getSlideContent } = useSlideContent();
-  const slideImage = getSlideImage('challenges');
+  const slideImage = getSlideImageForDisplay('challenges');
   const slideContent = getSlideContent('challenges');
 
   const handleNext = () => navigate('/slides/product-glimpse');
@@ -95,8 +95,8 @@ const ChallengesSlide = () => {
           {/* Right Column - Image */}
           <div className="animate-fade-in lg:col-span-3" style={{ animationDelay: '0.4s' }}>
             <ImageShowcase
-              imageId={slideImage?.imageId}
-              imageAlt={slideImage?.imageAlt}
+              imageUrl={slideImage?.url}
+              imageAlt={slideImage?.alt}
               onImageSelect={() => navigate('/media')}
               variant="hero"
             />

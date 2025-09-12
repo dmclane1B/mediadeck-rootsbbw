@@ -7,11 +7,11 @@ import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 const ContactSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
-  const slideImage = getSlideImage('contact');
+  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const slideImage = getSlideImageForDisplay('contact');
   const handleNext = () => navigate('/');
   const handlePrevious = () => navigate('/slides/ask');
   const handleHome = () => navigate('/');
@@ -125,8 +125,8 @@ const ContactSlide = () => {
           {/* Image Showcase */}
           <div className="mb-8">
             <ImageShowcase
-              imageId={slideImage?.imageId}
-              imageAlt={slideImage?.imageAlt}
+              imageUrl={slideImage?.url}
+              imageAlt={slideImage?.alt}
               onImageSelect={() => navigate('/media')}
               variant="standard"
               className="animate-fade-in"

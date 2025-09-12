@@ -6,11 +6,11 @@ import { Code, Globe, Rocket, Target, TrendingUp, Users, Zap, BarChart3, Clock }
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 const RoadmapSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
-  const slideImage = getSlideImage('roadmap');
+  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const slideImage = getSlideImageForDisplay('roadmap');
   return <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-primary flex items-center justify-center relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 opacity-10">
@@ -52,8 +52,8 @@ const RoadmapSlide = () => {
         {/* Image Showcase */}
         <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <ImageShowcase
-              imageId={slideImage?.imageId}
-              imageAlt={slideImage?.imageAlt}
+              imageUrl={slideImage?.url}
+              imageAlt={slideImage?.alt}
               onImageSelect={() => navigate('/media')}
               variant="hero"
             />

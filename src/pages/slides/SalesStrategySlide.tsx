@@ -5,12 +5,12 @@ import { Target, Users, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import useSlideImages from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 
 const SalesStrategySlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
-  const slideImage = getSlideImage('sales-strategy');
+  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const slideImage = getSlideImageForDisplay('sales-strategy');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-success flex items-center justify-center relative overflow-hidden">
@@ -54,8 +54,8 @@ const SalesStrategySlide = () => {
         {/* Image Showcase */}
         <div className="mb-16 animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <ImageShowcase
-            imageId={slideImage?.imageId}
-            imageAlt={slideImage?.imageAlt || 'Sales Strategy'}
+            imageUrl={slideImage?.url}
+            imageAlt={slideImage?.alt || 'Sales Strategy'}
             variant="featured"
           />
         </div>

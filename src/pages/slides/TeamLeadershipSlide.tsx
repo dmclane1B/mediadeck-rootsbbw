@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import teamLeadershipImage from '@/assets/team-leadership.png';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 const TeamLeadershipSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
-  const slideImage = getSlideImage('team-leadership');
+  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const slideImage = getSlideImageForDisplay('team-leadership');
   return <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -59,8 +59,8 @@ const TeamLeadershipSlide = () => {
         {/* Image Showcase */}
         <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <ImageShowcase
-              imageId={slideImage?.imageId}
-              imageAlt={slideImage?.imageAlt}
+              imageUrl={slideImage?.url}
+              imageAlt={slideImage?.alt}
               onImageSelect={() => navigate('/media')}
               variant="hero"
             />

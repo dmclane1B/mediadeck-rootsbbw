@@ -3,12 +3,12 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import useSlideImages from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 
 const ProofDemandSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
-  const slideImage = getSlideImage('proof-demand');
+  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const slideImage = getSlideImageForDisplay('proof-demand');
   return <div className="min-h-screen bg-gradient-to-br from-primary via-accent to-success flex items-center justify-center relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 opacity-10">
@@ -50,8 +50,8 @@ const ProofDemandSlide = () => {
         {/* Image Showcase */}
         <div className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
           <ImageShowcase
-            imageId={slideImage?.imageId}
-            imageAlt={slideImage?.imageAlt || 'Proof of Demand'}
+            imageUrl={slideImage?.url}
+            imageAlt={slideImage?.alt || 'Proof of Demand'}
             variant="featured"
           />
         </div>
