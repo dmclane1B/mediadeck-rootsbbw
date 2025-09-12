@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import SlideEditor from '@/components/SlideEditor';
-import SlideTemplates from '@/components/SlideTemplates';
+import LazySlideTemplates from '@/components/LazySlideTemplates';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import { Presentation, Sparkles, Zap, Image } from 'lucide-react';
 
@@ -32,7 +32,7 @@ const Index = () => {
               ← Back to Home
             </Button>
           </div>
-          <SlideTemplates onSelectTemplate={handleSelectTemplate} />
+          <LazySlideTemplates onSelectTemplate={handleSelectTemplate} />
         </div>
       </div>
     );
