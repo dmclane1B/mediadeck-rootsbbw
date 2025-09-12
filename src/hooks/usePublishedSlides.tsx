@@ -81,38 +81,16 @@ export function usePublishedSlides(): UsePublishedSlidesReturn {
 
   const publishSlide = async (slideId: string, image: any): Promise<boolean> => {
     try {
-      // First, ensure image is uploaded to cloud
-      const { data: mediaData, error: mediaError } = await supabase
-        .from('published_media')
-        .upsert({
-          image_id: image.id,
-          image_name: image.name,
-          cloud_path: image.cloudPath || `media/${image.id}`,
-          cloud_url: image.url,
-          file_size: image.size,
-          file_type: image.type || 'image/jpeg',
-          dimensions: image.dimensions,
-        })
-        .select()
-        .single();
+      // Use edge function to publish slide (bypasses RLS with service role)
+      const { data, error } = await supabase.functions.invoke('publish-slides', {
+        body: {
+          action: 'publishSlide',
+          data: { slideId, image }
+        }
+      });
 
-      if (mediaError) throw mediaError;
-
-      // Then publish the slide configuration
-      const { error: slideError } = await supabase
-        .from('published_slide_configurations')
-        .upsert({
-          slide_id: slideId,
-          image_id: image.id,
-          image_name: image.name,
-          image_url: image.url,
-          cloud_path: image.cloudPath || `media/${image.id}`,
-          alt_text: image.altText,
-          dimensions: image.dimensions,
-          size: image.size,
-        });
-
-      if (slideError) throw slideError;
+      if (error) throw error;
+      if (!data?.success) throw new Error('Failed to publish slide');
 
       await refreshPublishedSlides();
       
@@ -163,26 +141,33 @@ export function usePublishedSlides(): UsePublishedSlidesReturn {
 
   const publishAllSlides = async (slideConfig: Record<string, any>): Promise<boolean> => {
     try {
-      const slideEntries = Object.entries(slideConfig).filter(([_, image]) => image);
-      let successCount = 0;
+      // Use edge function to publish all slides at once (more efficient)
+      const { data, error } = await supabase.functions.invoke('publish-slides', {
+        body: {
+          action: 'publishAllSlides',
+          data: { slideConfig }
+        }
+      });
 
-      for (const [slideId, image] of slideEntries) {
-        const success = await publishSlide(slideId, image);
-        if (success) successCount++;
-      }
+      if (error) throw error;
 
-      if (successCount === slideEntries.length) {
+      const { success, successCount, totalCount, errors } = data;
+
+      if (success) {
         toast({
           title: "All Slides Published",
           description: `Successfully published ${successCount} slides. Your presentation is now live!`,
         });
+        await refreshPublishedSlides();
         return true;
       } else {
+        console.error('Publishing errors:', errors);
         toast({
           title: "Partial Success",
-          description: `Published ${successCount} of ${slideEntries.length} slides. Some slides may need attention.`,
+          description: `Published ${successCount} of ${totalCount} slides. Some slides failed to publish.`,
           variant: "destructive",
         });
+        await refreshPublishedSlides();
         return false;
       }
     } catch (err) {

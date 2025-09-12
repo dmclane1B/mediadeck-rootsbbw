@@ -1,1 +1,4 @@
 project_id = "lqdvixskvkezycjlvduh"
+
+[functions.publish-slides]
+verify_jwt = false
