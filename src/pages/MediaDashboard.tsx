@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import StorageMonitor from '@/components/StorageMonitor';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import MediaLibrary from '@/components/MediaLibrary';
 import ImageShowcase from '@/components/ImageShowcase';
 import useSlideImages, { SlideImage } from '@/hooks/useSlideImages';
@@ -28,6 +29,12 @@ const MediaDashboard = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("slides");
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [publishingProgress, setPublishingProgress] = useState<{
+    stage: 'idle' | 'preparing' | 'uploading' | 'publishing' | 'complete' | 'error';
+    progress: number;
+    currentSlide?: string;
+    details?: string;
+  }>({ stage: 'idle', progress: 0 });
  
   const slides = useMemo(() => [
     { id: 'title', name: 'Title Slide', route: '/' },
@@ -123,26 +130,91 @@ const MediaDashboard = () => {
   };
 
   const handlePublishSlides = async () => {
-    console.log('Publishing slides with config:', slideConfig);
-    console.log('Number of slides to publish:', Object.keys(slideConfig).length);
+    const slideCount = Object.keys(slideConfig).length;
+    console.log('🚀 Starting slide publishing process');
+    console.log('📊 Publishing configuration:', slideConfig);
+    console.log(`📑 Total slides to publish: ${slideCount}`);
+    
+    if (slideCount === 0) {
+      toast({
+        title: "No Slides to Publish",
+        description: "Please add images to your slides before publishing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Reset progress
+    setPublishingProgress({ stage: 'preparing', progress: 10, details: 'Preparing slides for publishing...' });
     
     try {
+      // Step 1: Pre-flight checks
+      console.log('🔍 Performing pre-flight checks...');
+      setPublishingProgress({ stage: 'preparing', progress: 20, details: 'Validating slide data...' });
+      
+      // Check Supabase connection
+      const { data: healthCheck, error: healthError } = await supabase
+        .from('published_slide_configurations')
+        .select('count')
+        .limit(1);
+      
+      if (healthError) {
+        console.error('❌ Supabase connection failed:', healthError);
+        throw new Error('Database connection failed. Please check your internet connection.');
+      }
+      
+      console.log('✅ Database connection verified');
+      
+      // Step 2: Start upload process
+      setPublishingProgress({ stage: 'uploading', progress: 40, details: 'Uploading images to cloud storage...' });
+      console.log('☁️ Starting cloud upload process...');
+      
+      // Step 3: Publish slides
+      setPublishingProgress({ stage: 'publishing', progress: 70, details: 'Publishing slides to database...' });
+      console.log('📤 Publishing slides to database...');
+      
       const success = await publishAllSlides(slideConfig);
+      
       if (success) {
+        console.log('✅ All slides published successfully!');
+        setPublishingProgress({ stage: 'complete', progress: 100, details: 'Publishing complete!' });
+        
+        // Brief delay to show completion
+        setTimeout(() => {
+          setPublishingProgress({ stage: 'idle', progress: 0 });
+          setShowSuccessDialog(true);
+        }, 1000);
+        
         toast({
           title: "Slides Published Successfully!",
           description: "Your slides are now live and accessible from any device.",
         });
-        setShowSuccessDialog(true);
       } else {
+        console.log('⚠️ Publishing completed with some failures');
+        setPublishingProgress({ stage: 'error', progress: 0, details: 'Some slides failed to publish' });
+        
+        setTimeout(() => {
+          setPublishingProgress({ stage: 'idle', progress: 0 });
+        }, 3000);
+        
         toast({
           title: "Publishing Incomplete",
-          description: "Some slides failed to publish. Check the logs for details.",
+          description: "Some slides failed to publish. Check the console for details.",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Failed to publish slides:', error);
+      console.error('❌ Failed to publish slides:', error);
+      setPublishingProgress({ 
+        stage: 'error', 
+        progress: 0, 
+        details: error instanceof Error ? error.message : 'Unknown error occurred' 
+      });
+      
+      setTimeout(() => {
+        setPublishingProgress({ stage: 'idle', progress: 0 });
+      }, 5000);
+      
       toast({
         title: "Publishing Failed",
         description: error instanceof Error ? error.message : "There was an error publishing your slides. Please try again.",
@@ -224,12 +296,25 @@ const MediaDashboard = () => {
             
             <Button 
               onClick={handlePublishSlides} 
-              disabled={isPublishing || summary.validImages === 0}
+              disabled={isPublishing || summary.validImages === 0 || publishingProgress.stage !== 'idle'}
               size="lg" 
-              className="mr-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="mr-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 min-w-[160px] relative overflow-hidden"
             >
-              <Globe className="w-4 h-4 mr-2" />
-              {isPublishing ? 'Publishing...' : 'Publish Slides'}
+              {publishingProgress.stage !== 'idle' && (
+                <div 
+                  className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-30 transition-all duration-300"
+                  style={{ width: `${publishingProgress.progress}%` }}
+                />
+              )}
+              <Globe className="w-4 h-4 mr-2 relative z-10" />
+              <span className="relative z-10">
+                {publishingProgress.stage === 'idle' && 'Publish Slides'}
+                {publishingProgress.stage === 'preparing' && 'Preparing...'}
+                {publishingProgress.stage === 'uploading' && 'Uploading...'}
+                {publishingProgress.stage === 'publishing' && 'Publishing...'}
+                {publishingProgress.stage === 'complete' && 'Complete!'}
+                {publishingProgress.stage === 'error' && 'Failed'}
+              </span>
             </Button>
             
             {/* Secondary Action Buttons */}
@@ -250,6 +335,26 @@ const MediaDashboard = () => {
             </Button>
           </div>
         </div>
+
+        {/* Publishing Progress Indicator */}
+        {publishingProgress.stage !== 'idle' && (
+          <div className="bg-card border rounded-lg p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-primary animate-pulse" />
+                <span className="font-medium">Publishing Progress</span>
+              </div>
+              <span className="text-sm text-muted-foreground">{publishingProgress.progress}%</span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2 mb-2">
+              <div 
+                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${publishingProgress.progress}%` }}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">{publishingProgress.details}</p>
+          </div>
+        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 max-w-2xl">
