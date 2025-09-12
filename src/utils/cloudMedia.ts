@@ -47,53 +47,64 @@ export class CloudMediaManager {
   static async uploadToCloud(file: File | Blob, fileName: string): Promise<CloudSyncResult> {
     try {
       console.log(`[CloudMedia] Uploading ${fileName} to cloud storage...`);
-      
+
       const safeName = this.sanitizeFileName(fileName);
       const filePath = `${this.FOLDER_PREFIX}${Date.now()}-${safeName}`;
-      
+
+      const mime = (file as any)?.type || 'application/octet-stream';
+      const isImage = typeof mime === 'string' && mime.startsWith('image/');
+
       // Enhanced cache control for better CDN performance
-      const cacheControl = file instanceof File && file.type.startsWith('image/') 
-        ? `max-age=${365 * 24 * 3600}, s-maxage=${365 * 24 * 3600}, immutable` // 1 year for images
-        : 'max-age=3600'; // 1 hour for other files
-      
-      const { data, error } = await supabase.storage
-        .from(this.BUCKET_NAME)
-        .upload(filePath, file, {
-          cacheControl,
-          upsert: false,
-          contentType: file instanceof File ? file.type : 'application/octet-stream'
-        });
+      const cacheControl = isImage
+        ? `max-age=${365 * 24 * 3600}, s-maxage=${365 * 24 * 3600}, immutable`
+        : 'max-age=3600';
 
-      if (error) {
-        console.error('[CloudMedia] Upload error:', error);
-        return { success: false, error: error.message };
+      // Retry upload up to 3 times in case of transient failures
+      let lastError: any = null;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        const { data, error } = await supabase.storage
+          .from(this.BUCKET_NAME)
+          .upload(filePath, file, {
+            cacheControl,
+            upsert: false,
+            contentType: mime,
+          });
+
+        if (!error && data) {
+          // Get optimized public URL for images
+          const { data: urlData } = supabase.storage
+            .from(this.BUCKET_NAME)
+            .getPublicUrl(data.path);
+
+          let optimizedUrl = urlData.publicUrl;
+          if (isImage) {
+            optimizedUrl = CDNImageOptimizer.getOptimizedUrl(data.path, { quality: 85 });
+          }
+
+          console.log(`[CloudMedia] Successfully uploaded ${fileName} to ${data.path}`);
+
+          return {
+            success: true,
+            cloudPath: data.path,
+            publicUrl: optimizedUrl,
+          };
+        }
+
+        // Capture error and retry with backoff
+        lastError = error;
+        console.error(`[CloudMedia] Upload error (attempt ${attempt}/3):`, error);
+        if (attempt < 3) {
+          await new Promise((res) => setTimeout(res, 400 * attempt));
+          continue;
+        }
       }
 
-      // Get optimized public URL for images
-      const { data: urlData } = supabase.storage
-        .from(this.BUCKET_NAME)
-        .getPublicUrl(data.path);
-
-      // For images, generate an optimized URL as the default
-      let optimizedUrl = urlData.publicUrl;
-      if (file instanceof File && file.type.startsWith('image/')) {
-        optimizedUrl = CDNImageOptimizer.getOptimizedUrl(data.path, {
-          quality: 85
-        });
-      }
-
-      console.log(`[CloudMedia] Successfully uploaded ${fileName} to ${data.path}`);
-      
-      return {
-        success: true,
-        cloudPath: data.path,
-        publicUrl: optimizedUrl
-      };
+      return { success: false, error: lastError?.message || 'Unknown upload error' };
     } catch (error) {
       console.error('[CloudMedia] Upload exception:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown upload error' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown upload error',
       };
     }
   }

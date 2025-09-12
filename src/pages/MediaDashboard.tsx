@@ -17,6 +17,7 @@ import { MediaFile } from '@/hooks/useMediaLibrary';
 import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw, Play, Save, Type, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SlideContentEditor from '@/components/SlideContentEditor';
+import { CloudMediaManager } from '@/utils/cloudMedia';
 
 const MediaDashboard = () => {
   const navigate = useNavigate();
@@ -144,36 +145,45 @@ const MediaDashboard = () => {
       return;
     }
 
-    // Reset progress
-    setPublishingProgress({ stage: 'preparing', progress: 10, details: 'Preparing slides for publishing...' });
-    
-    try {
-      // Step 1: Pre-flight checks
-      console.log('🔍 Performing pre-flight checks...');
-      setPublishingProgress({ stage: 'preparing', progress: 20, details: 'Validating slide data...' });
+      // Reset progress
+      setPublishingProgress({ stage: 'preparing', progress: 10, details: 'Preparing slides for publishing...' });
       
-      // Check Supabase connection
-      const { data: healthCheck, error: healthError } = await supabase
-        .from('published_slide_configurations')
-        .select('count')
-        .limit(1);
-      
-      if (healthError) {
-        console.error('❌ Supabase connection failed:', healthError);
-        throw new Error('Database connection failed. Please check your internet connection.');
-      }
-      
-      console.log('✅ Database connection verified');
-      
-      // Step 2: Start upload process
-      setPublishingProgress({ stage: 'uploading', progress: 40, details: 'Uploading images to cloud storage...' });
-      console.log('☁️ Starting cloud upload process...');
-      
-      // Step 3: Publish slides
-      setPublishingProgress({ stage: 'publishing', progress: 70, details: 'Publishing slides to database...' });
-      console.log('📤 Publishing slides to database...');
-      
-      const success = await publishAllSlides(slideConfig);
+      try {
+        // Step 1: Pre-flight checks
+        console.log('🔍 Performing pre-flight checks...');
+        setPublishingProgress({ stage: 'preparing', progress: 20, details: 'Validating slide data...' });
+        
+        // Check Supabase connection
+        const { data: healthCheck, error: healthError } = await supabase
+          .from('published_slide_configurations')
+          .select('count')
+          .limit(1);
+        
+        if (healthError) {
+          console.error('❌ Supabase connection failed:', healthError);
+          throw new Error('Database connection failed. Please check your internet connection.');
+        }
+        
+        console.log('✅ Database connection verified');
+
+        // Check Cloud Storage availability
+        setPublishingProgress({ stage: 'preparing', progress: 30, details: 'Checking cloud storage...' });
+        const cloudOk = await CloudMediaManager.isCloudAvailable();
+        if (!cloudOk) {
+          throw new Error('Cloud storage bucket is not available. Please try again later.');
+        }
+        console.log('✅ Cloud storage available');
+        setPublishingProgress({ stage: 'preparing', progress: 35, details: 'Cloud storage verified' });
+        
+        // Step 2: Start upload process
+        setPublishingProgress({ stage: 'uploading', progress: 40, details: 'Uploading images to cloud storage...' });
+        console.log('☁️ Starting cloud upload process...');
+        
+        // Step 3: Publish slides
+        setPublishingProgress({ stage: 'publishing', progress: 70, details: 'Publishing slides to database...' });
+        console.log('📤 Publishing slides to database...');
+        
+        const success = await publishAllSlides(slideConfig);
       
       if (success) {
         console.log('✅ All slides published successfully!');
@@ -239,7 +249,7 @@ const MediaDashboard = () => {
     <div className="min-h-screen bg-muted p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <Button variant="outline" onClick={() => navigate('/builder')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
