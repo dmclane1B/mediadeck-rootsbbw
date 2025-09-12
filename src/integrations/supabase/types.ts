@@ -652,6 +652,99 @@ export type Database = {
         }
         Relationships: []
       }
+      published_media: {
+        Row: {
+          cloud_path: string
+          cloud_url: string
+          dimensions: Json | null
+          file_size: number | null
+          file_type: string | null
+          id: string
+          image_id: string
+          image_name: string
+          published_at: string
+          published_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          cloud_path: string
+          cloud_url: string
+          dimensions?: Json | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          image_id: string
+          image_name: string
+          published_at?: string
+          published_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cloud_path?: string
+          cloud_url?: string
+          dimensions?: Json | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          image_id?: string
+          image_name?: string
+          published_at?: string
+          published_by?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      published_slide_configurations: {
+        Row: {
+          alt_text: string | null
+          cloud_path: string
+          dimensions: Json | null
+          id: string
+          image_id: string
+          image_name: string
+          image_url: string
+          published_at: string
+          published_by: string | null
+          size: number | null
+          slide_id: string
+          status: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          alt_text?: string | null
+          cloud_path: string
+          dimensions?: Json | null
+          id?: string
+          image_id: string
+          image_name: string
+          image_url: string
+          published_at?: string
+          published_by?: string | null
+          size?: number | null
+          slide_id: string
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          alt_text?: string | null
+          cloud_path?: string
+          dimensions?: Json | null
+          id?: string
+          image_id?: string
+          image_name?: string
+          image_url?: string
+          published_at?: string
+          published_by?: string | null
+          size?: number | null
+          slide_id?: string
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           created_at: string

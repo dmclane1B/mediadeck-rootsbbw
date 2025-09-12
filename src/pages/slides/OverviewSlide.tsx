@@ -7,7 +7,7 @@ import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
 
 const slides = [
@@ -127,9 +127,9 @@ const slides = [
 
 const OverviewSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
+  const { getSlideImageForDisplay } = useSlideImageResolver();
   const { getSlideContent } = useSlideContent();
-  const slideImage = getSlideImage('overview');
+  const slideImage = getSlideImageForDisplay('overview');
   const slideContent = getSlideContent('overview');
 
   const handleNext = () => navigate('/slides/challenges');
@@ -202,8 +202,8 @@ const OverviewSlide = () => {
           {/* Image Showcase */}
           <div className="mb-16">
             <ImageShowcase
-              imageId={slideImage?.imageId}
-              imageAlt={slideImage?.imageAlt}
+              imageId={slideImage?.id}
+              imageAlt={slideImage?.alt}
               onImageSelect={() => navigate('/media')}
               variant="hero"
               className="animate-fade-in"

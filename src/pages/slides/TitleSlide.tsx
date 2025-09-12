@@ -6,15 +6,15 @@ import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
-import { useSlideImages } from '@/hooks/useSlideImages';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const TitleSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImage } = useSlideImages();
+  const { getSlideImageForDisplay } = useSlideImageResolver();
   const { getSlideContent, loading } = useSlideContent();
-  const slideImage = getSlideImage('title');
+  const slideImage = getSlideImageForDisplay('title');
   const slideContent = getSlideContent('title');
 
   const handleNext = () => navigate('/slides/overview');
@@ -107,8 +107,8 @@ const TitleSlide = () => {
         {/* Image Showcase */}
         <div className="order-1 lg:order-2 lg:col-span-3">
           <ImageShowcase
-            imageId={slideImage?.imageId}
-            imageAlt={slideImage?.imageAlt}
+            imageId={slideImage?.id}
+            imageAlt={slideImage?.alt}
             onImageSelect={() => navigate('/media')}
             variant="featured"
             className="animate-fade-in"

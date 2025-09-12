@@ -9,9 +9,11 @@ import MediaLibrary from '@/components/MediaLibrary';
 import ImageShowcase from '@/components/ImageShowcase';
 import useSlideImages, { SlideImage } from '@/hooks/useSlideImages';
 import { useSlideImageValidation } from '@/hooks/useSlideImageValidation';
+import { usePublishedSlides } from '@/hooks/usePublishedSlides';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import SlideImageStatus from '@/components/SlideImageStatus';
 import { MediaFile } from '@/hooks/useMediaLibrary';
-import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw, Play, Save, Type } from 'lucide-react';
+import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw, Play, Save, Type, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SlideContentEditor from '@/components/SlideContentEditor';
 
@@ -19,6 +21,8 @@ const MediaDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { slideConfig, setSlideImage, getSlideImage, clearAllConfigurations } = useSlideImages();
+  const { publishAllSlides, isLoading: isPublishing } = usePublishedSlides();
+  const { isSlidePublished } = useSlideImageResolver();
   const [selectedSlide, setSelectedSlide] = useState<string | null>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -117,6 +121,25 @@ const MediaDashboard = () => {
     navigate('/');
   };
 
+  const handlePublishSlides = async () => {
+    try {
+      const success = await publishAllSlides(slideConfig);
+      if (success) {
+        toast({
+          title: "Slides Published!",
+          description: "Your slides are now live and accessible from any device.",
+        });
+      }
+    } catch (error) {
+      console.error('Failed to publish slides:', error);
+      toast({
+        title: "Publishing Failed",
+        description: "There was an error publishing your slides. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const exportConfiguration = () => {
     const dataStr = JSON.stringify(slideConfig, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -186,6 +209,16 @@ const MediaDashboard = () => {
             >
               <Save className="w-4 h-4 mr-2" />
               {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
+            
+            <Button 
+              onClick={handlePublishSlides} 
+              disabled={isPublishing || summary.validImages === 0}
+              size="lg" 
+              className="mr-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              <Globe className="w-4 h-4 mr-2" />
+              {isPublishing ? 'Publishing...' : 'Publish Slides'}
             </Button>
             
             {/* Secondary Action Buttons */}
