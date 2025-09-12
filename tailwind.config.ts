@@ -2,12 +2,25 @@ import type { Config } from "tailwindcss";
 
 export default {
 	darkMode: ["class"],
-	content: [
-		"./pages/**/*.{ts,tsx}",
-		"./components/**/*.{ts,tsx}",
-		"./app/**/*.{ts,tsx}",
-		"./src/**/*.{ts,tsx}",
-	],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
+  safelist: [
+    // Preserve animation classes
+    'animate-fade-in',
+    'animate-slide-in',
+    'animate-scale-in',
+    'animate-float',
+    'animate-glow',
+    // Preserve dynamic classes
+    'bg-gradient-to-r',
+    'from-primary',
+    'to-secondary',
+    'via-accent',
+  ],
 	prefix: "",
 	theme: {
 		container: {
@@ -18,10 +31,14 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				'inter': ['Inter', 'sans-serif'],
-				'space': ['Space Grotesk', 'sans-serif'],
-			},
+      fontFamily: {
+        'inter': ['Inter', 'sans-serif'],
+        'space': ['Space Grotesk', 'sans-serif'],
+      },
+      fontDisplay: {
+        'inter': 'swap',
+        'space': 'swap',
+      },
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',

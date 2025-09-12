@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { StorageInitializer } from "@/components/StorageInitializer";
 import LazySlideWrapper from "@/components/LazySlideWrapper";
+import PerformanceMonitor from "@/components/PerformanceMonitor";
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -34,6 +35,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <PerformanceMonitor />
       <StorageInitializer>
         <BrowserRouter>
           <Routes>
