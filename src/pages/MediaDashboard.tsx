@@ -122,19 +122,28 @@ const MediaDashboard = () => {
   };
 
   const handlePublishSlides = async () => {
+    console.log('Publishing slides with config:', slideConfig);
+    console.log('Number of slides to publish:', Object.keys(slideConfig).length);
+    
     try {
       const success = await publishAllSlides(slideConfig);
       if (success) {
         toast({
-          title: "Slides Published!",
+          title: "Slides Published Successfully!",
           description: "Your slides are now live and accessible from any device.",
+        });
+      } else {
+        toast({
+          title: "Publishing Incomplete",
+          description: "Some slides failed to publish. Check the logs for details.",
+          variant: "destructive",
         });
       }
     } catch (error) {
       console.error('Failed to publish slides:', error);
       toast({
         title: "Publishing Failed",
-        description: "There was an error publishing your slides. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error publishing your slides. Please try again.",
         variant: "destructive",
       });
     }
