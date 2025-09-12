@@ -13,9 +13,9 @@ import {
   AlertTriangle, 
   AlertCircle, 
   RefreshCw,
-  Settings,
+  CheckCircle,
   Cloud,
-  CloudOff
+  Settings
 } from 'lucide-react';
 import {
   Dialog,
@@ -143,6 +143,35 @@ const StorageMonitor: React.FC<StorageMonitorProps> = ({ compact = false }) => {
     }
   };
 
+  const handleStorageVerification = async () => {
+    setIsLoading(true);
+    try {
+      // Import CloudMediaManager dynamically to avoid circular dependencies
+      const { CloudMediaManager } = await import('@/utils/cloudMedia');
+      const healthCheck = await CloudMediaManager.verifyStorageHealth();
+      
+      if (healthCheck.healthy) {
+        toast({
+          title: "Storage verification passed",
+          description: "Cloud storage is working correctly"
+        });
+      } else {
+        toast({
+          title: "Storage verification failed",
+          description: healthCheck.error || "Unknown storage issue",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Verification error",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive"
+      });
+    }
+    setIsLoading(false);
+  };
+
   const getProgressColor = () => {
     if (shouldShowCritical()) return "bg-destructive";
     if (shouldShowWarning()) return "bg-yellow-500";
@@ -261,6 +290,16 @@ const StorageMonitor: React.FC<StorageMonitorProps> = ({ compact = false }) => {
                 Custom
               </Button>
             </DialogTrigger>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleStorageVerification}
+              disabled={isLoading}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Verify Storage
+            </Button>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Custom Cleanup Options</DialogTitle>

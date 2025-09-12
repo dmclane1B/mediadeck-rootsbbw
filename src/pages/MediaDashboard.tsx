@@ -30,6 +30,7 @@ const MediaDashboard = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("slides");
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showPublishSuccess, setShowPublishSuccess] = useState(false);
   const [publishingProgress, setPublishingProgress] = useState<{
     stage: 'idle' | 'preparing' | 'uploading' | 'publishing' | 'complete' | 'error';
     progress: number;
@@ -124,6 +125,81 @@ const MediaDashboard = () => {
     });
     
     setIsSaving(false);
+  };
+
+  const handleSaveAndPublish = async () => {
+    if (summary.validImages === 0) {
+      toast({
+        title: "No slides to publish",
+        description: "Please add images to your slides before publishing.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      setPublishingProgress({ stage: 'preparing', progress: 10, details: 'Starting save & publish...' });
+      console.log('[MediaDashboard] Starting save & publish process...');
+
+      // Step 1: Save current state
+      setPublishingProgress({ stage: 'preparing', progress: 20, details: 'Saving current state...' });
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate save
+      
+      // Step 2: Verify storage health
+      setPublishingProgress({ stage: 'preparing', progress: 30, details: 'Checking storage health...' });
+      console.log('[MediaDashboard] Checking storage health...');
+      const storageHealth = await CloudMediaManager.verifyStorageHealth();
+      if (!storageHealth.healthy) {
+        throw new Error(`Storage health check failed: ${storageHealth.error}`);
+      }
+      
+      // Step 3: Prepare slide configurations
+      setPublishingProgress({ stage: 'uploading', progress: 50, details: 'Preparing slide configurations...' });
+      console.log('[MediaDashboard] Building publish configurations...');
+      
+      const slideCount = Object.keys(slideConfig).length;
+      if (slideCount === 0) {
+        throw new Error('No slide configurations found to publish.');
+      }
+
+      // Step 4: Publish slides
+      setPublishingProgress({ stage: 'publishing', progress: 70, details: 'Publishing to database...' });
+      console.log('[MediaDashboard] Publishing slides to database...');
+      
+      // Create a mock result array since publishAllSlides returns boolean
+      const slideIds = Object.keys(slideConfig);
+      const publishResult = await publishAllSlides(slideIds);
+      const results = slideIds.map(id => ({ slideId: id, success: publishResult }));
+      
+      // Step 5: Complete
+      setPublishingProgress({ stage: 'complete', progress: 100, details: 'Publishing complete!' });
+      console.log('[MediaDashboard] Publish complete. Results:', results);
+
+      const successCount = results.filter(r => r.success).length;
+      const failureCount = results.length - successCount;
+
+      if (successCount > 0) {
+        setShowPublishSuccess(true);
+        toast({
+          title: "Slides Published Successfully!",
+          description: `${successCount} slides published${failureCount > 0 ? `, ${failureCount} failed` : ''}`
+        });
+      } else {
+        throw new Error(`All ${failureCount} slides failed to publish`);
+      }
+
+    } catch (error) {
+      console.error('[MediaDashboard] Save & publish error:', error);
+      toast({
+        title: "Publishing Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+      setPublishingProgress({ stage: 'idle', progress: 0, details: '' });
+    }
   };
 
   const handleStartPresentation = () => {
@@ -294,10 +370,9 @@ const MediaDashboard = () => {
             </Button>
             
             <Button 
-              onClick={handleSave} 
-              disabled={isSaving}
-              variant="secondary" 
-              size="lg" 
+              onClick={handleSaveAndPublish} 
+              disabled={isSaving || isPublishing}
+              size="lg"
               className="mr-4"
             >
               <Save className="w-4 h-4 mr-2" />

@@ -215,6 +215,58 @@ export class CloudMediaManager {
   }
 
   /**
+   * Comprehensive storage health check with test upload/delete
+   */
+  static async verifyStorageHealth(): Promise<{ healthy: boolean; error?: string }> {
+    try {
+      console.log('[CloudMedia] Starting comprehensive storage health check...');
+      
+      // Test 1: Basic bucket access
+      const { data: listData, error: listError } = await supabase.storage
+        .from(this.BUCKET_NAME)
+        .list('', { limit: 1 });
+
+      if (listError) {
+        return { healthy: false, error: `Bucket access failed: ${listError.message}` };
+      }
+
+      // Test 2: Test upload and delete
+      const testFileName = `health-check-${Date.now()}.txt`;
+      const testContent = new Blob(['health check'], { type: 'text/plain' });
+      
+      const { error: uploadError } = await supabase.storage
+        .from(this.BUCKET_NAME)
+        .upload(`${this.FOLDER_PREFIX}/${testFileName}`, testContent, {
+          upsert: true,
+          contentType: 'text/plain'
+        });
+
+      if (uploadError) {
+        return { healthy: false, error: `Test upload failed: ${uploadError.message}` };
+      }
+
+      // Clean up test file
+      const { error: deleteError } = await supabase.storage
+        .from(this.BUCKET_NAME)
+        .remove([`${this.FOLDER_PREFIX}/${testFileName}`]);
+
+      if (deleteError) {
+        console.warn('[CloudMedia] Test cleanup failed (non-critical):', deleteError);
+      }
+
+      console.log('[CloudMedia] Storage health check passed');
+      return { healthy: true };
+      
+    } catch (error) {
+      console.error('[CloudMedia] Storage health check exception:', error);
+      return { 
+        healthy: false, 
+        error: error instanceof Error ? error.message : 'Unknown health check error' 
+      };
+    }
+  }
+
+  /**
    * Get storage info from cloud
    */
   static async getCloudStorageInfo(): Promise<{ fileCount: number; error?: string }> {
