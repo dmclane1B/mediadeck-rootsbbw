@@ -120,18 +120,8 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({
             ✓ Image Set
           </div>
           
-          {/* Overlay for interaction */}
+          {/* Overlay for preview */}
           <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
-            {onImageSelect && (
-              <Button
-                variant="secondary"
-                onClick={onImageSelect}
-                className="bg-white/90 text-primary hover:bg-white"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Change Image
-              </Button>
-            )}
             <Button
               variant="secondary"
               onClick={() => setShowPreview(true)}
@@ -158,51 +148,29 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({
     );
   }
 
-  // Show placeholder if no image and placeholder is enabled
-  if (showPlaceholder && onImageSelect) {
+  // Show non-interactive placeholder if no image and placeholder is enabled
+  if (showPlaceholder) {
     return (
-      <div 
-        className={`${baseClasses} border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 transition-colors cursor-pointer ${className}`}
-        onClick={onImageSelect}
-      >
-        <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 hover:text-primary transition-colors">
-          <Upload className="w-12 h-12 mb-4 opacity-50" />
-          <h3 className="text-lg font-medium mb-2">No Image Set</h3>
-          <p className="text-sm text-center mb-4 max-w-xs">
-            Click to add an image for this slide from your media library
-          </p>
-          <Button variant="outline" className="hover:bg-primary hover:text-primary-foreground">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Image
-          </Button>
+      <Card className={`${baseClasses} ${className} border-2 border-dashed border-border`}>
+        <div className="flex items-center justify-center h-full bg-muted/30">
+          <div className="text-center p-6">
+            <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+              <Image className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold text-muted-foreground mb-2">
+              No Image Set
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Use the Media Dashboard to assign an image to this slide
+            </p>
+          </div>
         </div>
-      </div>
+      </Card>
     );
   }
 
-  // Return empty state if no placeholder should be shown
-  if (!showPlaceholder) {
-    return null;
-  }
-
-  // Fallback placeholder (when no onImageSelect is provided)
-  return (
-    <Card className={`${baseClasses} ${className} border-2 border-dashed border-border`}>
-      <div className="flex items-center justify-center h-full bg-muted/30">
-        <div className="text-center p-6">
-          <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
-            <Image className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-semibold text-muted-foreground mb-2">
-            Add Slide Image
-          </h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Upload an image to showcase on this slide
-          </p>
-        </div>
-      </div>
-    </Card>
-  );
+  // Return null if no placeholder should be shown
+  return null;
 };
 
 export default ImageShowcase;
