@@ -14,10 +14,13 @@ export interface SlideContent {
 export const defaultSlideContent: Record<string, SlideContent> = {
   title: {
     id: 'title',
-    title: 'ROOTS COMMUNITY HEALTH',
+    title: 'Roots Community Health - Black Breastfeeding Week',
     subtitle: 'HEALING OUR COMMUNITY FROM WITHIN',
     description: 'Uplifting those impacted by systemic inequities and poverty through comprehensive medical and behavioral health care, health navigation, workforce enterprises, housing, outreach, and advocacy.',
-    buttonText: 'Learn About Our Services'
+    buttonText: 'Learn About Our Services',
+    customFields: {
+      eventDate: 'August 25-31, 2025'
+    }
   },
   overview: {
     id: 'overview',

@@ -86,6 +86,9 @@ const TitleSlide = () => {
                 <div className="text-xl sm:text-2xl md:text-3xl text-primary font-inter mb-4 sm:mb-8">
                   {slideContent?.subtitle || 'HEALING OUR COMMUNITY FROM WITHIN'}
                 </div>
+                <div className="text-lg sm:text-xl text-primary font-inter mb-4">
+                  {slideContent?.customFields?.eventDate || 'August 25-31, 2025'}
+                </div>
                 <div className="w-20 sm:w-32 h-1 bg-primary animate-fade-in" style={{ animationDelay: '0.5s' }}></div>
               </div>
               

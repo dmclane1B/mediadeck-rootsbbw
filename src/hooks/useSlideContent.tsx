@@ -38,7 +38,25 @@ export const useSlideContent = (): UseSlideContentReturn => {
               mergedContent[key] = { ...defaultSlideContent[key], ...parsedContent[key] };
             }
           });
+
+          // Migration: Update old title slide content
+          if (mergedContent.title && 
+              (mergedContent.title.title === 'ROOTS COMMUNITY HEALTH' || 
+               mergedContent.title.title === 'Black Breastfeeding Week 2025')) {
+            mergedContent.title.title = 'Roots Community Health - Black Breastfeeding Week';
+          }
+          
+          // Ensure event date is present
+          if (mergedContent.title && !mergedContent.title.customFields?.eventDate) {
+            mergedContent.title.customFields = {
+              ...mergedContent.title.customFields,
+              eventDate: 'August 25-31, 2025'
+            };
+          }
+
           setContent(mergedContent);
+          // Save migrated content back to localStorage
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedContent));
         }
         setError(null);
       } catch (err) {
