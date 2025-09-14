@@ -81,7 +81,7 @@ const TitleSlide = () => {
             <>
               <div className="mb-8 sm:mb-12">
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-tight mb-4 sm:mb-8">
-                  {slideContent?.title || 'ROOTS COMMUNITY HEALTH'}
+                  {slideContent?.title || 'Roots Community Health - Black Breastfeeding Week'}
                 </h1>
                 <div className="text-xl sm:text-2xl md:text-3xl text-primary font-inter mb-4 sm:mb-8">
                   {slideContent?.subtitle || 'HEALING OUR COMMUNITY FROM WITHIN'}
