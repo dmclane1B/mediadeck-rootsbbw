@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import SlideEditor from '@/components/SlideEditor';
 import LazySlideTemplates from '@/components/LazySlideTemplates';
 import PWAInstallButton from '@/components/PWAInstallButton';
-import { Presentation, Sparkles, Zap, Image } from 'lucide-react';
+import { Heart, Sparkles, Zap, Image, FileDown } from 'lucide-react';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'home' | 'templates' | 'editor'>('home');
@@ -47,7 +47,7 @@ const Index = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <div className="w-8 h-8 sm:w-12 sm:h-12 bg-white rounded-lg flex items-center justify-center">
-                <Presentation className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               </div>
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white">
               Black Breastfeeding Week 2025
@@ -81,7 +81,7 @@ const Index = () => {
             </Card>
             
             <Card className="p-4 sm:p-6 text-center bg-white/10 backdrop-blur border-white/20 text-white sm:col-span-2 md:col-span-1">
-              <Presentation className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
+              <FileDown className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-white" />
               <h3 className="text-base sm:text-lg font-semibold mb-2">Export Ready</h3>
               <p className="text-sm sm:text-base text-white/80">
                 Download as PDF or high-quality images for any presentation needs
@@ -121,7 +121,7 @@ const Index = () => {
                 onClick={() => navigate('/slides/title')}
                 className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 mr-4"
               >
-                <Presentation className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                <Heart className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 DX1 Presentation
               </Button>
               
