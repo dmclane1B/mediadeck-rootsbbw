@@ -50,10 +50,13 @@ const Index = () => {
                 <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               </div>
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white">
-              Black Breastfeeding Week 2025
+              Roots Community Health - Black Breastfeeding Week
             </h1>
+            <div className="text-lg sm:text-xl text-white/90 font-medium mb-2">
+              Healing Our Community From Within
+            </div>
             <div className="text-lg sm:text-xl text-white/80 font-medium">
-              August 25-31, 2025 • Roots Community Health
+              August 25-31, 2025
             </div>
             </div>
             
