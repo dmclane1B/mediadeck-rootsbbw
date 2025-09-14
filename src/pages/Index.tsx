@@ -49,13 +49,16 @@ const Index = () => {
               <div className="w-8 h-8 sm:w-12 sm:h-12 bg-white rounded-lg flex items-center justify-center">
                 <Presentation className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white">
-                Slide Designer
-              </h1>
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white">
+              Black Breastfeeding Week 2025
+            </h1>
+            <div className="text-lg sm:text-xl text-white/80 font-medium">
+              August 25-31, 2025 • Roots Community Health
+            </div>
             </div>
             
             <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-2xl mx-auto px-4">
-              Create stunning presentations with AI-powered design inspired by your DX-Play slides
+              Join us in celebrating and supporting Black breastfeeding families through education, community events, and resources
             </p>
           </div>
 
@@ -134,7 +137,7 @@ const Index = () => {
             </div>
             
             <p className="text-white/70 text-xs sm:text-sm px-4">
-              Inspired by your DX-Play presentation design • Built for professional results
+              Roots Community Health • Empowering Black families through breastfeeding support and education
             </p>
           </div>
         </div>
