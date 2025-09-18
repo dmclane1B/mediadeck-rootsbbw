@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import ContentValidator from '@/components/ContentValidator';
 import { StorageInitializer } from "@/components/StorageInitializer";
 import LazySlideWrapper from "@/components/LazySlideWrapper";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
@@ -40,7 +41,8 @@ const App = () => (
       <PerformanceMonitor />
       <StorageInitializer>
         <MigrationManager>
-          <BrowserRouter>
+          <ContentValidator>
+            <BrowserRouter>
           <Routes>
             <Route path="/" element={<LazySlideWrapper><TitleSlide /></LazySlideWrapper>} />
             <Route path="/slides/title" element={<LazySlideWrapper><TitleSlide /></LazySlideWrapper>} />
@@ -72,6 +74,7 @@ const App = () => (
             <Route path="*" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}><NotFound /></Suspense>} />
           </Routes>
           </BrowserRouter>
+          </ContentValidator>
         </MigrationManager>
       </StorageInitializer>
     </TooltipProvider>

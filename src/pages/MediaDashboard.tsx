@@ -17,6 +17,7 @@ import { MediaFile } from '@/hooks/useMediaLibrary';
 import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw, Play, Save, Type, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SlideContentEditor from '@/components/SlideContentEditor';
+import SlideHealthCheck from '@/components/SlideHealthCheck';
 import { CloudMediaManager } from '@/utils/cloudMedia';
 
 const MediaDashboard = () => {
@@ -443,7 +444,7 @@ const MediaDashboard = () => {
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
             <TabsTrigger value="slides" className="flex items-center gap-2">
               <Presentation className="w-4 h-4" />
               Slide Images
@@ -451,6 +452,10 @@ const MediaDashboard = () => {
             <TabsTrigger value="content" className="flex items-center gap-2">
               <Type className="w-4 h-4" />
               Text Content
+            </TabsTrigger>
+            <TabsTrigger value="health" className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              Health Check
             </TabsTrigger>
             <TabsTrigger value="library" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
@@ -530,6 +535,10 @@ const MediaDashboard = () => {
                 onNavigateToImages={() => setActiveTab("slides")}
               />
             </Card>
+          </TabsContent>
+
+          <TabsContent value="health">
+            <SlideHealthCheck onFixIssues={() => setActiveTab("content")} />
           </TabsContent>
 
           <TabsContent value="library">

@@ -9,6 +9,7 @@ import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
+import { SlideContent, defaultSlideContent } from '@/data/slideContent';
 import { useSlideContent } from '@/hooks/useSlideContent';
 
 const ValuePropositionsSlide = () => {
@@ -16,7 +17,7 @@ const ValuePropositionsSlide = () => {
   const { getSlideImageForDisplay } = useSlideImageResolver();
   const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImageForDisplay('resources-support');
-  const slideContent = getSlideContent('resources-support');
+  const slideContent = getSlideContent('resources-support') || defaultSlideContent.resourcesSupport;
 
   const handlePrevious = () => navigate('/slides/smoothie-demo');
   const handleNext = () => navigate('/slides/community-partners');
@@ -194,18 +195,41 @@ const ValuePropositionsSlide = () => {
               </div>
             </div>
 
-            {/* Community Impact */}
-            <div className="animate-fade-in" style={{ animationDelay: '1.5s' }}>
+            {/* Community Partnerships */}
+            {slideContent?.sections?.[2] && (
+              <div className="animate-fade-in mb-12 sm:mb-16" style={{ animationDelay: '1.5s' }}>
+                <div className="text-center mb-8 sm:mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-space">{slideContent.sections[2].title}</h2>
+                  <div className="w-20 sm:w-24 h-1 bg-white/60 mx-auto mb-4 sm:mb-6"></div>
+                  <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto font-inter px-4">
+                    Building connections that strengthen our community
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                  {Array.isArray(slideContent.sections[2].content) ? slideContent.sections[2].content.map((partnership, index) => (
+                    <Card key={index} className="bg-white/10 backdrop-blur-sm p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 group text-center">
+                      <div className="p-4 rounded-full bg-white/20 mx-auto mb-4 w-fit group-hover:bg-white/30 transition-colors duration-300">
+                        <Users className="w-10 h-10 text-white" />
+                      </div>
+                      <p className="text-white/90 font-inter">{partnership}</p>
+                    </Card>
+                  )) : null}
+                </div>
+              </div>
+            )}
+
+            {/* Community Impact Statistics */}
+            <div className="animate-fade-in" style={{ animationDelay: '2s' }}>
               <div className="text-center mb-8 sm:mb-12">
                 <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 font-space">Community Impact</h2>
                 <div className="w-20 sm:w-24 h-1 bg-white/60 mx-auto mb-4 sm:mb-6"></div>
                 <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto font-inter px-4">
-                  Supporting healthy families and strong communities
+                  Supporting healthy families and strong communities through Black Breastfeeding Week
                 </p>
               </div>
 
-              {/* Impact Statistics */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <Card className="bg-white/10 backdrop-blur-sm p-4 sm:p-6 border border-white/20 text-center">
                   <div className="p-3 rounded-full bg-white/20 mx-auto mb-4 w-fit">
                     <Heart className="w-8 h-8 text-white" />
@@ -232,76 +256,18 @@ const ValuePropositionsSlide = () => {
 
                 <Card className="bg-white/10 backdrop-blur-sm p-4 sm:p-6 border border-white/20 text-center">
                   <div className="p-3 rounded-full bg-white/20 mx-auto mb-4 w-fit">
-                    <Phone className="w-8 h-8 text-white" />
+                    <Shield className="w-8 h-8 text-white" />
                   </div>
-                  <h4 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-space">5+</h4>
-                  <p className="text-xs sm:text-sm text-white/80 font-inter">Years Experience</p>
+                  <h4 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-space">Trusted</h4>
+                  <p className="text-xs sm:text-sm text-white/80 font-inter">Community Partner</p>
                 </Card>
-              </div>
-
-              {/* Competitor Comparison */}
-              <div className="bg-white/5 backdrop-blur-sm p-6 sm:p-8 rounded-xl border border-white/10">
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 font-space text-center">Direct Competitor Analysis</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                  <div className="text-center">
-                    <div className="p-4 rounded-full bg-success/30 mx-auto mb-4 w-fit">
-                      <Shield className="w-10 h-10 text-white" />
-                    </div>
-                    <h4 className="text-xl font-bold text-success mb-2 font-space">DX1</h4>
-                    <ul className="text-sm text-white/90 space-y-2">
-                      <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-success" /> RF Technology</li>
-                      <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-success" /> Military Encryption</li>
-                      <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-success" /> 1+ Mile Range</li>
-                      <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-success" /> Real-time Analytics</li>
-                    </ul>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="p-4 rounded-full bg-muted/30 mx-auto mb-4 w-fit">
-                      <Radio className="w-10 h-10 text-white/70" />
-                    </div>
-                    <h4 className="text-xl font-bold text-white/70 mb-2 font-space">go route</h4>
-                    <ul className="text-sm text-white/70 space-y-2">
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> Bluetooth Limited</li>
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> Basic Security</li>
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> Short Range</li>
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> No Analytics</li>
-                    </ul>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="p-4 rounded-full bg-muted/30 mx-auto mb-4 w-fit">
-                      <Wifi className="w-10 h-10 text-white/70" />
-                    </div>
-                    <h4 className="text-xl font-bold text-white/70 mb-2 font-space">PitchCom</h4>
-                    <ul className="text-sm text-white/70 space-y-2">
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> Audio Only</li>
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> Limited Encryption</li>
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> Baseball Specific</li>
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> No Data Insights</li>
-                    </ul>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="p-4 rounded-full bg-muted/30 mx-auto mb-4 w-fit">
-                      <Target className="w-10 h-10 text-white/70" />
-                    </div>
-                    <h4 className="text-xl font-bold text-white/70 mb-2 font-space">Game Day Signals</h4>
-                    <ul className="text-sm text-white/70 space-y-2">
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> Visual Only</li>
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> No Encryption</li>
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> Weather Issues</li>
-                      <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-destructive" /> Manual Process</li>
-                    </ul>
-                  </div>
-                </div>
               </div>
             </div>
 
             {/* Bottom Tagline */}
             <div className="text-center mt-12 sm:mt-16 mb-8">
-              <div className="text-white/80 font-space font-medium text-lg sm:text-xl animate-fade-in" style={{ animationDelay: '2s' }}>
-                INNOVATION. SECURITY. PERFORMANCE.
+              <div className="text-white/80 font-space font-medium text-lg sm:text-xl animate-fade-in" style={{ animationDelay: '2.5s' }}>
+                COMMUNITY. COMPASSION. CARE.
               </div>
             </div>
           </div>

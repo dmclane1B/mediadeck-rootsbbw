@@ -266,5 +266,29 @@ export const defaultSlideContent: Record<string, SlideContent> = {
     customFields: {
       category: 'CONNECT'
     }
+  },
+  resourcesSupport: {
+    id: 'resources-support',
+    title: '10 RESOURCES & SUPPORT',
+    subtitle: 'Comprehensive Community Care',
+    description: 'Access to essential resources and support services for breastfeeding mothers and families in our community.',
+    buttonText: 'Get Support',
+    sections: [
+      {
+        title: 'Lactation Support Services',
+        content: ['Free lactation consultations with certified specialists', 'Breastfeeding support groups and peer connections', 'Pump rental and equipment assistance', 'Educational materials in multiple languages', '24/7 helpline for urgent breastfeeding questions']
+      },
+      {
+        title: 'Family Wellness Resources',
+        content: ['Mental health counseling for new mothers', 'Nutritional guidance and meal planning', 'Childcare assistance during appointments', 'Postpartum care coordination', 'Connection to community support networks']
+      },
+      {
+        title: 'Community Partnerships',
+        content: ['Healthcare provider referrals', 'WIC program coordination', 'Insurance navigation support', 'Transportation assistance', 'Cultural competency and language support']
+      }
+    ],
+    customFields: {
+      category: 'SUPPORT'
+    }
   }
 };
