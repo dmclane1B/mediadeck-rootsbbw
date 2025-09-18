@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { indexedDBManager } from '@/utils/indexedDBManager';
+import { migrateSlideIds, isMigrationNeeded } from '@/utils/slideIdMigration';
 
 export interface SlideImage {
   id: string;
@@ -38,6 +39,18 @@ export const useSlideImages = () => {
         }
         if (migrationResult.errors.length > 0) {
           console.warn('Migration errors:', migrationResult.errors);
+        }
+        
+        // Check if we need to migrate old slide IDs to new ones
+        if (await isMigrationNeeded()) {
+          console.log('Slide ID migration needed, starting migration...');
+          const slideIdMigrationResult = await migrateSlideIds();
+          if (slideIdMigrationResult.migrated > 0) {
+            console.log(`Migrated ${slideIdMigrationResult.migrated} slide configurations to new slide IDs`);
+          }
+          if (slideIdMigrationResult.errors.length > 0) {
+            console.warn('Slide ID migration errors:', slideIdMigrationResult.errors);
+          }
         }
         
         // Load configurations from IndexedDB
