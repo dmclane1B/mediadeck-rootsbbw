@@ -24,16 +24,25 @@ export const defaultSlideContent: Record<string, SlideContent> = {
   },
   overview: {
     id: 'overview',
-    title: 'BLACK BREASTFEEDING WEEK',
+    title: '02 SCHEDULE',
+    subtitle: 'Week Overview',
     description: 'A comprehensive week of events, education, and community support celebrating and promoting breastfeeding in the Black community',
+    sections: [
+      {
+        title: 'Event Schedule',
+        content: ['Monday: Virtual Welcome & Discussion', 'Tuesday: Expert Panel with Board-Certified Lactation Consultant', 'Wednesday: Community Voices Panel', 'Thursday: Wellness Fair', 'Friday: Workout Session & Smoothie Demo']
+      }
+    ],
     customFields: {
+      category: 'SCHEDULE',
       eventDetails: 'Event Week: August 25-31, 2025 | Location: Community & Virtual Events'
     }
   },
   challenges: {
     id: 'challenges',
-    title: 'WHY THIS MATTERS',
-    description: 'Addressing critical challenges in our community',
+    title: '03 IMPACT',
+    subtitle: 'Why This Matters',
+    description: 'Addressing critical challenges in our community and the importance of Black Breastfeeding Week',
     sections: [
       {
         title: 'Health Disparities',
@@ -47,135 +56,215 @@ export const defaultSlideContent: Record<string, SlideContent> = {
         title: 'Cultural Barriers',
         content: 'Historical trauma and cultural misconceptions need to be addressed through community education and support.'
       }
-    ]
+    ],
+    customFields: {
+      category: 'IMPACT'
+    }
   },
   'product-glimpse': {
     id: 'product-glimpse',
-    title: 'MONDAY KICK-OFF',
-    subtitle: 'Virtual Welcome & Discussion',
+    title: '04 EVENTS',
+    subtitle: 'Monday Kick-Off',
     description: 'Join us for an inspiring start to Black Breastfeeding Week with community leaders and healthcare professionals.',
     sections: [
       {
         title: 'Event Details',
-        content: ['Monday, August 25, 2025', '6:00 PM - 7:30 PM', 'Virtual Event via Zoom']
+        content: ['Monday, August 25, 2025', '6:00 PM - 7:30 PM', 'Virtual Event via Zoom', 'Welcome discussion and overview']
       }
-    ]
+    ],
+    customFields: {
+      category: 'EVENTS'
+    }
+  },
+  'expert-panel': {
+    id: 'expert-panel',
+    title: '05 EVENTS',
+    subtitle: 'Expert Panel',
+    description: 'Learn from board-certified lactation consultants and healthcare professionals about best practices and evidence-based support.',
+    sections: [
+      {
+        title: 'Featured Experts',
+        content: ['Board-certified lactation consultant', 'Pediatric specialists', 'Community health advocates', 'Q&A session included']
+      },
+      {
+        title: 'Event Details',
+        content: ['Tuesday, August 26, 2025', '7:00 PM - 8:30 PM', 'Virtual Event via Zoom']
+      }
+    ],
+    customFields: {
+      category: 'EVENTS'
+    }
   },
   'market-overview': {
     id: 'market-overview',
-    title: 'COMMUNITY VOICES',
-    subtitle: 'Panel Discussion with Local Mothers',
-    description: 'Hear powerful stories and experiences from mothers in our community.',
+    title: '06 EVENTS',
+    subtitle: 'Community Voices',
+    description: 'Hear powerful stories and experiences from mothers in our community who have navigated their breastfeeding journeys.',
     sections: [
       {
         title: 'Featured Speakers',
-        content: ['Local mothers sharing their journeys', 'Community advocates', 'Healthcare professionals']
+        content: ['Local mothers sharing their journeys', 'Community advocates', 'Peer support leaders', 'Interactive discussion']
+      },
+      {
+        title: 'Event Details',
+        content: ['Wednesday, August 27, 2025', '6:30 PM - 8:00 PM', 'Community Center & Virtual Option']
       }
-    ]
+    ],
+    customFields: {
+      category: 'EVENTS'
+    }
   },
   'proof-demand': {
     id: 'proof-demand',
-    title: 'WELLNESS FAIR',
-    subtitle: 'Friday Celebration and Resources',
+    title: '07 EVENTS',
+    subtitle: 'Wellness Fair',
     description: 'Join us for a community celebration with resources, activities, and support for families.',
     sections: [
       {
         title: 'Event Highlights',
-        content: ['Resource booths', 'Health screenings', 'Family activities', 'Community networking']
+        content: ['Resource booths from local organizations', 'Health screenings and consultations', 'Family activities and games', 'Community networking opportunities']
+      },
+      {
+        title: 'Event Details',
+        content: ['Thursday, August 28, 2025', '10:00 AM - 3:00 PM', 'Community Center Main Hall']
       }
-    ]
+    ],
+    customFields: {
+      category: 'EVENTS'
+    }
   },
   'sales-strategy': {
     id: 'sales-strategy',
-    title: 'WORKOUT SESSION',
-    subtitle: 'Fitness and Wellness Activities',
-    description: 'Stay active and healthy with community fitness activities designed for all levels.',
+    title: '08 ACTIVITIES',
+    subtitle: 'Workout Session',
+    description: 'Stay active and healthy with community fitness activities designed for all levels, including prenatal and postnatal options.',
     sections: [
       {
         title: 'Activities Include',
-        content: ['Prenatal yoga', 'Postnatal fitness', 'Family-friendly exercises', 'Wellness tips']
+        content: ['Prenatal yoga and stretching', 'Postnatal fitness routines', 'Family-friendly exercises', 'Wellness tips and guidance']
+      },
+      {
+        title: 'Event Details',
+        content: ['Friday, August 29, 2025', '9:00 AM - 10:30 AM', 'Community Center Gym']
       }
-    ]
+    ],
+    customFields: {
+      category: 'ACTIVITIES'
+    }
   },
   'customer-persona': {
     id: 'customer-persona',
-    title: 'SMOOTHIE DEMO',
-    subtitle: 'Led by our very own Jocelyn',
-    description: 'Learn to make nutritious smoothies that support breastfeeding and overall health.',
+    title: '09 ACTIVITIES',
+    subtitle: 'Smoothie Demo',
+    description: 'Learn to make nutritious smoothies that support breastfeeding and overall health, led by our very own nutrition expert Jocelyn.',
     sections: [
       {
         title: 'What You\'ll Learn',
-        content: ['Nutrient-rich ingredients', 'Lactation-supporting recipes', 'Healthy meal planning', 'Budget-friendly options']
+        content: ['Nutrient-rich ingredients for lactation support', 'Lactation-supporting recipes and combinations', 'Healthy meal planning strategies', 'Budget-friendly nutritious options']
+      },
+      {
+        title: 'Event Details',
+        content: ['Friday, August 29, 2025', '11:00 AM - 12:30 PM', 'Community Center Kitchen']
       }
-    ]
+    ],
+    customFields: {
+      category: 'ACTIVITIES'
+    }
   },
   'value-propositions': {
     id: 'value-propositions',
-    title: 'RESOURCES & SUPPORT',
-    subtitle: 'Available Community Services',
-    description: 'Comprehensive support services available to families in our community.',
+    title: '10 SUPPORT',
+    subtitle: 'Resources & Support',
+    description: 'Comprehensive support services available to families in our community throughout the year.',
     sections: [
       {
         title: 'Available Services',
-        content: ['Lactation consultation', 'Mental health support', 'Nutrition counseling', 'Peer support groups']
+        content: ['Lactation consultation and support', 'Mental health counseling', 'Nutrition counseling and planning', 'Peer support groups and networks']
       },
       {
         title: 'How to Access',
-        content: ['Call our main number', 'Visit our website', 'Walk-in appointments available', 'Insurance accepted']
+        content: ['Call our main number for appointments', 'Visit our website for resources', 'Walk-in appointments available', 'Most insurance plans accepted']
       }
-    ]
+    ],
+    customFields: {
+      category: 'SUPPORT'
+    }
   },
   'team-leadership': {
     id: 'team-leadership',
-    title: 'COMMUNITY PARTNERS',
-    subtitle: 'Organizations Supporting the Week',
-    description: 'Meet the incredible organizations and leaders making this week possible.',
+    title: '11 PARTNERS',
+    subtitle: 'Community Partners',
+    description: 'Meet the incredible organizations and leaders making Black Breastfeeding Week possible in our community.',
     sections: [
       {
         title: 'Partner Organizations',
-        content: ['Local healthcare providers', 'Community advocacy groups', 'Educational institutions', 'Government agencies']
+        content: ['Local healthcare providers and clinics', 'Community advocacy groups', 'Educational institutions and schools', 'Government agencies and departments']
+      },
+      {
+        title: 'Leadership Team',
+        content: ['Community health coordinators', 'Volunteer coordinators', 'Event planning committee', 'Medical advisory board']
       }
-    ]
+    ],
+    customFields: {
+      category: 'PARTNERS'
+    }
   },
   roadmap: {
     id: 'roadmap',
-    title: 'HOW TO PARTICIPATE',
-    subtitle: 'RSVP and Join the Movement',
+    title: '12 ACTION',
+    subtitle: 'How to Participate',
     description: 'Multiple ways to get involved and support Black Breastfeeding Week in our community.',
     sections: [
       {
         title: 'Ways to Participate',
-        content: ['Attend virtual events', 'Join in-person activities', 'Share on social media', 'Volunteer opportunities']
+        content: ['Attend virtual events and workshops', 'Join in-person activities and celebrations', 'Share on social media with #BlackBreastfeedingWeek', 'Volunteer at events and activities']
       },
       {
-        title: 'Registration',
-        content: ['Online RSVP required', 'Free for all events', 'Childcare available', 'Materials provided']
+        title: 'Getting Started',
+        content: ['Register online for all events', 'Follow us on social media', 'Sign up for volunteer opportunities', 'Spread the word in your network']
       }
-    ]
+    ],
+    customFields: {
+      category: 'ACTION'
+    }
   },
   ask: {
     id: 'ask',
-    title: 'REGISTER TODAY',
-    subtitle: 'Don\'t Miss These Important Events',
-    description: 'Secure your spot for all Black Breastfeeding Week events and activities.',
+    title: '13 RSVP',
+    subtitle: 'Register Today',
+    description: 'Secure your spot for all Black Breastfeeding Week events and activities. Registration is free and required for all events.',
     buttonText: 'Register Now',
     sections: [
       {
         title: 'Registration Benefits',
-        content: ['Event reminders', 'Resource packets', 'Priority seating', 'Follow-up support']
+        content: ['Email reminders for all events', 'Resource packets and materials', 'Priority seating at in-person events', 'Follow-up support and resources']
+      },
+      {
+        title: 'How to Register',
+        content: ['Online registration available 24/7', 'Call our office during business hours', 'Register at any partner location', 'Group registration available']
       }
-    ]
+    ],
+    customFields: {
+      category: 'RSVP'
+    }
   },
   contact: {
     id: 'contact',
-    title: 'CONNECT WITH US',
-    subtitle: 'Roots Community Health',
-    description: 'Get in touch with our team for more information about our services and programs.',
+    title: '14 CONNECT',
+    subtitle: 'Contact Us',
+    description: 'Get in touch with our team for more information about our services, programs, and Black Breastfeeding Week events.',
     sections: [
       {
         title: 'Contact Information',
-        content: ['Phone: (555) 123-4567', 'Email: info@rootscommunityhealth.org', 'Address: 123 Community Ave', 'Hours: Mon-Fri 8AM-6PM']
+        content: ['Phone: (555) 123-4567', 'Email: info@rootscommunityhealth.org', 'Address: 123 Community Avenue', 'Hours: Monday-Friday 8AM-6PM']
+      },
+      {
+        title: 'Follow Us',
+        content: ['Facebook: @RootsCommunityHealth', 'Instagram: @rootscommhealth', 'Website: www.rootscommunityhealth.org', 'Newsletter signup available']
       }
-    ]
+    ],
+    customFields: {
+      category: 'CONNECT'
+    }
   }
 };
