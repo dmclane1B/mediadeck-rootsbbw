@@ -111,12 +111,12 @@ const ValuePropositionsSlide = () => {
                     <div className="w-16 h-1 bg-white/60 mx-auto mb-6"></div>
                     
                     <div className="space-y-3 text-left">
-                      {slideContent.sections[0].content.map((service, index) => (
+                      {Array.isArray(slideContent.sections[0].content) ? slideContent.sections[0].content.map((service, index) => (
                         <div key={index} className="flex items-center gap-3 text-white/80">
                           <div className="w-2 h-2 bg-white rounded-full flex-shrink-0"></div>
                           <span className="text-sm">{service}</span>
                         </div>
-                      ))}
+                      )) : null}
                     </div>
                   </div>
                 </Card>
@@ -134,12 +134,12 @@ const ValuePropositionsSlide = () => {
                       <div className="w-16 h-1 bg-white/60 mx-auto mb-6"></div>
                       
                       <div className="space-y-3 text-left">
-                        {slideContent.sections[1].content.map((access, index) => (
+                        {Array.isArray(slideContent.sections[1].content) ? slideContent.sections[1].content.map((access, index) => (
                           <div key={index} className="flex items-center gap-3 text-white/80">
                             <div className="w-2 h-2 bg-white rounded-full flex-shrink-0"></div>
                             <span className="text-sm">{access}</span>
                           </div>
-                        ))}
+                        )) : null}
                       </div>
                     </div>
                   </Card>

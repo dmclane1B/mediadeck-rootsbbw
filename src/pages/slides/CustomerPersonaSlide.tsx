@@ -91,12 +91,12 @@ const CustomerPersonaSlide = () => {
 
                 <div className="space-y-6">
                   <ul className="space-y-3 text-muted-foreground font-inter">
-                    {slideContent.sections[0].content.map((item, index) => (
+                    {Array.isArray(slideContent.sections[0].content) ? slideContent.sections[0].content.map((item, index) => (
                       <li key={index} className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-accent rounded-full mt-2 flex-shrink-0"></div>
                         {item}
                       </li>
-                    ))}
+                    )) : null}
                   </ul>
                 </div>
               </Card>
@@ -139,12 +139,12 @@ const CustomerPersonaSlide = () => {
                   <h3 className="text-xl font-bold text-accent font-space">{slideContent.sections[1].title}</h3>
                 </div>
                 <div className="space-y-3 text-sm font-inter">
-                  {slideContent.sections[1].content.map((item, index) => (
+                  {Array.isArray(slideContent.sections[1].content) ? slideContent.sections[1].content.map((item, index) => (
                     <div key={index} className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-accent rounded-full"></div>
                       <span>{item}</span>
                     </div>
-                  ))}
+                  )) : null}
                 </div>
               </Card>
             )}

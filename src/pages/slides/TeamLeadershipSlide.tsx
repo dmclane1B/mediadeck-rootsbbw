@@ -74,7 +74,7 @@ const TeamLeadershipSlide = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in" style={{
               animationDelay: '0.3s'
             }}>
-                {slideContent.sections[0].content.map((partner, index) => (
+                {Array.isArray(slideContent.sections[0].content) ? slideContent.sections[0].content.map((partner, index) => (
                   <Card key={index} className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-accent hover:shadow-elegant transition-all duration-300 group">
                     <div className="flex items-start gap-6">
                       <div className="flex-shrink-0">
@@ -90,7 +90,7 @@ const TeamLeadershipSlide = () => {
                       </div>
                     </div>
                   </Card>
-                ))}
+                )) : null}
               </div>
             </div>
           )}
@@ -102,7 +102,7 @@ const TeamLeadershipSlide = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in" style={{
               animationDelay: '0.6s'
             }}>
-                {slideContent.sections[1].content.map((leader, index) => (
+                {Array.isArray(slideContent.sections[1].content) ? slideContent.sections[1].content.map((leader, index) => (
                   <Card key={index} className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-primary hover:shadow-elegant transition-all duration-300 group">
                     <div className="flex items-start gap-6">
                       <div className="flex-shrink-0">
@@ -118,7 +118,7 @@ const TeamLeadershipSlide = () => {
                       </div>
                     </div>
                   </Card>
-                ))}
+                )) : null}
               </div>
             </div>
           )}
