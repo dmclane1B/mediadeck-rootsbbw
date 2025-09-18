@@ -2,15 +2,17 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Target, DollarSign, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import MarketChart from '@/components/MarketChart';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
+import { useSlideContent } from '@/hooks/useSlideContent';
 
 const MarketOverviewSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
+  const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImageForDisplay('community-voices');
+  const slideContent = getSlideContent('community-voices');
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
@@ -62,13 +64,13 @@ const MarketOverviewSlide = () => {
       <div className="max-w-7xl mx-auto px-8">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <div className="text-slate-500/60 text-lg font-inter mb-4">Community Panel Discussion</div>
+          <div className="text-primary/80 text-lg font-inter mb-4 font-semibold">{slideContent?.customFields?.category || 'EVENTS'}</div>
           <h1 className="text-6xl md:text-8xl font-black text-slate-900 mb-6 font-space leading-tight">
-            Community <span className="text-primary">Voices</span>
+            {slideContent?.subtitle || 'Community'} <span className="text-primary">{slideContent?.subtitle?.split(' ')[1] || 'Voices'}</span>
           </h1>
           <div className="w-32 h-1 bg-gradient-to-r from-primary to-accent mx-auto mb-8 animate-scale-in"></div>
-          <p className="text-xl text-slate-600 max-w-4xl mx-auto font-inter leading-relaxed">
-            Hear directly from <span className="font-bold text-primary bg-primary/10 px-2 py-1 rounded">local Black mothers</span> sharing their breastfeeding journeys, challenges, and triumphs in our community.
+          <p className="text-xl text-slate-800 max-w-4xl mx-auto font-inter leading-relaxed font-medium">
+            {slideContent?.description || 'Hear directly from local Black mothers sharing their breastfeeding journeys, challenges, and triumphs in our community.'}
           </p>
         </div>
 
@@ -79,6 +81,7 @@ const MarketOverviewSlide = () => {
             imageAlt={slideImage?.alt}
             onImageSelect={() => navigate('/media')}
             variant="hero"
+            showPlaceholder={true}
           />
         </div>
 
@@ -87,7 +90,7 @@ const MarketOverviewSlide = () => {
           <div className="space-y-12">
             {/* Panel Participants */}
             <div className="group animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-8 rounded-xl border border-primary/20 group-hover:shadow-elegant transition-all duration-300">
+              <div className="bg-white/90 backdrop-blur-sm p-8 rounded-xl border border-primary/30 group-hover:shadow-elegant transition-all duration-300 shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-left">
                     <div className="text-6xl md:text-7xl font-black text-primary mb-2 font-space animate-glow">
@@ -96,12 +99,12 @@ const MarketOverviewSlide = () => {
                     <div className="text-slate-900 font-bold text-lg">Panel Participants</div>
                   </div>
                 </div>
-                <div className="space-y-2 text-sm text-slate-600 font-inter">
-                  <div className="text-slate-900 font-medium">Local mothers sharing authentic experiences</div>
+                <div className="space-y-2 text-sm text-slate-700 font-inter">
+                  <div className="text-slate-900 font-semibold">Local mothers sharing authentic experiences</div>
                   <div>• New mothers navigating breastfeeding challenges</div>
                   <div>• Experienced mothers sharing wisdom</div>
                   <div>• Mothers who overcame barriers to breastfeed</div>
-                  <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded mt-2 inline-block">
+                  <div className="text-xs bg-primary/15 text-primary px-3 py-1.5 rounded-full mt-3 inline-block font-semibold">
                     Real stories, real solutions
                   </div>
                 </div>
@@ -110,7 +113,7 @@ const MarketOverviewSlide = () => {
 
             {/* Discussion Topics */}
             <div className="group animate-fade-in" style={{ animationDelay: '0.5s' }}>
-              <div className="bg-gradient-to-r from-accent/10 to-primary/10 p-8 rounded-xl border border-accent/20 group-hover:shadow-elegant transition-all duration-300">
+              <div className="bg-white/90 backdrop-blur-sm p-8 rounded-xl border border-accent/30 group-hover:shadow-elegant transition-all duration-300 shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-left">
                     <div className="text-5xl md:text-6xl font-black text-accent mb-2 font-space">
@@ -119,13 +122,13 @@ const MarketOverviewSlide = () => {
                     <div className="text-slate-900 font-bold text-lg">Authentic Conversations</div>
                   </div>
                 </div>
-                <div className="space-y-2 text-sm text-slate-600 font-inter">
-                  <div className="text-slate-900 font-medium">Topics that matter to our community</div>
+                <div className="space-y-2 text-sm text-slate-700 font-inter">
+                  <div className="text-slate-900 font-semibold">Topics that matter to our community</div>
                   <div>• Overcoming societal barriers and stigma</div>
                   <div>• Finding support within family and community</div>
                   <div>• Balancing work and breastfeeding goals</div>
                   <div>• Building confidence and self-advocacy</div>
-                  <div className="text-xs bg-accent/10 text-accent px-2 py-1 rounded mt-2 inline-block">
+                  <div className="text-xs bg-accent/15 text-accent px-3 py-1.5 rounded-full mt-3 inline-block font-semibold">
                     Honest, supportive dialogue
                   </div>
                 </div>
@@ -134,7 +137,7 @@ const MarketOverviewSlide = () => {
 
             {/* Community Impact */}
             <div className="group animate-fade-in" style={{ animationDelay: '0.7s' }}>
-              <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-8 rounded-xl border border-primary/20 group-hover:shadow-elegant transition-all duration-300">
+              <div className="bg-white/90 backdrop-blur-sm p-8 rounded-xl border border-primary/30 group-hover:shadow-elegant transition-all duration-300 shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-left">
                     <div className="text-4xl md:text-5xl font-black text-primary mb-2 font-space">
@@ -143,13 +146,13 @@ const MarketOverviewSlide = () => {
                     <div className="text-slate-900 font-bold text-lg">Community Connection</div>
                   </div>
                 </div>
-                <div className="space-y-2 text-sm text-slate-600 font-inter">
-                  <div className="text-slate-900 font-medium">Building lasting support networks</div>
+                <div className="space-y-2 text-sm text-slate-700 font-inter">
+                  <div className="text-slate-900 font-semibold">Building lasting support networks</div>
                   <div>• Connect with mothers in similar situations</div>
                   <div>• Share resources and practical tips</div>
                   <div>• Create ongoing peer support groups</div>
                   <div>• Celebrate successes together</div>
-                  <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded mt-2 inline-block">
+                  <div className="text-xs bg-primary/15 text-primary px-3 py-1.5 rounded-full mt-3 inline-block font-semibold">
                     Together we are stronger
                   </div>
                 </div>
@@ -159,7 +162,7 @@ const MarketOverviewSlide = () => {
 
           {/* Right Column - Event Details */}
           <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 shadow-lg">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 shadow-lg">
               <h3 className="text-2xl font-bold text-slate-900 mb-6 font-space text-center">Panel Details</h3>
               
               <div className="space-y-6">

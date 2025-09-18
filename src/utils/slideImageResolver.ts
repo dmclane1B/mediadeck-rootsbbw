@@ -34,8 +34,31 @@ export function useSlideImageResolver() {
       };
     }
 
-    // Fall back to local configuration
-    const localConfig = getSlideImage(slideId);
+    // Fall back to local configuration with legacy ID fallback
+    let localConfig = getSlideImage(slideId);
+    
+    // Try legacy ID mappings if current slideId doesn't work
+    if (!localConfig) {
+      const legacyMappings: Record<string, string> = {
+        'community-voices': 'market-overview',
+        'monday-kickoff': 'product-glimpse',
+        'expert-panel': 'expert-panel',
+        'nutrition-education': 'proof-demand',
+        'workout-session': 'sales-strategy',
+        'smoothie-demo': 'customer-persona',
+        'resources-support': 'resources-support',
+        'community-partners': 'team-leadership',
+        'roadmap': 'roadmap',
+        'ask': 'ask',
+        'contact': 'contact'
+      };
+      
+      const legacyId = legacyMappings[slideId];
+      if (legacyId) {
+        localConfig = getSlideImage(legacyId);
+      }
+    }
+    
     if (localConfig) {
       const localImage = images.find(img => img.id === localConfig.imageId);
       if (localImage) {

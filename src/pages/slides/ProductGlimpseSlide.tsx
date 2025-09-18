@@ -6,11 +6,14 @@ import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
+import { useSlideContent } from '@/hooks/useSlideContent';
 
 const ProductGlimpseSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
+  const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImageForDisplay('monday-kickoff');
+  const slideContent = getSlideContent('monday-kickoff');
 
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center relative">
@@ -36,7 +39,7 @@ const ProductGlimpseSlide = () => {
       <div className="absolute top-4 sm:top-8 left-1/2 transform -translate-x-1/2 z-10">
         <div className="text-center px-4">
           <div className="text-accent text-lg sm:text-xl lg:text-2xl font-space font-bold animate-glow">BLACK BREASTFEEDING WEEK</div>
-          <div className="text-muted-foreground text-xs sm:text-sm font-inter">Monday Kick-Off</div>
+          <div className="text-muted-foreground text-xs sm:text-sm font-inter font-semibold">{slideContent?.customFields?.category || 'EVENTS'}</div>
         </div>
       </div>
 
@@ -51,11 +54,11 @@ const ProductGlimpseSlide = () => {
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 animate-fade-in">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-foreground mb-4 sm:mb-6 font-space leading-tight px-4">
-            MONDAY <span className="text-accent">KICK-OFF</span>
+            {slideContent?.subtitle?.toUpperCase() || 'MONDAY'} <span className="text-accent">{slideContent?.subtitle?.split(' ')[1]?.toUpperCase() || 'KICK-OFF'}</span>
           </h1>
           <div className="w-20 sm:w-24 lg:w-32 h-1 bg-gradient-to-r from-accent to-success mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
-          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed px-4">
-            Start the week with an inspiring virtual gathering introducing the theme and setting the tone for learning and empowerment
+          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed px-4 font-medium">
+            {slideContent?.description || 'Start the week with an inspiring virtual gathering introducing the theme and setting the tone for learning and empowerment'}
           </p>
         </div>
 
@@ -66,6 +69,7 @@ const ProductGlimpseSlide = () => {
             imageAlt={slideImage?.alt}
             onImageSelect={() => navigate('/media')}
             variant="standard"
+            showPlaceholder={true}
           />
         </div>
 

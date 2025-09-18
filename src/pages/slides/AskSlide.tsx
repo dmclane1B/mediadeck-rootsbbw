@@ -6,11 +6,14 @@ import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
+import { useSlideContent } from '@/hooks/useSlideContent';
 
 const AskSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
+  const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImageForDisplay('ask');
+  const slideContent = getSlideContent('ask');
 
   const registrationSteps = [
     {
@@ -95,11 +98,11 @@ const AskSlide = () => {
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-6xl md:text-8xl font-bold text-white leading-tight font-space mb-8">
-            REGISTER <span className="text-white/80">TODAY</span>
+            {slideContent?.subtitle?.toUpperCase() || 'REGISTER'} <span className="text-white/80">TODAY</span>
           </h1>
           <div className="w-32 h-1 bg-white/80 mx-auto mb-8 animate-scale-in"></div>
-          <p className="text-xl text-white/80 max-w-4xl mx-auto font-inter leading-relaxed">
-            Don't miss this meaningful opportunity to join our community celebration and support network
+          <p className="text-xl text-white/90 max-w-4xl mx-auto font-inter leading-relaxed font-medium">
+            {slideContent?.description || "Don't miss this meaningful opportunity to join our community celebration and support network"}
           </p>
         </div>
 
@@ -110,6 +113,7 @@ const AskSlide = () => {
             imageAlt={slideImage?.alt}
             onImageSelect={() => navigate('/media')}
             variant="standard"
+            showPlaceholder={true}
           />
         </div>
 
