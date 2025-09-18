@@ -49,56 +49,56 @@ const TitleSlide = () => {
       </div>
       
       {/* Roots Community Health Branding */}
-      <div className="absolute top-8 right-8 z-10 text-right">
-        <img src="/lovable-uploads/8f771217-3f89-469e-9a26-608410b785c2.png" alt="Roots Community Health Logo" className="h-10 w-auto ml-auto mb-2" />
-        <div className="text-muted-foreground text-xl font-space font-bold">01</div>
+      <div className="absolute top-4 sm:top-8 right-4 sm:right-8 z-10 text-right">
+        <img src="/lovable-uploads/8f771217-3f89-469e-9a26-608410b785c2.png" alt="Roots Community Health Logo" className="h-6 sm:h-10 w-auto ml-auto mb-2" />
+        <div className="text-muted-foreground text-lg sm:text-xl font-space font-bold">01</div>
       </div>
 
       {/* Navigation */}
-      <div className="absolute top-8 left-8 z-10">
+      <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
         <Button 
           variant="outline" 
           onClick={handleHome}
-          className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          className="transition-all duration-300 hover:scale-105 hover:shadow-lg min-h-[44px] text-xs sm:text-sm px-2 sm:px-4"
         >
-          ← Home
+          ← <span className="hidden sm:inline">Home</span>
         </Button>
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 max-w-7xl mx-auto px-4 sm:px-8 animate-fade-in z-10 relative items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in z-10 relative items-center pt-16 sm:pt-20 pb-20 sm:pb-24">
         <div className="order-2 lg:order-1 lg:col-span-2">
           {loading ? (
-            <div className="mb-8 sm:mb-12 space-y-4">
-              <Skeleton className="h-16 w-full max-w-lg" />
-              <Skeleton className="h-8 w-3/4" />
-              <Skeleton className="h-1 w-32" />
-              <Skeleton className="h-6 w-full mt-8" />
-              <Skeleton className="h-6 w-5/6" />
-              <Skeleton className="h-12 w-48 mt-8" />
+            <div className="mb-6 sm:mb-8 lg:mb-12 space-y-4">
+              <Skeleton className="h-12 sm:h-16 w-full max-w-lg" />
+              <Skeleton className="h-6 sm:h-8 w-3/4" />
+              <Skeleton className="h-1 w-24 sm:w-32" />
+              <Skeleton className="h-4 sm:h-6 w-full mt-6 sm:mt-8" />
+              <Skeleton className="h-4 sm:h-6 w-5/6" />
+              <Skeleton className="h-10 sm:h-12 w-36 sm:w-48 mt-6 sm:mt-8" />
             </div>
           ) : (
             <>
-              <div className="mb-8 sm:mb-12">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-tight mb-4 sm:mb-8">
+              <div className="mb-6 sm:mb-8 lg:mb-12">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground tracking-wide animate-scale-in font-space leading-tight mb-4 sm:mb-6 lg:mb-8">
                   {slideContent?.title || 'Roots Community Health - Black Breastfeeding Week'}
                 </h1>
-                <div className="text-xl sm:text-2xl md:text-3xl text-primary font-inter mb-4 sm:mb-8">
+                <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-primary font-inter mb-4 sm:mb-6 lg:mb-8">
                   {slideContent?.subtitle || 'HEALING OUR COMMUNITY FROM WITHIN'}
                 </div>
-                <div className="text-lg sm:text-xl text-primary font-inter mb-4">
+                <div className="text-base sm:text-lg lg:text-xl text-primary font-inter mb-4">
                   {slideContent?.customFields?.eventDate || 'August 25-31, 2025'}
                 </div>
-                <div className="w-20 sm:w-32 h-1 bg-primary animate-fade-in" style={{ animationDelay: '0.5s' }}></div>
+                <div className="w-16 sm:w-20 lg:w-32 h-1 bg-primary animate-fade-in" style={{ animationDelay: '0.5s' }}></div>
               </div>
               
-              <div className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fade-in">
+              <div className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 animate-fade-in leading-relaxed">
                 {slideContent?.description || 'Uplifting those impacted by systemic inequities and poverty through comprehensive medical and behavioral health care, health navigation, workforce enterprises, housing, outreach, and advocacy.'}
               </div>
               
               <Button 
                 onClick={handleOverview}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 text-lg animate-fade-in shadow-lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 sm:px-6 py-2 sm:py-3 text-base sm:text-lg animate-fade-in shadow-lg min-h-[44px] touch-manipulation"
                 style={{ animationDelay: '1.2s' }}
               >
                 {slideContent?.buttonText || 'Learn About Our Services'}

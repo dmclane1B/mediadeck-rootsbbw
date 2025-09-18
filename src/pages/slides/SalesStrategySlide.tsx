@@ -25,32 +25,32 @@ const SalesStrategySlide = () => {
       </div>
 
       {/* Navigation */}
-      <div className="absolute top-8 left-8 z-10">
+      <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
         <Button 
           variant="outline" 
           onClick={() => navigate('/')}
-          className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+          className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 min-h-[44px] text-xs sm:text-sm px-2 sm:px-4"
         >
-          ← Home
+          ← <span className="hidden sm:inline">Home</span>
         </Button>
       </div>
 
       {/* Roots Community Health Branding */}
-      <div className="absolute top-8 right-8 z-10 text-right">
-        <div className="text-white text-2xl font-space font-bold mb-2">ROOTS</div>
-        <div className="text-white/80 text-sm font-inter mb-2">Community Health</div>
-        <div className="text-white text-xl font-space font-bold">08</div>
+      <div className="absolute top-4 sm:top-8 right-4 sm:right-8 z-10 text-right">
+        <div className="text-white text-lg sm:text-xl lg:text-2xl font-space font-bold mb-1 sm:mb-2">ROOTS</div>
+        <div className="text-white/80 text-xs sm:text-sm font-inter mb-1 sm:mb-2">Community Health</div>
+        <div className="text-white text-base sm:text-lg lg:text-xl font-space font-bold">08</div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-20 sm:pb-24">
         {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-6xl md:text-8xl font-bold text-white leading-tight font-space mb-8">
+        <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-bold text-white leading-tight font-space mb-6 sm:mb-8 px-4">
             {slideContent?.title || 'WORKOUT SESSION'}
           </h1>
-          <div className="w-32 h-1 bg-white/80 mx-auto mb-8 animate-scale-in"></div>
-          <p className="text-xl text-white/80 max-w-4xl mx-auto font-inter leading-relaxed">
+          <div className="w-20 sm:w-24 lg:w-32 h-1 bg-white/80 mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
+          <p className="text-base sm:text-lg lg:text-xl text-white/80 max-w-4xl mx-auto font-inter leading-relaxed px-4">
             {slideContent?.description || 'Stay active and healthy with community fitness activities designed for all levels.'}
           </p>
         </div>

@@ -28,38 +28,38 @@ const CustomerPersonaSlide = () => {
       </div>
 
       {/* Navigation */}
-      <div className="absolute top-8 left-8 z-10">
+      <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
         <Button 
           variant="outline" 
           onClick={() => navigate('/')}
-          className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          className="transition-all duration-300 hover:scale-105 hover:shadow-lg min-h-[44px] text-xs sm:text-sm px-2 sm:px-4"
         >
-          ← Home
+          ← <span className="hidden sm:inline">Home</span>
         </Button>
       </div>
 
       {/* Roots Community Health Branding */}
-      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
-        <div className="text-center">
-          <div className="text-accent text-2xl font-space font-bold animate-glow">ROOTS</div>
-          <div className="text-muted-foreground text-sm font-inter">Community Health</div>
+      <div className="absolute top-4 sm:top-8 left-1/2 transform -translate-x-1/2 z-10">
+        <div className="text-center px-4">
+          <div className="text-accent text-lg sm:text-xl lg:text-2xl font-space font-bold animate-glow">ROOTS</div>
+          <div className="text-muted-foreground text-xs sm:text-sm font-inter">Community Health</div>
         </div>
       </div>
 
       {/* Slide Number */}
-      <div className="absolute top-8 right-8 z-10 text-right">
-        <div className="text-accent text-xl font-space font-bold">09</div>
+      <div className="absolute top-4 sm:top-8 right-4 sm:right-8 z-10 text-right">
+        <div className="text-accent text-lg sm:text-xl font-space font-bold">09</div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-20 sm:pb-24">
         {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-6xl md:text-8xl font-black text-foreground mb-6 font-space leading-tight">
+        <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-black text-foreground mb-4 sm:mb-6 font-space leading-tight px-4">
             {slideContent?.title || 'SMOOTHIE DEMO'}
           </h1>
-          <div className="w-32 h-1 bg-gradient-to-r from-accent to-primary mx-auto mb-8 animate-scale-in"></div>
-          <p className="text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed">
+          <div className="w-20 sm:w-24 lg:w-32 h-1 bg-gradient-to-r from-accent to-primary mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
+          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed px-4">
             {slideContent?.description || 'Learn to make nutritious smoothies that support breastfeeding and overall health.'}
           </p>
         </div>
