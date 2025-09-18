@@ -515,7 +515,7 @@ const RoadmapSlide = () => {
       {/* Slide Navigation */}
       <SlideNavigation 
         currentSlide={12}
-        previousRoute="/slides/team-leadership"
+        previousRoute="/slides/community-partners"
         nextRoute="/slides/ask"
       />
     </div>;

@@ -15,7 +15,7 @@ const ChallengesSlide = () => {
   const slideImage = getSlideImageForDisplay('challenges');
   const slideContent = getSlideContent('challenges');
 
-  const handleNext = () => navigate('/slides/product-glimpse');
+  const handleNext = () => navigate('/slides/monday-kickoff');
   const handlePrevious = () => navigate('/slides/overview');
   const handleHome = () => navigate('/');
 
@@ -153,7 +153,7 @@ const ChallengesSlide = () => {
       <SlideNavigation 
         currentSlide={3}
         previousRoute="/slides/overview"
-        nextRoute="/slides/product-glimpse"
+        nextRoute="/slides/monday-kickoff"
       />
     </div>
   );

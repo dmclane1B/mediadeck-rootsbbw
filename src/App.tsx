@@ -3,10 +3,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { StorageInitializer } from "@/components/StorageInitializer";
 import LazySlideWrapper from "@/components/LazySlideWrapper";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
+import MigrationManager from "@/components/MigrationManager";
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -38,7 +39,8 @@ const App = () => (
       <Sonner />
       <PerformanceMonitor />
       <StorageInitializer>
-        <BrowserRouter>
+        <MigrationManager>
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<LazySlideWrapper><TitleSlide /></LazySlideWrapper>} />
             <Route path="/slides/title" element={<LazySlideWrapper><TitleSlide /></LazySlideWrapper>} />
@@ -54,14 +56,14 @@ const App = () => (
             <Route path="/slides/resources-support" element={<LazySlideWrapper><ValuePropositionsSlide /></LazySlideWrapper>} />
             <Route path="/slides/community-partners" element={<LazySlideWrapper><TeamLeadershipSlide /></LazySlideWrapper>} />
             
-            {/* Legacy routes for backward compatibility */}
-            <Route path="/slides/product-glimpse" element={<LazySlideWrapper><ProductGlimpseSlide /></LazySlideWrapper>} />
-            <Route path="/slides/market-overview" element={<LazySlideWrapper><MarketOverviewSlide /></LazySlideWrapper>} />
-            <Route path="/slides/proof-demand" element={<LazySlideWrapper><ProofDemandSlide /></LazySlideWrapper>} />
-            <Route path="/slides/sales-strategy" element={<LazySlideWrapper><SalesStrategySlide /></LazySlideWrapper>} />
-            <Route path="/slides/customer-persona" element={<LazySlideWrapper><CustomerPersonaSlide /></LazySlideWrapper>} />
-            <Route path="/slides/value-propositions" element={<LazySlideWrapper><ValuePropositionsSlide /></LazySlideWrapper>} />
-            <Route path="/slides/team-leadership" element={<LazySlideWrapper><TeamLeadershipSlide /></LazySlideWrapper>} />
+            {/* Legacy route redirects */}
+            <Route path="/slides/product-glimpse" element={<Navigate to="/slides/monday-kickoff" replace />} />
+            <Route path="/slides/market-overview" element={<Navigate to="/slides/community-voices" replace />} />
+            <Route path="/slides/proof-demand" element={<Navigate to="/slides/nutrition-education" replace />} />
+            <Route path="/slides/sales-strategy" element={<Navigate to="/slides/workout-session" replace />} />
+            <Route path="/slides/customer-persona" element={<Navigate to="/slides/smoothie-demo" replace />} />
+            <Route path="/slides/value-propositions" element={<Navigate to="/slides/resources-support" replace />} />
+            <Route path="/slides/team-leadership" element={<Navigate to="/slides/community-partners" replace />} />
             <Route path="/slides/roadmap" element={<LazySlideWrapper><RoadmapSlide /></LazySlideWrapper>} />
             <Route path="/slides/ask" element={<LazySlideWrapper><AskSlide /></LazySlideWrapper>} />
             <Route path="/slides/contact" element={<LazySlideWrapper><ContactSlide /></LazySlideWrapper>} />
@@ -69,7 +71,8 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}><NotFound /></Suspense>} />
           </Routes>
-        </BrowserRouter>
+          </BrowserRouter>
+        </MigrationManager>
       </StorageInitializer>
     </TooltipProvider>
   </QueryClientProvider>

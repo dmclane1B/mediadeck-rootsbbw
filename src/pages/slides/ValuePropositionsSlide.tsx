@@ -18,8 +18,8 @@ const ValuePropositionsSlide = () => {
   const slideImage = getSlideImageForDisplay('resources-support');
   const slideContent = getSlideContent('resources-support');
 
-  const handlePrevious = () => navigate('/slides/market-overview');
-  const handleNext = () => navigate('/slides/ask');
+  const handlePrevious = () => navigate('/slides/smoothie-demo');
+  const handleNext = () => navigate('/slides/community-partners');
   const handleHome = () => navigate('/');
 
   useSwipeNavigation({
