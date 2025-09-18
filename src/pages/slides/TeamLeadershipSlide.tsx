@@ -1,16 +1,18 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { User, Award, Briefcase, GraduationCap } from 'lucide-react';
+import { Users, Award, Briefcase, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import teamLeadershipImage from '@/assets/team-leadership.png';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
+import { useSlideContent } from '@/hooks/useSlideContent';
 const TeamLeadershipSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
+  const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImageForDisplay('team-leadership');
+  const slideContent = getSlideContent('team-leadership');
   return <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -28,17 +30,16 @@ const TeamLeadershipSlide = () => {
         </Button>
       </div>
 
-      {/* DX1 Branding */}
+      {/* Roots Community Health Branding */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
         <div className="text-center">
-          <div className="text-accent text-2xl font-space font-bold animate-glow">DX1</div>
-          <div className="text-muted-foreground text-sm font-inter">Leadership Team</div>
+          <div className="text-accent text-2xl font-space font-bold animate-glow">ROOTS</div>
+          <div className="text-muted-foreground text-sm font-inter">Community Health</div>
         </div>
       </div>
 
-      {/* DX1 Branding */}
+      {/* Slide Number */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <img src="/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png" alt="DX1 Logo" className="h-8 w-auto ml-auto mb-2" />
         <div className="text-accent text-xl font-space font-bold">11</div>
       </div>
 
@@ -47,12 +48,11 @@ const TeamLeadershipSlide = () => {
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-6xl md:text-8xl font-black text-foreground mb-6 font-space leading-tight">
-            TEAM <span className="text-accent">&</span><br />
-            <span className="text-accent">LEADERSHIP</span>
+            {slideContent?.title || 'COMMUNITY PARTNERS'}
           </h1>
           <div className="w-32 h-1 bg-gradient-to-r from-accent to-primary mx-auto mb-8 animate-scale-in"></div>
           <p className="text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed">
-            Experienced leaders driving innovation in sports communication technology
+            {slideContent?.description || 'Meet the incredible organizations making Black Breastfeeding Week possible.'}
           </p>
         </div>
 
@@ -67,106 +67,61 @@ const TeamLeadershipSlide = () => {
         </div>
 
         <div className="max-w-6xl mx-auto">
+          {/* Partner Organizations */}
+          {slideContent?.sections?.[0] && (
+            <div className="mb-16">
+              <h2 className="text-3xl font-bold text-primary mb-8 text-center font-space">{slideContent.sections[0].title}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in" style={{
+              animationDelay: '0.3s'
+            }}>
+                {slideContent.sections[0].content.map((partner, index) => (
+                  <Card key={index} className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-accent hover:shadow-elegant transition-all duration-300 group">
+                    <div className="flex items-start gap-6">
+                      <div className="flex-shrink-0">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <Heart className="w-10 h-10 text-white" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-2xl font-bold text-primary font-space mb-2">{partner}</h3>
+                        <p className="mt-4 text-muted-foreground font-inter leading-relaxed">
+                          Supporting our community through collaborative healthcare services and resources.
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Leadership Team */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold text-primary mb-8 text-center font-space">Leadership Team</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in" style={{
-            animationDelay: '0.3s'
-          }}>
-              {/* Bob Perales - CPO */}
-              <Card className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-accent hover:shadow-elegant transition-all duration-300 group">
-                <div className="flex items-start gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <User className="w-10 h-10 text-white" />
+          {slideContent?.sections?.[1] && (
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-8 text-center font-space">{slideContent.sections[1].title}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in" style={{
+              animationDelay: '0.6s'
+            }}>
+                {slideContent.sections[1].content.map((leader, index) => (
+                  <Card key={index} className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-primary hover:shadow-elegant transition-all duration-300 group">
+                    <div className="flex items-start gap-6">
+                      <div className="flex-shrink-0">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <Users className="w-10 h-10 text-white" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-2xl font-bold text-primary font-space mb-2">{leader}</h3>
+                        <p className="mt-4 text-muted-foreground font-inter leading-relaxed">
+                          Dedicated to advancing community health and supporting families throughout their breastfeeding journey.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-primary font-space mb-2">Bob Perales, Chief Product Officer</h3>
-                    
-                    <div className="space-y-3 text-sm text-muted-foreground font-inter">
-                      
-                      
-                      
-                    </div>
-                    
-                    <p className="mt-4 text-muted-foreground font-inter leading-relaxed">
-                      Brings deep understanding of coaching needs and athletic department operations, with a proven track record of successful technology adoption in sports.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Danny McLane - CEO */}
-              <Card className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-primary hover:shadow-elegant transition-all duration-300 group">
-                <div className="flex items-start gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <User className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-primary font-space mb-2">Danny McLane, Chief Executive Officer</h3>
-                    
-                    
-                    
-                    
-                    <p className="mt-4 text-muted-foreground font-inter leading-relaxed">
-                      Specializes in AI-powered communication systems and has led product development for major collegiate athletics programs nationwide.
-                    </p>
-                  </div>
-                </div>
-              </Card>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
-
-          {/* Advisory Board */}
-          <div>
-            <h2 className="text-3xl font-bold text-primary mb-8 text-center font-space">Advisory Board</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in" style={{
-            animationDelay: '0.6s'
-          }}>
-              {/* Tarrell Gamble */}
-              <Card className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-primary hover:shadow-elegant transition-all duration-300 group">
-                <div className="flex items-start gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <Briefcase className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-primary font-space mb-2">Tarrell Gamble</h3>
-                    <p className="text-accent font-semibold mb-2 font-inter">SVP Capital Markets</p>
-                    <p className="text-muted-foreground text-sm mb-4 font-inter">Blaylock Van, LLC</p>
-                    
-                    <p className="mt-4 text-muted-foreground font-inter leading-relaxed">
-                      Provides strategic guidance on capital markets and financial growth strategies for scaling technology companies.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Brian Seng */}
-              <Card className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-accent hover:shadow-elegant transition-all duration-300 group">
-                <div className="flex items-start gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <Award className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-primary font-space mb-2">Brian Seng</h3>
-                    <p className="text-accent font-semibold mb-2 font-inter">Owner</p>
-                    <p className="text-muted-foreground text-sm mb-4 font-inter">Altest Manufacturing Corp</p>
-                    
-                    <p className="mt-4 text-muted-foreground font-inter leading-relaxed">
-                      Brings extensive manufacturing and operations expertise to guide product development and scaling strategies.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </div>
+          )}
         </div>
 
       </div>
@@ -175,8 +130,8 @@ const TeamLeadershipSlide = () => {
       <div className="absolute bottom-16 left-8 animate-fade-in" style={{
       animationDelay: '1s'
     }}>
-        <div className="text-accent font-bold font-space text-lg">PROVEN LEADERS. PROVEN RESULTS.</div>
-        <div className="text-muted-foreground text-sm font-inter">Building the future of sports communication</div>
+        <div className="text-accent font-bold font-space text-lg">TOGETHER. STRONGER. HEALTHIER.</div>
+        <div className="text-muted-foreground text-sm font-inter">Building healthy communities through partnership</div>
       </div>
 
       {/* Slide Navigation */}

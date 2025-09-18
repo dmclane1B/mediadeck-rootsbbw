@@ -1,16 +1,19 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { User, Target, TrendingUp, DollarSign } from 'lucide-react';
+import { Apple, Clock, Heart, ChefHat } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
+import { useSlideContent } from '@/hooks/useSlideContent';
 
 const CustomerPersonaSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
+  const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImageForDisplay('customer-persona');
+  const slideContent = getSlideContent('customer-persona');
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
@@ -35,17 +38,16 @@ const CustomerPersonaSlide = () => {
         </Button>
       </div>
 
-      {/* DX1 Branding */}
+      {/* Roots Community Health Branding */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
         <div className="text-center">
-          <div className="text-accent text-2xl font-space font-bold animate-glow">DX1</div>
-          <div className="text-muted-foreground text-sm font-inter">Customer Analysis</div>
+          <div className="text-accent text-2xl font-space font-bold animate-glow">ROOTS</div>
+          <div className="text-muted-foreground text-sm font-inter">Community Health</div>
         </div>
       </div>
 
-      {/* DX1 Branding */}
+      {/* Slide Number */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <img src="/lovable-uploads/b608d56d-eb3b-4b0b-b339-8fdffa17d540.png" alt="DX1 Logo" className="h-8 w-auto ml-auto mb-2" />
         <div className="text-accent text-xl font-space font-bold">09</div>
       </div>
 
@@ -54,11 +56,11 @@ const CustomerPersonaSlide = () => {
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-6xl md:text-8xl font-black text-foreground mb-6 font-space leading-tight">
-            CUSTOMER <span className="text-accent">PERSONA</span>
+            {slideContent?.title || 'SMOOTHIE DEMO'}
           </h1>
           <div className="w-32 h-1 bg-gradient-to-r from-accent to-primary mx-auto mb-8 animate-scale-in"></div>
           <p className="text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed">
-            Understanding our primary target audience and their specific pain points in sports communication
+            {slideContent?.description || 'Learn to make nutritious smoothies that support breastfeeding and overall health.'}
           </p>
         </div>
 
@@ -73,127 +75,98 @@ const CustomerPersonaSlide = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          {/* Primary Persona */}
-          <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <Card className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-accent hover:shadow-elegant transition-all duration-300">
-              <div className="flex items-center gap-6 mb-8">
-                <div className="p-4 rounded-full bg-accent/10">
-                  <User className="w-12 h-12 text-accent" />
+          {/* Learning Section */}
+          {slideContent?.sections?.[0] && (
+            <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <Card className="p-8 bg-card/50 backdrop-blur-sm border-l-4 border-l-accent hover:shadow-elegant transition-all duration-300">
+                <div className="flex items-center gap-6 mb-8">
+                  <div className="p-4 rounded-full bg-accent/10">
+                    <ChefHat className="w-12 h-12 text-accent" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-accent font-space">{slideContent.sections[0].title}</h2>
+                    <p className="text-lg text-muted-foreground font-inter">Nutrition Workshop</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-3xl font-bold text-accent font-space">Coach Mike</h2>
-                  <p className="text-lg text-muted-foreground font-inter">Division I Baseball Coach</p>
-                </div>
-              </div>
 
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-3 font-space">Demographics</h3>
-                  <ul className="space-y-2 text-muted-foreground font-inter">
-                    <li>• Age: 35-55 years old</li>
-                    <li>• Experience: 10+ years coaching</li>
-                    <li>• Education: Sports Management/Kinesiology</li>
-                    <li>• Tech comfort: Moderate to high</li>
+                <div className="space-y-6">
+                  <ul className="space-y-3 text-muted-foreground font-inter">
+                    {slideContent.sections[0].content.map((item, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-accent rounded-full mt-2 flex-shrink-0"></div>
+                        {item}
+                      </li>
+                    ))}
                   </ul>
                 </div>
+              </Card>
+            </div>
+          )}
 
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-3 font-space">Goals & Motivations</h3>
-                  <ul className="space-y-2 text-muted-foreground font-inter">
-                    <li>• Win championships and develop athletes</li>
-                    <li>• Gain competitive advantage through technology</li>
-                    <li>• Improve team communication efficiency</li>
-                    <li>• Protect strategic information from opponents</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-3 font-space">Pain Points</h3>
-                  <ul className="space-y-2 text-muted-foreground font-inter">
-                    <li>• Slow communication during critical moments</li>
-                    <li>• Risk of strategy interception</li>
-                    <li>• Complex technology adoption barriers</li>
-                    <li>• Budget constraints for new tools</li>
-                  </ul>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Persona Insights */}
+          {/* Event Details */}
           <div className="space-y-8 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            {/* Decision Factors */}
+            {/* Nutrition Benefits */}
             <Card className="p-6 bg-card/50 backdrop-blur-sm border border-accent/20 hover:shadow-card transition-all duration-300">
               <div className="flex items-center gap-3 mb-4">
-                <Target className="w-6 h-6 text-accent" />
-                <h3 className="text-xl font-bold text-accent font-space">Decision Factors</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-sm font-inter">
-                <div>
-                  <div className="font-medium text-foreground mb-2">Primary Concerns</div>
-                  <ul className="space-y-1 text-muted-foreground">
-                    <li>• Security & Privacy</li>
-                    <li>• Ease of Use</li>
-                    <li>• Cost Effectiveness</li>
-                    <li>• Proven Results</li>
-                  </ul>
-                </div>
-                <div>
-                  <div className="font-medium text-foreground mb-2">Influence Sources</div>
-                  <ul className="space-y-1 text-muted-foreground">
-                    <li>• Peer Recommendations</li>
-                    <li>• Athletic Directors</li>
-                    <li>• Industry Publications</li>
-                    <li>• Conference Networks</li>
-                  </ul>
-                </div>
-              </div>
-            </Card>
-
-            {/* Buying Journey */}
-            <Card className="p-6 bg-card/50 backdrop-blur-sm border border-accent/20 hover:shadow-card transition-all duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <TrendingUp className="w-6 h-6 text-accent" />
-                <h3 className="text-xl font-bold text-accent font-space">Buying Journey</h3>
+                <Heart className="w-6 h-6 text-accent" />
+                <h3 className="text-xl font-bold text-accent font-space">Health Benefits</h3>
               </div>
               <div className="space-y-3 text-sm font-inter">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-accent rounded-full"></div>
-                  <span><strong>Awareness:</strong> Problem recognition through game losses</span>
+                  <span>Supports lactation and milk production</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-accent rounded-full"></div>
-                  <span><strong>Research:</strong> Peer consultation and demo requests</span>
+                  <span>Provides essential nutrients for new mothers</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-accent rounded-full"></div>
-                  <span><strong>Evaluation:</strong> Pilot programs and ROI analysis</span>
+                  <span>Boosts energy and supports recovery</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-accent rounded-full"></div>
-                  <span><strong>Purchase:</strong> Budget approval and implementation</span>
+                  <span>Easy to prepare and family-friendly</span>
                 </div>
               </div>
             </Card>
 
-            {/* Budget & Authority */}
+            {/* Event Details */}
+            {slideContent?.sections?.[1] && (
+              <Card className="p-6 bg-card/50 backdrop-blur-sm border border-accent/20 hover:shadow-card transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <Clock className="w-6 h-6 text-accent" />
+                  <h3 className="text-xl font-bold text-accent font-space">{slideContent.sections[1].title}</h3>
+                </div>
+                <div className="space-y-3 text-sm font-inter">
+                  {slideContent.sections[1].content.map((item, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-accent rounded-full"></div>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Featured Ingredients */}
             <Card className="p-6 bg-card/50 backdrop-blur-sm border border-accent/20 hover:shadow-card transition-all duration-300">
               <div className="flex items-center gap-3 mb-4">
-                <DollarSign className="w-6 h-6 text-accent" />
-                <h3 className="text-xl font-bold text-accent font-space">Budget & Authority</h3>
+                <Apple className="w-6 h-6 text-accent" />
+                <h3 className="text-xl font-bold text-accent font-space">Featured Ingredients</h3>
               </div>
-              <div className="space-y-4 text-sm font-inter">
+              <div className="space-y-3 text-sm font-inter">
                 <div>
-                  <div className="font-medium text-foreground mb-1">Budget Range</div>
-                  <div className="text-muted-foreground">$1,500 - $5,000 annually per team</div>
+                  <div className="font-medium text-foreground mb-1">Superfoods</div>
+                  <div className="text-muted-foreground">Spinach, kale, berries, and chia seeds</div>
                 </div>
                 <div>
-                  <div className="font-medium text-foreground mb-1">Decision Makers</div>
-                  <div className="text-muted-foreground">Head Coach + Athletic Director approval</div>
+                  <div className="font-medium text-foreground mb-1">Protein Sources</div>
+                  <div className="text-muted-foreground">Greek yogurt, nut butters, protein powder</div>
                 </div>
                 <div>
-                  <div className="font-medium text-foreground mb-1">Budget Cycle</div>
-                  <div className="text-muted-foreground">Annual planning (June-August)</div>
+                  <div className="font-medium text-foreground mb-1">Natural Sweeteners</div>
+                  <div className="text-muted-foreground">Dates, bananas, and pure maple syrup</div>
                 </div>
               </div>
             </Card>
@@ -203,8 +176,8 @@ const CustomerPersonaSlide = () => {
 
       {/* Bottom Tagline */}
       <div className="absolute bottom-16 left-8 animate-fade-in" style={{ animationDelay: '1s' }}>
-        <div className="text-accent font-bold font-space text-lg">KNOW YOUR COACH. WIN THE GAME.</div>
-        <div className="text-muted-foreground text-sm font-inter">Data-driven persona development</div>
+        <div className="text-accent font-bold font-space text-lg">NOURISH. LEARN. THRIVE.</div>
+        <div className="text-muted-foreground text-sm font-inter">Nutrition education for wellness</div>
       </div>
 
       {/* Slide Navigation */}
