@@ -35,22 +35,24 @@ const ProofDemandSlide = () => {
       {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
         <div className="text-white text-xl font-space font-bold">07</div>
-        <div className="text-white/80 text-sm font-inter">EVENTS</div>
+        <div className="text-white/80 text-sm font-inter">NUTRITION</div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-8">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <div className="text-white/60 text-lg font-inter mb-4">{slideContent?.subtitle || 'Community Health Event'}</div>
-          <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight font-space mb-8">
-            {slideContent?.title || 'WELLNESS FAIR'}
+          <div className="text-white/90 text-lg font-inter mb-4 bg-background/20 backdrop-blur-sm py-2 px-4 rounded-lg inline-block">{slideContent?.subtitle || 'Nutrition Education'}</div>
+          <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight font-space mb-8 drop-shadow-lg">
+            {slideContent?.title || '07 NUTRITION'}
           </h1>
-          <div className="w-32 h-1 bg-white/80 mx-auto mb-8 animate-scale-in"></div>
+          <div className="w-32 h-1 bg-white mx-auto mb-8 animate-scale-in drop-shadow-md"></div>
           {slideContent?.description && (
-            <p className="text-white/80 text-lg font-inter max-w-3xl mx-auto">
-              {slideContent.description}
-            </p>
+            <div className="bg-background/30 backdrop-blur-md p-6 rounded-xl border border-white/20 max-w-3xl mx-auto">
+              <p className="text-white text-lg font-inter leading-relaxed">
+                {slideContent.description}
+              </p>
+            </div>
           )}
         </div>
 
@@ -58,79 +60,79 @@ const ProofDemandSlide = () => {
         <div className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
           <ImageShowcase
             imageUrl={slideImage?.url}
-            imageAlt={slideImage?.alt || slideContent?.title || 'Wellness Fair'}
+            imageAlt={slideImage?.alt || slideContent?.title || 'Nutrition Education'}
             variant="featured"
           />
         </div>
 
-        {/* Event Highlights */}
+        {/* Nutrition Highlights */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in" style={{
         animationDelay: '0.5s'
       }}>
-          {/* Resource Booths */}
-          <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-            <div className="text-4xl font-bold text-white mb-2 font-space">15+</div>
-            <div className="text-white/80 font-medium mb-2 font-space">Resource Booths</div>
-            <p className="text-white/70 text-sm font-inter">
-              Community vendors, health organizations, and lactation specialists providing valuable resources
+          {/* Lactation Support */}
+          <div className="bg-background/25 backdrop-blur-md p-6 rounded-xl border border-white/30 hover:bg-background/35 transition-all duration-300 hover:scale-105">
+            <div className="text-4xl font-bold text-white mb-2 font-space">24/7</div>
+            <div className="text-white font-medium mb-2 font-space">Lactation Support</div>
+            <p className="text-white/90 text-sm font-inter leading-relaxed">
+              Professional lactation consultants available around the clock for breastfeeding guidance and support
             </p>
           </div>
 
-          {/* Health Screenings */}
-          <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
+          {/* Nutrition Counseling */}
+          <div className="bg-background/25 backdrop-blur-md p-6 rounded-xl border border-white/30 hover:bg-background/35 transition-all duration-300 hover:scale-105">
             <div className="text-4xl font-bold text-white mb-2 font-space">FREE</div>
-            <div className="text-white/80 font-medium mb-2 font-space">Health Screenings</div>
-            <p className="text-white/70 text-sm font-inter">
-              Blood pressure checks, BMI assessments, and wellness consultations available for all attendees
+            <div className="text-white font-medium mb-2 font-space">Nutrition Counseling</div>
+            <p className="text-white/90 text-sm font-inter leading-relaxed">
+              Personalized nutrition planning and dietary guidance for optimal breastfeeding health
             </p>
           </div>
 
-          {/* Family Activities */}
-          <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-            <div className="text-4xl font-bold text-white mb-2 font-space">ALL</div>
-            <div className="text-white/80 font-medium mb-2 font-space">Ages Welcome</div>
-            <p className="text-white/70 text-sm font-inter">
-              Family-friendly activities, children's area, and interactive wellness demonstrations
+          {/* Educational Resources */}
+          <div className="bg-background/25 backdrop-blur-md p-6 rounded-xl border border-white/30 hover:bg-background/35 transition-all duration-300 hover:scale-105">
+            <div className="text-4xl font-bold text-white mb-2 font-space">100+</div>
+            <div className="text-white font-medium mb-2 font-space">Resources Available</div>
+            <p className="text-white/90 text-sm font-inter leading-relaxed">
+              Comprehensive educational materials, meal plans, and nutritional supplements guidance
             </p>
           </div>
         </div>
 
-        {/* Event Details */}
+        {/* Nutrition Services */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in" style={{
         animationDelay: '1s'
       }}>
-          <div className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
-            <h3 className="text-2xl font-bold text-white mb-4 font-space">Event Highlights</h3>
-            <ul className="space-y-3 text-white/80 font-inter">
+          <div className="bg-background/20 backdrop-blur-md p-8 rounded-xl border border-white/20">
+            <h3 className="text-2xl font-bold text-white mb-4 font-space">Nutrition Services</h3>
+            <ul className="space-y-3 text-white/95 font-inter">
               <li className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                Interactive wellness booths and demonstrations
+                Professional lactation consultant appointments
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                Free health screenings and consultations
+                Breastfeeding nutrition workshops and classes
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                Community networking and resource sharing
+                Healthy meal planning for nursing mothers
               </li>
             </ul>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
-            <h3 className="text-2xl font-bold text-white mb-4 font-space">What to Expect</h3>
-            <ul className="space-y-3 text-white/80 font-inter">
+          <div className="bg-background/20 backdrop-blur-md p-8 rounded-xl border border-white/20">
+            <h3 className="text-2xl font-bold text-white mb-4 font-space">Support Available</h3>
+            <ul className="space-y-3 text-white/95 font-inter">
               <li className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                Local health organizations and vendors
+                One-on-one nutrition counseling sessions
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                Educational materials and giveaways
+                Group breastfeeding support meetings
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                Family-friendly activities for all ages
+                Educational materials and follow-up care
               </li>
             </ul>
           </div>
@@ -138,10 +140,12 @@ const ProofDemandSlide = () => {
       </div>
 
       {/* Bottom Tagline */}
-      <div className="absolute bottom-16 left-8 text-white/80 font-space font-medium animate-fade-in" style={{
+      <div className="absolute bottom-16 left-8 bg-background/30 backdrop-blur-sm py-2 px-4 rounded-lg animate-fade-in" style={{
       animationDelay: '1.5s'
     }}>
-        WELLNESS FOR ALL. COMMUNITY STRONG.
+        <div className="text-white font-space font-medium">
+          NOURISHING MOTHERS. STRENGTHENING BABIES.
+        </div>
       </div>
 
       {/* Slide Navigation */}

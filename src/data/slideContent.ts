@@ -116,21 +116,21 @@ export const defaultSlideContent: Record<string, SlideContent> = {
   },
   'proof-demand': {
     id: 'proof-demand',
-    title: '07 EVENTS',
-    subtitle: 'Wellness Fair',
-    description: 'Join us for a community celebration with resources, activities, and support for families.',
+    title: '07 NUTRITION',
+    subtitle: 'Nutrition Education',
+    description: 'Essential nutrition guidance and lactation support for healthy breastfeeding journey and optimal mother-baby wellness.',
     sections: [
       {
-        title: 'Event Highlights',
-        content: ['Resource booths from local organizations', 'Health screenings and consultations', 'Family activities and games', 'Community networking opportunities']
+        title: 'Nutrition Services',
+        content: ['Lactation consultant appointments', 'Breastfeeding nutrition workshops', 'Healthy meal planning for nursing mothers', 'Nutritional supplements guidance']
       },
       {
-        title: 'Event Details',
-        content: ['Thursday, August 28, 2025', '10:00 AM - 3:00 PM', 'Community Center Main Hall']
+        title: 'Support Available',
+        content: ['One-on-one nutrition counseling', 'Group breastfeeding support sessions', 'Educational materials and resources', 'Follow-up care and monitoring']
       }
     ],
     customFields: {
-      category: 'EVENTS'
+      category: 'NUTRITION'
     }
   },
   'sales-strategy': {
