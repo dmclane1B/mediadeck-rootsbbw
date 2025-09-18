@@ -15,8 +15,8 @@ const ValuePropositionsSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
   const { getSlideContent } = useSlideContent();
-  const slideImage = getSlideImageForDisplay('value-propositions');
-  const slideContent = getSlideContent('value-propositions');
+  const slideImage = getSlideImageForDisplay('resources-support');
+  const slideContent = getSlideContent('resources-support');
 
   const handlePrevious = () => navigate('/slides/market-overview');
   const handleNext = () => navigate('/slides/ask');
@@ -311,8 +311,8 @@ const ValuePropositionsSlide = () => {
       {/* Slide Navigation */}
       <SlideNavigation 
         currentSlide={10}
-        previousRoute="/slides/market-overview"
-        nextRoute="/slides/ask"
+        previousRoute="/slides/smoothie-demo"
+        nextRoute="/slides/community-partners"
       />
     </div>
   );

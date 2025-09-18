@@ -12,8 +12,8 @@ const SalesStrategySlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
   const { getSlideContent } = useSlideContent();
-  const slideImage = getSlideImageForDisplay('sales-strategy');
-  const slideContent = getSlideContent('sales-strategy');
+  const slideImage = getSlideImageForDisplay('workout-session');
+  const slideContent = getSlideContent('workout-session');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-success flex items-center justify-center relative overflow-hidden">
@@ -145,8 +145,8 @@ const SalesStrategySlide = () => {
       {/* Slide Navigation */}
       <SlideNavigation 
         currentSlide={8}
-        previousRoute="/slides/proof-demand"
-        nextRoute="/slides/customer-persona"
+        previousRoute="/slides/nutrition-education"
+        nextRoute="/slides/smoothie-demo"
       />
     </div>
   );

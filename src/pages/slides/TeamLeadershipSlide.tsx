@@ -11,8 +11,8 @@ const TeamLeadershipSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
   const { getSlideContent } = useSlideContent();
-  const slideImage = getSlideImageForDisplay('team-leadership');
-  const slideContent = getSlideContent('team-leadership');
+  const slideImage = getSlideImageForDisplay('community-partners');
+  const slideContent = getSlideContent('community-partners');
   return <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -137,7 +137,7 @@ const TeamLeadershipSlide = () => {
       {/* Slide Navigation */}
       <SlideNavigation 
         currentSlide={11}
-        previousRoute="/slides/value-propositions"
+        previousRoute="/slides/resources-support"
         nextRoute="/slides/roadmap"
       />
     </div>;

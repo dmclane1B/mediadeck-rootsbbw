@@ -40,7 +40,7 @@ const slides = [
     title: "Monday Kick-Off",
     description: "Virtual welcome & discussion",
     icon: Lightbulb,
-    route: "/slides/product-glimpse",
+    route: "/slides/monday-kickoff",
     section: "Events"
   },
   {
@@ -48,7 +48,7 @@ const slides = [
     title: "Expert Panel",
     description: "Board-certified lactation consultant",
     icon: Shield,
-    route: "/slides/product-page",
+    route: "/slides/expert-panel",
     section: "Events"
   },
   {
@@ -56,15 +56,15 @@ const slides = [
     title: "Community Voices",
     description: "Panel discussion with local mothers",
     icon: Users,
-    route: "/slides/market-overview",
+    route: "/slides/community-voices",
     section: "Events"
   },
   {
     number: 7,
-    title: "Wellness Fair",
-    description: "Friday celebration and resources",
+    title: "Nutrition Education",
+    description: "Essential nutrition guidance & lactation support",
     icon: TrendingUp,
-    route: "/slides/proof-demand",
+    route: "/slides/nutrition-education",
     section: "Events"
   },
   {
@@ -72,7 +72,7 @@ const slides = [
     title: "Workout Session",
     description: "Fitness and wellness activities",
     icon: Zap,
-    route: "/slides/sales-strategy",
+    route: "/slides/workout-session",
     section: "Activities"
   },
   {
@@ -80,7 +80,7 @@ const slides = [
     title: "Smoothie Demo",
     description: "Led by our very own Jocelyn",
     icon: Users,
-    route: "/slides/customer-persona",
+    route: "/slides/smoothie-demo",
     section: "Activities"
   },
   {
@@ -88,7 +88,7 @@ const slides = [
     title: "Resources & Support",
     description: "Available community services",
     icon: MapPin,
-    route: "/slides/value-propositions",
+    route: "/slides/resources-support",
     section: "Support"
   },
   {
@@ -96,7 +96,7 @@ const slides = [
     title: "Community Partners",
     description: "Organizations supporting the week",
     icon: Users,
-    route: "/slides/team-leadership",
+    route: "/slides/community-partners",
     section: "Partners"
   },
   {

@@ -10,7 +10,7 @@ import { useSlideImageResolver } from '@/utils/slideImageResolver';
 const ProductGlimpseSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
-  const slideImage = getSlideImageForDisplay('product-glimpse');
+  const slideImage = getSlideImageForDisplay('monday-kickoff');
 
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center relative">
@@ -249,7 +249,7 @@ const ProductGlimpseSlide = () => {
       <SlideNavigation 
         currentSlide={4}
         previousRoute="/slides/challenges"
-        nextRoute="/slides/market-overview"
+        nextRoute="/slides/expert-panel"
       />
     </div>
   );

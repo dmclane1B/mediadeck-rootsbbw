@@ -12,8 +12,8 @@ const CustomerPersonaSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
   const { getSlideContent } = useSlideContent();
-  const slideImage = getSlideImageForDisplay('customer-persona');
-  const slideContent = getSlideContent('customer-persona');
+  const slideImage = getSlideImageForDisplay('smoothie-demo');
+  const slideContent = getSlideContent('smoothie-demo');
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
@@ -183,8 +183,8 @@ const CustomerPersonaSlide = () => {
       {/* Slide Navigation */}
       <SlideNavigation 
         currentSlide={9}
-        previousRoute="/slides/sales-strategy"
-        nextRoute="/slides/value-propositions"
+        previousRoute="/slides/workout-session"
+        nextRoute="/slides/resources-support"
       />
     </div>
   );

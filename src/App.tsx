@@ -18,6 +18,7 @@ const TitleSlide = lazy(() => import("./pages/slides/TitleSlide"));
 const OverviewSlide = lazy(() => import("./pages/slides/OverviewSlide"));
 const ChallengesSlide = lazy(() => import("./pages/slides/ChallengesSlide"));
 const ProductGlimpseSlide = lazy(() => import("./pages/slides/ProductGlimpseSlide"));
+const ExpertPanelSlide = lazy(() => import("./pages/slides/ExpertPanelSlide"));
 const MarketOverviewSlide = lazy(() => import("./pages/slides/MarketOverviewSlide"));
 const ProofDemandSlide = lazy(() => import("./pages/slides/ProofDemandSlide"));
 const SalesStrategySlide = lazy(() => import("./pages/slides/SalesStrategySlide"));
@@ -44,8 +45,17 @@ const App = () => (
             <Route path="/builder" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}><Index /></Suspense>} />
             <Route path="/slides/overview" element={<LazySlideWrapper><OverviewSlide /></LazySlideWrapper>} />
             <Route path="/slides/challenges" element={<LazySlideWrapper><ChallengesSlide /></LazySlideWrapper>} />
-            <Route path="/slides/product-glimpse" element={<LazySlideWrapper><ProductGlimpseSlide /></LazySlideWrapper>} />
+            <Route path="/slides/monday-kickoff" element={<LazySlideWrapper><ProductGlimpseSlide /></LazySlideWrapper>} />
+            <Route path="/slides/expert-panel" element={<LazySlideWrapper><ExpertPanelSlide /></LazySlideWrapper>} />
+            <Route path="/slides/community-voices" element={<LazySlideWrapper><MarketOverviewSlide /></LazySlideWrapper>} />
+            <Route path="/slides/nutrition-education" element={<LazySlideWrapper><ProofDemandSlide /></LazySlideWrapper>} />
+            <Route path="/slides/workout-session" element={<LazySlideWrapper><SalesStrategySlide /></LazySlideWrapper>} />
+            <Route path="/slides/smoothie-demo" element={<LazySlideWrapper><CustomerPersonaSlide /></LazySlideWrapper>} />
+            <Route path="/slides/resources-support" element={<LazySlideWrapper><ValuePropositionsSlide /></LazySlideWrapper>} />
+            <Route path="/slides/community-partners" element={<LazySlideWrapper><TeamLeadershipSlide /></LazySlideWrapper>} />
             
+            {/* Legacy routes for backward compatibility */}
+            <Route path="/slides/product-glimpse" element={<LazySlideWrapper><ProductGlimpseSlide /></LazySlideWrapper>} />
             <Route path="/slides/market-overview" element={<LazySlideWrapper><MarketOverviewSlide /></LazySlideWrapper>} />
             <Route path="/slides/proof-demand" element={<LazySlideWrapper><ProofDemandSlide /></LazySlideWrapper>} />
             <Route path="/slides/sales-strategy" element={<LazySlideWrapper><SalesStrategySlide /></LazySlideWrapper>} />

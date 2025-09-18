@@ -10,8 +10,8 @@ const ProofDemandSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
   const { getSlideContent } = useSlideContent();
-  const slideImage = getSlideImageForDisplay('proof-demand');
-  const slideContent = getSlideContent('proof-demand');
+  const slideImage = getSlideImageForDisplay('nutrition-education');
+  const slideContent = getSlideContent('nutrition-education');
   return <div className="min-h-screen bg-gradient-to-br from-primary via-accent to-success flex items-center justify-center relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 opacity-10">
@@ -151,8 +151,8 @@ const ProofDemandSlide = () => {
       {/* Slide Navigation */}
       <SlideNavigation 
         currentSlide={7}
-        previousRoute="/slides/market-overview"
-        nextRoute="/slides/sales-strategy"
+        previousRoute="/slides/community-voices"
+        nextRoute="/slides/workout-session"
       />
     </div>;
 };

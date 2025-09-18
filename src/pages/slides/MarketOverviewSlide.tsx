@@ -10,7 +10,7 @@ import { useSlideImageResolver } from '@/utils/slideImageResolver';
 const MarketOverviewSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
-  const slideImage = getSlideImageForDisplay('market-overview');
+  const slideImage = getSlideImageForDisplay('community-voices');
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
@@ -217,8 +217,8 @@ const MarketOverviewSlide = () => {
       {/* Slide Navigation */}
       <SlideNavigation 
         currentSlide={6}
-        previousRoute="/slides/product-glimpse"
-        nextRoute="/slides/proof-demand"
+        previousRoute="/slides/expert-panel"
+        nextRoute="/slides/nutrition-education"
       />
     </div>
   );

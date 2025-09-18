@@ -61,8 +61,8 @@ export const defaultSlideContent: Record<string, SlideContent> = {
       category: 'IMPACT'
     }
   },
-  'product-glimpse': {
-    id: 'product-glimpse',
+  'monday-kickoff': {
+    id: 'monday-kickoff',
     title: '04 EVENTS',
     subtitle: 'Monday Kick-Off',
     description: 'Join us for an inspiring start to Black Breastfeeding Week with community leaders and healthcare professionals.',
@@ -95,8 +95,8 @@ export const defaultSlideContent: Record<string, SlideContent> = {
       category: 'EVENTS'
     }
   },
-  'market-overview': {
-    id: 'market-overview',
+  'community-voices': {
+    id: 'community-voices',
     title: '06 EVENTS',
     subtitle: 'Community Voices',
     description: 'Hear powerful stories and experiences from mothers in our community who have navigated their breastfeeding journeys.',
@@ -114,8 +114,8 @@ export const defaultSlideContent: Record<string, SlideContent> = {
       category: 'EVENTS'
     }
   },
-  'proof-demand': {
-    id: 'proof-demand',
+  'nutrition-education': {
+    id: 'nutrition-education',
     title: '07 NUTRITION',
     subtitle: 'Nutrition Education',
     description: 'Essential nutrition guidance and lactation support for healthy breastfeeding journey and optimal mother-baby wellness.',
@@ -133,8 +133,8 @@ export const defaultSlideContent: Record<string, SlideContent> = {
       category: 'NUTRITION'
     }
   },
-  'sales-strategy': {
-    id: 'sales-strategy',
+  'workout-session': {
+    id: 'workout-session',
     title: '08 ACTIVITIES',
     subtitle: 'Workout Session',
     description: 'Stay active and healthy with community fitness activities designed for all levels, including prenatal and postnatal options.',
@@ -152,8 +152,8 @@ export const defaultSlideContent: Record<string, SlideContent> = {
       category: 'ACTIVITIES'
     }
   },
-  'customer-persona': {
-    id: 'customer-persona',
+  'smoothie-demo': {
+    id: 'smoothie-demo',
     title: '09 ACTIVITIES',
     subtitle: 'Smoothie Demo',
     description: 'Learn to make nutritious smoothies that support breastfeeding and overall health, led by our very own nutrition expert Jocelyn.',
@@ -171,8 +171,8 @@ export const defaultSlideContent: Record<string, SlideContent> = {
       category: 'ACTIVITIES'
     }
   },
-  'value-propositions': {
-    id: 'value-propositions',
+  'resources-support': {
+    id: 'resources-support',
     title: '10 SUPPORT',
     subtitle: 'Resources & Support',
     description: 'Comprehensive support services available to families in our community throughout the year.',
@@ -190,8 +190,8 @@ export const defaultSlideContent: Record<string, SlideContent> = {
       category: 'SUPPORT'
     }
   },
-  'team-leadership': {
-    id: 'team-leadership',
+  'community-partners': {
+    id: 'community-partners',
     title: '11 PARTNERS',
     subtitle: 'Community Partners',
     description: 'Meet the incredible organizations and leaders making Black Breastfeeding Week possible in our community.',
