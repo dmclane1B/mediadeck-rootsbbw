@@ -160,7 +160,7 @@ const OverviewSlide = () => {
       category="EVENT OVERVIEW"
       slideNumber="02"
       testimonial={slideContent?.customFields?.testimonial}
-      backgroundImage="/src/assets/background-community.png"
+      backgroundImage="/src/assets/roots-logo.png"
     >
       {/* Navigation */}
       <div className="absolute top-4 left-4 z-20">

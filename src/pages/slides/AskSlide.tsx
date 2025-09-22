@@ -67,7 +67,7 @@ const AskSlide = () => {
         <picture>
           <source srcSet="/src/assets/background-community-optimized.webp" type="image/webp" />
           <img 
-            src="/src/assets/background-community.png" 
+            src="/src/assets/roots-logo.png" 
             alt="Community Support" 
             className="w-full h-full object-cover opacity-10"
             loading="lazy"
