@@ -42,7 +42,7 @@ const ProofDemandSlide = () => {
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
           <div className="text-white/90 text-lg font-inter mb-4 bg-background/20 backdrop-blur-sm py-2 px-4 rounded-lg inline-block">{slideContent?.subtitle || 'Nutrition Education'}</div>
-          <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight font-space mb-8 drop-shadow-lg">
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold bg-gradient-to-r from-white via-primary/90 to-white bg-clip-text text-transparent leading-tight font-space mb-8 drop-shadow-2xl animate-fade-in hover-scale tracking-tight filter drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]">
             {slideContent?.title || '07 NUTRITION'}
           </h1>
           <div className="w-32 h-1 bg-white mx-auto mb-8 animate-scale-in drop-shadow-md"></div>
