@@ -9,6 +9,8 @@ import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
+import MagazineLayout from '@/components/MagazineLayout';
+import CommunitySection from '@/components/CommunitySection';
 
 const slides = [
   {
@@ -152,30 +154,16 @@ const OverviewSlide = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 relative overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <picture>
-          <source srcSet="/src/assets/background-community-optimized.webp" type="image/webp" />
-          <img 
-            src="/src/assets/background-community.png" 
-            alt="UCLA Softball Player" 
-            className="w-full h-full object-cover opacity-10"
-            loading="lazy"
-          />
-        </picture>
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50/95 to-slate-100/95"></div>
-      </div>
-
-
-      {/* Roots Community Health Branding */}
-      <div className="absolute top-8 right-8 z-10 text-right">
-        <div className="text-primary text-2xl font-space font-bold mb-2">ROOTS</div>
-        <div className="text-slate-500 text-xl font-space font-bold">02</div>
-      </div>
-
+    <MagazineLayout
+      title={slideContent?.title || 'BLACK BREASTFEEDING WEEK EVENT OVERVIEW'}
+      subtitle={slideContent?.subtitle || 'A Vibrant Celebration of Community Support and Education'}
+      category="EVENT OVERVIEW"
+      slideNumber="02"
+      testimonial={slideContent?.customFields?.testimonial}
+      backgroundImage="/src/assets/background-community.png"
+    >
       {/* Navigation */}
-      <div className="absolute top-8 left-8 z-10">
+      <div className="absolute top-4 left-4 z-20">
         <Button 
           variant="outline" 
           onClick={handleHome}
@@ -185,77 +173,97 @@ const OverviewSlide = () => {
         </Button>
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 pt-24 pb-20 px-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-4 font-space">
-              {slideContent?.title || 'BLACK BREASTFEEDING WEEK'}
-            </h1>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-6">
-              {slideContent?.description || 'A comprehensive week of events, education, and community support celebrating and promoting breastfeeding in the Black community'}
-            </p>
-            <div className="w-32 h-1 bg-primary mx-auto"></div>
-          </div>
+      {/* Event Highlights Section */}
+      <CommunitySection
+        title="Event Highlights"
+        description="Our community came together for an incredible week of education, celebration, and support for Black mothers and families."
+        variant="highlights"
+        items={[
+          {
+            title: "Community Participation",
+            content: slideContent?.sections?.[0]?.content || [
+              'Over 50 community members participating',
+              '5 days of comprehensive programming',
+              'Expert-led educational sessions',
+              'Community testimonials and story sharing'
+            ],
+            highlight: true
+          },
+          {
+            title: "Professional Support",
+            content: slideContent?.sections?.[1]?.content || [
+              'Board-certified lactation consultants',
+              'Healthcare provider partnerships',
+              'Free resources and support materials',
+              'Follow-up care coordination'
+            ]
+          }
+        ]}
+      />
 
-          {/* Image Showcase */}
-          <div className="mb-16">
-            <ImageShowcase
-              imageUrl={slideImage?.url}
-              imageAlt={slideImage?.alt}
-              onImageSelect={() => navigate('/media')}
-              variant="hero"
-              className="animate-fade-in"
-            />
-          </div>
+      {/* Featured Image */}
+      <div className="my-12">
+        <ImageShowcase
+          imageUrl={slideImage?.url}
+          imageAlt={slideImage?.alt || 'Community members celebrating together at Black Breastfeeding Week event'}
+          onImageSelect={() => navigate('/media')}
+          variant="hero"
+          className="animate-fade-in rounded-lg shadow-lg"
+        />
+      </div>
 
-          {/* Slides Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {slides.map((slide) => {
-              const IconComponent = slide.icon;
-              return (
-                <Card 
-                  key={slide.number}
-                  className="p-6 cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border-slate-200"
-                  onClick={() => handleSlideClick(slide.route)}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <IconComponent className="w-6 h-6 text-primary" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-1 rounded">
-                          {slide.number.toString().padStart(2, '0')}
-                        </span>
-                        <span className="text-xs text-slate-500 uppercase tracking-wide">
-                          {slide.section}
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-bold text-slate-900 mb-1 font-space">
-                        {slide.title}
-                      </h3>
-                      <p className="text-slate-600 text-sm">
-                        {slide.description}
-                      </p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-slate-400 flex-shrink-0" />
+      {/* Program Schedule Navigation */}
+      <CommunitySection
+        title="Week Schedule Overview"
+        description="Navigate through our comprehensive program designed to support, educate, and celebrate our community."
+        items={slides.slice(2).map((slide, index) => ({
+          title: `Day ${index + 1}: ${slide.title}`,
+          content: slide.description,
+          highlight: index === 0
+        }))}
+      />
+
+      {/* Quick Access Cards */}
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {slides.slice(0, 6).map((slide) => {
+          const IconComponent = slide.icon;
+          return (
+            <Card 
+              key={slide.number}
+              className="p-6 cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border border-border/20"
+              onClick={() => handleSlideClick(slide.route)}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <IconComponent className="w-6 h-6 text-primary" />
                   </div>
-                </Card>
-              );
-            })}
-          </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-1 rounded">
+                      {slide.number.toString().padStart(2, '0')}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground mb-1 font-space">
+                    {slide.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {slide.description}
+                  </p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              </div>
+            </Card>
+          );
+        })}
+      </div>
 
-          {/* Estimated Duration */}
-          <div className="text-center mt-12">
-            <p className="text-slate-500">
-              <strong>Event Week:</strong> {slideContent?.customFields?.eventDetails || 'August 25-31, 2025 | Location: Community & Virtual Events'}
-            </p>
-          </div>
-        </div>
+      {/* Event Details */}
+      <div className="text-center mt-12 p-6 bg-muted/30 rounded-lg">
+        <p className="text-muted-foreground text-lg">
+          <strong className="text-foreground">Event Details:</strong> {slideContent?.customFields?.eventDetails || 'August 25-31, 2025 | Community Centers & Virtual Platforms'}
+        </p>
       </div>
 
       {/* Slide Navigation */}
@@ -264,7 +272,7 @@ const OverviewSlide = () => {
         previousRoute="/"
         nextRoute="/slides/challenges"
       />
-    </div>
+    </MagazineLayout>
   );
 };
 

@@ -14,51 +14,99 @@ export interface SlideContent {
 export const defaultSlideContent: Record<string, SlideContent> = {
   title: {
     id: 'title',
-    title: 'Roots Community Health - Black Breastfeeding Week',
-    subtitle: 'HEALING OUR COMMUNITY FROM WITHIN',
-    description: 'Uplifting those impacted by systemic inequities and poverty through comprehensive medical and behavioral health care, health navigation, workforce enterprises, housing, outreach, and advocacy.',
-    buttonText: 'Learn About Our Services',
+    title: 'BLACK BREASTFEEDING WEEK 2025',
+    subtitle: 'Celebrating and Supporting Breastfeeding in Our Community',
+    description: 'Join Roots Community Health for a week of education, empowerment, and celebration as we support Black mothers and families in their breastfeeding journeys.',
+    buttonText: 'Join Our Community',
     customFields: {
-      eventDate: 'August 25-31, 2025'
+      eventDate: 'August 25-31, 2025',
+      location: 'Community Centers & Virtual Events',
+      testimonial: {
+        quote: 'This event gave me the support and confidence I needed as a new mother. The community came together beautifully to celebrate and educate.',
+        author: 'Maria Johnson',
+        role: 'Community Member & New Mother'
+      }
     }
   },
   overview: {
     id: 'overview',
-    title: '02 SCHEDULE',
-    subtitle: 'Week Overview',
-    description: 'A comprehensive week of events, education, and community support celebrating and promoting breastfeeding in the Black community',
+    title: 'BLACK BREASTFEEDING WEEK EVENT OVERVIEW',
+    subtitle: 'A Vibrant Celebration of Community Support and Education',
+    description: 'Join us for a transformative week of events designed to celebrate, educate, and empower Black mothers and families in their breastfeeding journeys. Our community comes together to share stories, learn from experts, and build lasting connections.',
     sections: [
       {
-        title: 'Event Schedule',
-        content: ['Monday: Virtual Welcome & Discussion', 'Tuesday: Expert Panel with Board-Certified Lactation Consultant', 'Wednesday: Community Voices Panel', 'Thursday: Wellness Fair', 'Friday: Workout Session & Smoothie Demo']
+        title: 'Event Highlights',
+        content: [
+          'Over 50 community members participating',
+          '5 days of comprehensive programming',
+          'Expert-led educational sessions',
+          'Community testimonials and story sharing',
+          'Free resources and support materials',
+          'Virtual and in-person participation options'
+        ]
+      },
+      {
+        title: 'Community Partners',
+        content: [
+          'Local healthcare providers and lactation consultants',
+          'Community advocacy organizations',
+          'Educational institutions and parent groups',
+          'Local businesses supporting families'
+        ]
       }
     ],
     customFields: {
-      category: 'SCHEDULE',
-      eventDetails: 'Event Week: August 25-31, 2025 | Location: Community & Virtual Events'
+      category: 'EVENT OVERVIEW',
+      eventDetails: 'August 25-31, 2025 | Community Centers & Virtual Platforms',
+      testimonial: {
+        quote: 'Seeing our community come together to support each other was incredibly moving. The knowledge shared and connections made will impact families for years to come.',
+        author: 'Dr. Sarah Williams',
+        role: 'Community Health Director'
+      }
     }
   },
   challenges: {
     id: 'challenges',
-    title: '03 IMPACT',
-    subtitle: 'Why This Matters',
-    description: 'Addressing critical challenges in our community and the importance of Black Breastfeeding Week',
+    title: 'ADDRESSING HEALTH DISPARITIES IN OUR COMMUNITY',
+    subtitle: 'Understanding the Challenges and Creating Solutions',
+    description: 'Through education, support, and community engagement, we work together to address the systemic barriers that impact Black mothers and families in their breastfeeding journeys.',
     sections: [
       {
-        title: 'Health Disparities',
-        content: 'Black mothers face significantly higher rates of maternal mortality and lower breastfeeding initiation rates due to systemic barriers.'
+        title: 'Community Impact Statistics',
+        content: [
+          'Black mothers have lower breastfeeding initiation rates compared to other groups',
+          'Limited access to culturally competent lactation support',
+          'Higher rates of maternal mortality requiring comprehensive care',
+          'Need for community-based education and peer support networks'
+        ]
       },
       {
-        title: 'Lack of Support',
-        content: 'Limited access to lactation consultants and culturally competent healthcare providers creates additional obstacles.'
+        title: 'Our Community Response',
+        content: [
+          'Free lactation consultations with certified specialists',
+          'Peer support groups led by community members',
+          'Educational workshops in multiple languages',
+          'Partnership with local healthcare providers',
+          'Advocacy for systemic healthcare improvements'
+        ]
       },
       {
-        title: 'Cultural Barriers',
-        content: 'Historical trauma and cultural misconceptions need to be addressed through community education and support.'
+        title: 'Success Stories',
+        content: [
+          'Increased breastfeeding duration among program participants',
+          'Growing network of peer support leaders',
+          'Improved access to lactation resources',
+          'Stronger community connections and support systems'
+        ]
       }
     ],
     customFields: {
-      category: 'IMPACT'
+      category: 'COMMUNITY IMPACT',
+      testimonial: {
+        quote: 'The support I received from this program changed everything. Not only did I successfully breastfeed my baby, but I found a community of mothers who understood my journey.',
+        author: 'Keisha Thompson',
+        role: 'Program Participant & Peer Support Leader'
+      }
     }
   },
   'monday-kickoff': {
