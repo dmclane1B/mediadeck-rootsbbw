@@ -8,6 +8,7 @@ import { StorageInitializer } from "@/components/StorageInitializer";
 import LazySlideWrapper from "@/components/LazySlideWrapper";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import MigrationManager from "@/components/MigrationManager";
+import '@/utils/instantValidation'; // Auto-runs validation
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));

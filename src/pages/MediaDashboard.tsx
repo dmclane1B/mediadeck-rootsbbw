@@ -18,6 +18,7 @@ import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, 
 import { useToast } from '@/hooks/use-toast';
 import SlideContentEditor from '@/components/SlideContentEditor';
 import SlideHealthCheck from '@/components/SlideHealthCheck';
+import ValidationRunner from '@/components/ValidationRunner';
 import { CloudMediaManager } from '@/utils/cloudMedia';
 
 const MediaDashboard = () => {
@@ -444,7 +445,7 @@ const MediaDashboard = () => {
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
+          <TabsList className="grid w-full grid-cols-6 max-w-4xl">
             <TabsTrigger value="slides" className="flex items-center gap-2">
               <Presentation className="w-4 h-4" />
               Slide Images
@@ -456,6 +457,10 @@ const MediaDashboard = () => {
             <TabsTrigger value="health" className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
               Health Check
+            </TabsTrigger>
+            <TabsTrigger value="validation" className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" />
+              Validation
             </TabsTrigger>
             <TabsTrigger value="library" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
@@ -539,6 +544,10 @@ const MediaDashboard = () => {
 
           <TabsContent value="health">
             <SlideHealthCheck onFixIssues={() => setActiveTab("content")} />
+          </TabsContent>
+
+          <TabsContent value="validation">
+            <ValidationRunner autoRun={activeTab === "validation"} />
           </TabsContent>
 
           <TabsContent value="library">
