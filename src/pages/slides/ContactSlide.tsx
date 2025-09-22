@@ -8,6 +8,8 @@ import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
+import SlideBackground from '@/components/SlideBackground';
+import SideTab from '@/components/SideTab';
 const ContactSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
@@ -85,21 +87,15 @@ const ContactSlide = () => {
       icon: Building2
     }
   ];
-  return <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="/src/assets/roots-logo-brand.png" 
-          alt="Roots Community Health Logo" 
-          className="w-full h-full object-contain opacity-5"
-          loading="lazy"
-        />
-      </div>
+  return (
+    <SlideBackground className="flex flex-col">
+      {/* Side Tab */}
+      <SideTab text="CONNECT WITH US" />
 
       {/* Navigation */}
       <div className="absolute top-8 left-8 z-10">
         <Button 
-          variant="outline" 
+          variant="green" 
           onClick={handleHome}
           className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
         >
@@ -110,7 +106,7 @@ const ContactSlide = () => {
       {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
         <img src="/lovable-uploads/8f771217-3f89-469e-9a26-608410b785c2.png" alt="Roots Community Health Logo" className="h-10 w-auto ml-auto mb-2" />
-        <div className="text-foreground text-xl font-space font-bold">14</div>
+        <div className="text-primary text-xl font-space font-bold">14</div>
       </div>
 
       {/* Main Content */}
@@ -183,6 +179,7 @@ const ContactSlide = () => {
         previousRoute="/slides/ask"
         isLastSlide={true}
       />
-    </div>;
+    </SlideBackground>
+  );
 };
 export default ContactSlide;

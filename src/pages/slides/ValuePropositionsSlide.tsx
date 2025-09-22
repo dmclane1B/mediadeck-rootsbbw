@@ -11,6 +11,8 @@ import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { SlideContent, defaultSlideContent } from '@/data/slideContent';
 import { useSlideContent } from '@/hooks/useSlideContent';
+import SlideBackground from '@/components/SlideBackground';
+import SideTab from '@/components/SideTab';
 
 const ValuePropositionsSlide = () => {
   const navigate = useNavigate();
@@ -35,23 +37,16 @@ const ValuePropositionsSlide = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background relative">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="/src/assets/roots-logo-brand.png" 
-          alt="Roots Community Health Logo" 
-          className="w-full h-full object-contain opacity-5"
-          loading="lazy"
-        />
-      </div>
+    <SlideBackground>
+      {/* Side Tab */}
+      <SideTab text="RESOURCES & SUPPORT" />
 
       {/* Fixed Navigation */}
       <div className="fixed top-4 sm:top-6 left-4 sm:left-6 z-50">
         <Button 
-          variant="outline" 
+          variant="green" 
           onClick={handleHome}
-          className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+          className="transition-all duration-300 hover:scale-105 hover:shadow-lg text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
           aria-label="Go to home page"
         >
           <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -62,14 +57,14 @@ const ValuePropositionsSlide = () => {
       {/* Fixed Roots Community Health Branding */}
       <div className="fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50">
         <div className="text-center">
-          <div className="text-white text-lg sm:text-xl font-space font-bold animate-glow">ROOTS</div>
-          <div className="text-white/80 text-xs sm:text-sm font-inter">Community Health</div>
+          <div className="text-primary text-lg sm:text-xl font-space font-bold">ROOTS</div>
+          <div className="text-muted-foreground text-xs sm:text-sm font-inter">Community Health</div>
         </div>
       </div>
 
       {/* Fixed Slide Number */}
       <div className="fixed top-4 sm:top-6 right-4 sm:right-6 z-50 text-right">
-        <div className="text-white text-lg sm:text-xl font-space font-bold">10</div>
+        <div className="text-primary text-lg sm:text-xl font-space font-bold">10</div>
       </div>
 
       {/* Scrollable Content */}
@@ -78,12 +73,12 @@ const ValuePropositionsSlide = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
             <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-              <div className="text-white/60 text-base sm:text-lg font-inter mb-3 sm:mb-4">Supporting Our Community</div>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight font-space mb-6 sm:mb-8">
+              <div className="text-muted-foreground text-base sm:text-lg font-inter mb-3 sm:mb-4">Supporting Our Community</div>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight font-space mb-6 sm:mb-8">
                 {slideContent?.title || 'RESOURCES & SUPPORT'}
               </h1>
-              <div className="w-24 sm:w-32 h-1 bg-white/80 mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
-              <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto font-inter leading-relaxed px-4">
+              <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-primary to-accent mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto font-inter leading-relaxed px-4">
                 {slideContent?.description || 'Comprehensive support services available to families in our community.'}
               </p>
             </div>
@@ -281,7 +276,7 @@ const ValuePropositionsSlide = () => {
         previousRoute="/slides/smoothie-demo"
         nextRoute="/slides/community-partners"
       />
-    </div>
+    </SlideBackground>
   );
 };
 

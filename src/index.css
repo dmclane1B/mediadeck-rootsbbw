@@ -17,17 +17,17 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Roots Community Health brand colors - extracted from logo */
-    --primary: 25 65% 30%;  /* Rich earth brown from logo */
+    /* Roots Community Health brand colors - Green Primary Theme */
+    --primary: 120 60% 40%;  /* Vibrant green as primary */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 120 55% 35%; /* Forest green from logo */
+    --secondary: 25 65% 30%; /* Earth brown as secondary */
     --secondary-foreground: 0 0% 100%;
 
-    --accent: 120 45% 45%; /* Lighter green accent from logo */
+    --accent: 120 45% 45%; /* Lighter green accent */
     --accent-foreground: 0 0% 100%;
 
-    --success: 120 55% 35%; /* Success matches secondary green */
+    --success: 120 60% 40%; /* Success matches primary green */
     --success-foreground: 0 0% 100%;
 
     --muted: 210 40% 96.1%;

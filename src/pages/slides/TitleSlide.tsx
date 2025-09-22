@@ -11,6 +11,7 @@ import { useSlideContent } from '@/hooks/useSlideContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import MagazineLayout from '@/components/MagazineLayout';
 import { Badge } from '@/components/ui/badge';
+import SideTab from '@/components/SideTab';
 
 const TitleSlide = () => {
   const navigate = useNavigate();
@@ -43,10 +44,13 @@ const TitleSlide = () => {
       testimonial={slideContent?.customFields?.testimonial}
       backgroundImage="/src/assets/roots-logo.png"
     >
+      {/* Side Tab */}
+      <SideTab text="WELCOME HOME" />
+
       {/* Navigation */}
       <div className="absolute top-4 left-4 z-20">
         <Button 
-          variant="outline" 
+          variant="green" 
           onClick={handleHome}
           className="transition-all duration-300 hover:scale-105 hover:shadow-lg min-h-[44px]"
         >
@@ -76,7 +80,8 @@ const TitleSlide = () => {
                 <div className="flex gap-4 pt-4">
                   <Button 
                     onClick={handleOverview}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 text-lg"
+                    variant="green"
+                    className="px-6 py-3 text-lg"
                   >
                     {slideContent?.buttonText || 'Join Our Community'}
                   </Button>

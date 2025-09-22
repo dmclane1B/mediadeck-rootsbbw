@@ -11,6 +11,7 @@ import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
 import MagazineLayout from '@/components/MagazineLayout';
 import CommunitySection from '@/components/CommunitySection';
+import SideTab from '@/components/SideTab';
 
 const slides = [
   {
@@ -162,10 +163,13 @@ const OverviewSlide = () => {
       testimonial={slideContent?.customFields?.testimonial}
       backgroundImage="/src/assets/roots-logo.png"
     >
+      {/* Side Tab */}
+      <SideTab text="WEEK OVERVIEW" />
+
       {/* Navigation */}
       <div className="absolute top-4 left-4 z-20">
         <Button 
-          variant="outline" 
+          variant="green" 
           onClick={handleHome}
           className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
         >

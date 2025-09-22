@@ -7,6 +7,8 @@ import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
+import SlideBackground from '@/components/SlideBackground';
+import SideTab from '@/components/SideTab';
 
 const ChallengesSlide = () => {
   const navigate = useNavigate();
@@ -31,17 +33,7 @@ const ChallengesSlide = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="/src/assets/roots-logo-brand.png" 
-          alt="Roots Community Health Logo" 
-          className="w-full h-full object-contain opacity-5"
-          loading="lazy"
-        />
-      </div>
-
+    <SlideBackground className="flex items-center justify-center">
       {/* Navigation */}
       <div className="absolute top-8 left-8 z-10">
         <Button 
@@ -59,12 +51,8 @@ const ChallengesSlide = () => {
         <div className="text-accent text-xl font-space font-bold">03</div>
       </div>
 
-      {/* Why This Matters Tab */}
-      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-accent to-primary text-white px-6 py-20 rounded-l-lg shadow-elegant animate-slide-in">
-        <div className="transform rotate-90 text-lg font-medium whitespace-nowrap font-space">
-          WHY THIS MATTERS
-        </div>
-      </div>
+      {/* Side Tab */}
+      <SideTab text="WHY THIS MATTERS" />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
@@ -155,7 +143,7 @@ const ChallengesSlide = () => {
         previousRoute="/slides/overview"
         nextRoute="/slides/monday-kickoff"
       />
-    </div>
+    </SlideBackground>
   );
 };
 
