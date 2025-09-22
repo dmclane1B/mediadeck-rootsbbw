@@ -73,54 +73,8 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({ children }) => {
     return () => clearTimeout(timer);
   }, [children]);
 
-  if (issues.length === 0 && !isValidating) {
-    return <>{children}</>;
-  }
-
-  return (
-    <>
-      {children}
-      
-      {/* Validation Issues Overlay */}
-      {issues.length > 0 && (
-        <div className="fixed top-4 right-4 z-[9999] max-w-md space-y-2">
-          {issues.map((issue, index) => (
-            <Alert key={index} variant={issue.type === 'error' ? 'destructive' : 'default'}>
-              <div className="flex items-start gap-3">
-                {issue.type === 'error' ? (
-                  <AlertTriangle className="w-4 h-4 text-destructive mt-0.5" />
-                ) : (
-                  <AlertTriangle className="w-4 h-4 text-warning mt-0.5" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge variant={issue.type === 'error' ? 'destructive' : 'secondary'}>
-                      {issue.type.toUpperCase()}
-                    </Badge>
-                  </div>
-                  <AlertDescription className="text-sm">
-                    <div className="font-medium">{issue.message}</div>
-                    {issue.details && (
-                      <div className="text-xs mt-1 opacity-80">{issue.details}</div>
-                    )}
-                  </AlertDescription>
-                </div>
-              </div>
-            </Alert>
-          ))}
-        </div>
-      )}
-      
-      {/* Validation Status Indicator */}
-      {isValidating && (
-        <div className="fixed bottom-4 right-4 z-[9999]">
-          <Badge variant="outline" className="bg-background/90 backdrop-blur-sm">
-            Validating content...
-          </Badge>
-        </div>
-      )}
-    </>
-  );
+  // Run validation silently for development use
+  return <>{children}</>;
 };
 
 export default ContentValidator;
