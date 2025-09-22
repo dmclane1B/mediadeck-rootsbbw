@@ -32,8 +32,8 @@ export default {
 		},
 		extend: {
       fontFamily: {
-        'inter': ['Inter', 'sans-serif'],
-        'space': ['Space Grotesk', 'sans-serif'],
+        'roots': ['Arial Black', 'Helvetica Bold', 'Helvetica', 'Arial', 'sans-serif'],
+        'brand': ['Arial Black', 'Helvetica Bold', 'Helvetica', 'Arial', 'sans-serif'],
       },
       fontDisplay: {
         'inter': 'swap',

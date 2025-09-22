@@ -17,17 +17,17 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Roots Community Health color palette */
-    --primary: 340 45% 35%;  /* Deep maroon/burgundy */
+    /* Roots Community Health brand colors - extracted from logo */
+    --primary: 25 65% 30%;  /* Rich earth brown from logo */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 150 35% 40%; /* Natural green from tree logo */
+    --secondary: 120 55% 35%; /* Forest green from logo */
     --secondary-foreground: 0 0% 100%;
 
-    --accent: 170 45% 55%; /* Healing teal accent */
+    --accent: 120 45% 45%; /* Lighter green accent from logo */
     --accent-foreground: 0 0% 100%;
 
-    --success: 150 50% 45%; /* Community green */
+    --success: 120 55% 35%; /* Success matches secondary green */
     --success-foreground: 0 0% 100%;
 
     --muted: 210 40% 96.1%;
@@ -115,13 +115,14 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-background text-foreground font-brand;
     font-display: swap; /* Optimize font loading */
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-space;
+    @apply font-roots;
     font-display: swap; /* Optimize font loading */
+    font-weight: 900; /* Bold weight to match logo */
   }
 
   /* Enhanced navigation utilities */

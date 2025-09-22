@@ -46,7 +46,7 @@ const MagazineLayout: React.FC<MagazineLayoutProps> = ({
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-primary font-space">
+              <h1 className="text-2xl font-bold text-primary font-roots">
                 ROOTS COMMUNITY HEALTH
               </h1>
               <p className="text-sm text-muted-foreground uppercase tracking-wide mt-1">
@@ -57,7 +57,7 @@ const MagazineLayout: React.FC<MagazineLayoutProps> = ({
               <Badge variant="outline" className="mb-2">
                 {category}
               </Badge>
-              <div className="text-3xl font-bold text-primary font-space">
+              <div className="text-3xl font-bold text-primary font-roots">
                 {slideNumber}
               </div>
             </div>
@@ -66,11 +66,11 @@ const MagazineLayout: React.FC<MagazineLayoutProps> = ({
           <Separator className="mb-6" />
           
           <div className="space-y-2">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground font-space leading-tight">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground font-roots leading-tight">
               {title}
             </h2>
             {subtitle && (
-              <p className="text-xl text-muted-foreground font-inter">
+              <p className="text-xl text-muted-foreground font-brand">
                 {subtitle}
               </p>
             )}

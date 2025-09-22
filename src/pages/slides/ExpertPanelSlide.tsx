@@ -37,8 +37,8 @@ const ExpertPanelSlide = () => {
 
       {/* Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <div className="text-primary text-2xl font-space font-bold mb-2">ROOTS</div>
-        <div className="text-muted-foreground text-xl font-space font-bold">05</div>
+        <div className="text-primary text-2xl font-roots font-bold mb-2">ROOTS</div>
+        <div className="text-muted-foreground text-xl font-roots font-bold">05</div>
       </div>
 
       {/* Main Content */}
@@ -49,7 +49,7 @@ const ExpertPanelSlide = () => {
             <div className="inline-block px-4 py-2 bg-primary/10 text-primary text-sm font-semibold rounded-full mb-4 border border-primary/20">
               {slideContent?.customFields?.category || 'EVENTS'}
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 font-space">
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 font-roots">
               {slideContent?.subtitle || 'Expert Panel'}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">

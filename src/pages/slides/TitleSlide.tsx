@@ -106,7 +106,7 @@ const TitleSlide = () => {
 
       {/* Community Highlights */}
       <div className="space-y-8">
-        <h3 className="text-2xl font-bold text-foreground font-space text-center">
+        <h3 className="text-2xl font-bold text-foreground font-roots text-center">
           Community Celebration Highlights
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
