@@ -7,18 +7,18 @@ import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
-
 const ExpertPanelSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImageForDisplay } = useSlideImageResolver();
-  const { getSlideContent } = useSlideContent();
+  const {
+    getSlideImageForDisplay
+  } = useSlideImageResolver();
+  const {
+    getSlideContent
+  } = useSlideContent();
   const slideImage = getSlideImageForDisplay('expert-panel');
   const slideContent = getSlideContent('expert-panel');
-
   const handleHome = () => navigate('/');
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10 relative overflow-hidden">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10 relative overflow-hidden">
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0 bg-[url('/src/assets/geometric-pattern.png')] bg-repeat animate-pulse"></div>
@@ -29,11 +29,7 @@ const ExpertPanelSlide = () => {
 
       {/* Navigation */}
       <div className="absolute top-8 left-8 z-10">
-        <Button 
-          variant="outline" 
-          onClick={handleHome}
-          className="transition-all duration-300 hover:scale-105"
-        >
+        <Button variant="outline" onClick={handleHome} className="transition-all duration-300 hover:scale-105">
           <Home className="w-4 h-4 mr-2" />
           Home
         </Button>
@@ -63,13 +59,7 @@ const ExpertPanelSlide = () => {
 
           {/* Image Showcase */}
           <div className="mb-16">
-            <ImageShowcase
-              imageUrl={slideImage?.url}
-              imageAlt={slideImage?.alt || 'Expert Panel'}
-              onImageSelect={() => navigate('/media')}
-              variant="hero"
-              className="animate-fade-in"
-            />
+            <ImageShowcase imageUrl={slideImage?.url} imageAlt={slideImage?.alt || 'Expert Panel'} onImageSelect={() => navigate('/media')} variant="hero" className="animate-fade-in" />
           </div>
 
           {/* Content Grid */}
@@ -84,15 +74,10 @@ const ExpertPanelSlide = () => {
                   <h3 className="text-2xl font-bold text-foreground">Featured Experts</h3>
                 </div>
                 <div className="space-y-4">
-                  {Array.isArray(slideContent?.sections?.[0]?.content) 
-                    ? slideContent.sections[0].content.map((item, index) => (
-                        <div key={index} className="flex items-start gap-3">
+                  {Array.isArray(slideContent?.sections?.[0]?.content) ? slideContent.sections[0].content.map((item, index) => <div key={index} className="flex items-start gap-3">
                           <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
                           <p className="text-muted-foreground">{item}</p>
-                        </div>
-                      ))
-                    : (
-                      <>
+                        </div>) : <>
                         <div className="flex items-start gap-3">
                           <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
                           <p className="text-muted-foreground">Board-certified lactation consultant</p>
@@ -109,9 +94,7 @@ const ExpertPanelSlide = () => {
                           <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
                           <p className="text-muted-foreground">Q&A session included</p>
                         </div>
-                      </>
-                    )
-                  }
+                      </>}
                 </div>
               </Card>
             </div>
@@ -166,24 +149,16 @@ const ExpertPanelSlide = () => {
           {/* Call to Action */}
           <div className="text-center mt-16">
             <div className="max-w-2xl mx-auto">
-              <h3 className="text-2xl font-bold text-foreground mb-4">Join Our Expert Panel</h3>
-              <p className="text-muted-foreground mb-6">Get evidence-based guidance from certified professionals and connect with your community.</p>
-              <Button size="lg" className="px-8 py-3">
-                Register for Free
-              </Button>
+              
+              
+              
             </div>
           </div>
         </div>
       </div>
 
       {/* Slide Navigation */}
-      <SlideNavigation 
-        currentSlide={5}
-        previousRoute="/slides/monday-kickoff"
-        nextRoute="/slides/community-voices"
-      />
-    </div>
-  );
+      <SlideNavigation currentSlide={5} previousRoute="/slides/monday-kickoff" nextRoute="/slides/community-voices" />
+    </div>;
 };
-
 export default ExpertPanelSlide;
