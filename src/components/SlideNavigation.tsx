@@ -104,7 +104,7 @@ const SlideNavigation: React.FC<SlideNavigationProps> = ({
         </div>
 
         {/* Navigation Container */}
-        <div className="bg-black/20 backdrop-blur-md border-t border-white/10 px-4 py-3 sm:px-6 sm:py-4">
+        <div className="bg-black/40 backdrop-blur-md border-t border-white/30 px-4 py-3 sm:px-6 sm:py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             
             {/* Left: Previous Button */}
