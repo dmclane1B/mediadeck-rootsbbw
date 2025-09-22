@@ -64,6 +64,7 @@ export const useMediaLibrary = () => {
   const [images, setImages] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
+  const [restoring, setRestoring] = useState(false);
 
   // Restore images from cloud storage
   const restoreFromCloud = useCallback(async (): Promise<number> => {
@@ -200,6 +201,78 @@ export const useMediaLibrary = () => {
 
     loadImages();
   }, [restoreFromCloud]);
+
+  // Restore images from published slides in Supabase
+  const restoreFromPublishedSlides = useCallback(async (): Promise<number> => {
+    console.log('[MediaLibrary] Starting published slides restore...');
+    setRestoring(true);
+    
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      // Fetch published slide configurations from Supabase
+      const { data: publishedSlides, error } = await supabase
+        .from('published_slide_configurations')
+        .select('image_id, image_name, image_url, cloud_path, alt_text, dimensions, size')
+        .eq('status', 'active');
+
+      if (error) {
+        console.error('[MediaLibrary] Error fetching published slides:', error);
+        throw new Error(`Failed to fetch published slides: ${error.message}`);
+      }
+
+      if (!publishedSlides || publishedSlides.length === 0) {
+        console.log('[MediaLibrary] No published slides found');
+        return 0;
+      }
+
+      console.log(`[MediaLibrary] Found ${publishedSlides.length} published slides`);
+      const restoredImages: MediaFile[] = [];
+
+      // Convert published slides to MediaFile objects
+      for (const slide of publishedSlides) {
+        // Skip if we already have this image
+        const existingImage = images.find(img => img.cloudPath === slide.cloud_path);
+        if (existingImage) {
+          console.log(`[MediaLibrary] Skipping ${slide.image_name} - already exists`);
+          continue;
+        }
+
+        const mediaFile: MediaFile = {
+          id: slide.image_id,
+          name: slide.image_name,
+          url: slide.image_url, // Use the published URL directly
+          uploadDate: new Date().toISOString(),
+          dimensions: slide.dimensions as { width: number; height: number } | undefined,
+          size: slide.size,
+          cloudPath: slide.cloud_path,
+          publicUrl: slide.image_url,
+          source: 'cloud'
+        };
+
+        // Save to IndexedDB
+        try {
+          await indexedDBManager.addImage(mediaFile);
+          restoredImages.push(mediaFile);
+          console.log(`[MediaLibrary] Restored ${slide.image_name} from published slides`);
+        } catch (error) {
+          console.error(`[MediaLibrary] Failed to save restored image ${slide.image_name}:`, error);
+        }
+      }
+
+      // Update local state
+      setImages(prev => [...prev, ...restoredImages]);
+      
+      console.log(`[MediaLibrary] Successfully restored ${restoredImages.length} images from published slides`);
+      return restoredImages.length;
+      
+    } catch (error) {
+      console.error('[MediaLibrary] Error during published slides restore:', error);
+      throw error;
+    } finally {
+      setRestoring(false);
+    }
+  }, [images]);
 
   const addImages = async (
     files: FileList,
@@ -625,11 +698,13 @@ export const useMediaLibrary = () => {
     images,
     loading,
     uploadProgress,
+    restoring,
     addImages,
     removeImage,
     updateImage,
     clearAll,
     restoreFromCloud, // Add restore function
+    restoreFromPublishedSlides,
     getStorageInfo,
     getCloudStorageInfo
   };

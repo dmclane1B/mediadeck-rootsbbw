@@ -18,7 +18,7 @@ interface MediaLibraryProps {
 }
 
 const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: MediaLibraryProps) => {
-  const { images, loading, uploadProgress, addImages, removeImage, updateImage, getStorageInfo } = useMediaLibrary();
+  const { images, loading, uploadProgress, restoring, addImages, removeImage, updateImage, getStorageInfo, restoreFromPublishedSlides } = useMediaLibrary();
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -154,6 +154,30 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
     });
   };
 
+  const handleRestoreFromPublishedSlides = async () => {
+    try {
+      const restoredCount = await restoreFromPublishedSlides();
+      if (restoredCount > 0) {
+        toast({
+          title: "Images restored",
+          description: `Successfully restored ${restoredCount} image(s) from published slides.`
+        });
+      } else {
+        toast({
+          title: "No images to restore",
+          description: "All published slide images are already in your library."
+        });
+      }
+    } catch (error) {
+      console.error('Failed to restore from published slides:', error);
+      toast({
+        variant: "destructive",
+        title: "Restore failed",
+        description: "Failed to restore images from published slides."
+      });
+    }
+  };
+
   if (compact) {
     return (
       <div className="space-y-4">
@@ -274,13 +298,22 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
             </div>
           )}
           
-          <Button 
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            {isUploading ? 'Uploading...' : 'Choose Files'}
-          </Button>
+          <div className="flex gap-2 justify-center">
+            <Button 
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading || restoring}
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              {isUploading ? 'Uploading...' : 'Choose Files'}
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={handleRestoreFromPublishedSlides}
+              disabled={isUploading || restoring}
+            >
+              {restoring ? 'Restoring...' : 'Restore Published Images'}
+            </Button>
+          </div>
         </div>
       </Card>
 
@@ -386,10 +419,25 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
       )}
 
       {!loading && filteredImages.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground space-y-2">
+        <div className="text-center py-12 text-muted-foreground space-y-4">
           <div>
             {searchTerm ? 'No images match your search.' : 'No images uploaded yet.'}
           </div>
+          {!searchTerm && (
+            <div className="space-y-2">
+              <p className="text-sm">
+                If you have images visible on your slides but not here, try restoring them:
+              </p>
+              <Button 
+                variant="outline"
+                onClick={handleRestoreFromPublishedSlides}
+                disabled={restoring}
+                className="mx-auto"
+              >
+                {restoring ? 'Restoring...' : 'Restore Published Images'}
+              </Button>
+            </div>
+          )}
           {debugInfo && (
             <div className="text-xs bg-muted p-2 rounded font-mono">
               Debug: {debugInfo}
