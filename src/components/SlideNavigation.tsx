@@ -94,7 +94,7 @@ const SlideNavigation: React.FC<SlideNavigationProps> = ({
   return (
     <>
       {/* Enhanced Footer Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 z-[60] pb-safe">
         {/* Progress Bar */}
         <div className="w-full h-1 bg-black/20 backdrop-blur-sm">
           <div 
@@ -214,7 +214,7 @@ const SlideNavigation: React.FC<SlideNavigationProps> = ({
 
       {/* Slide Overview Modal */}
       {showOverview && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowOverview(false)}>
+        <div className="fixed inset-0 z-[55] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowOverview(false)}>
           <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white font-space">Presentation Overview</h3>
