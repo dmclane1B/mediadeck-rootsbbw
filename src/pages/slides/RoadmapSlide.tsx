@@ -17,26 +17,22 @@ const RoadmapSlide = () => {
 
   if (!slideContent) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-primary flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-primary flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <picture>
-          <source srcSet="/src/assets/background-community-optimized.webp" type="image/webp" />
-          <img 
-            src="/src/assets/roots-logo.png" 
-            alt="Community Background" 
-            className="w-full h-full object-cover opacity-10"
-            loading="lazy"
-          />
-        </picture>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-secondary/95 to-primary/95"></div>
+        <img 
+          src="/src/assets/roots-logo-brand.png" 
+          alt="Roots Community Health Logo" 
+          className="w-full h-full object-contain opacity-5"
+          loading="lazy"
+        />
       </div>
 
       {/* Animated Background Elements */}

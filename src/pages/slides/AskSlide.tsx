@@ -61,27 +61,23 @@ const AskSlide = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-primary flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <picture>
-          <source srcSet="/src/assets/background-community-optimized.webp" type="image/webp" />
-          <img 
-            src="/src/assets/roots-logo.png" 
-            alt="Community Support" 
-            className="w-full h-full object-cover opacity-10"
-            loading="lazy"
-          />
-        </picture>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-secondary/95 to-primary/95"></div>
+        <img 
+          src="/src/assets/roots-logo-brand.png" 
+          alt="Roots Community Health Logo" 
+          className="w-full h-full object-contain opacity-5"
+          loading="lazy"
+        />
       </div>
 
       {/* Navigation */}
       <div className="absolute top-8 left-8 z-10">
-        <Button 
+         <Button 
           variant="outline" 
           onClick={() => navigate('/')}
-          className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+          className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
         >
           ← Home
         </Button>
@@ -89,19 +85,19 @@ const AskSlide = () => {
 
       {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <div className="text-white text-2xl font-space font-bold mb-2">ROOTS</div>
-        <div className="text-white/80 text-xl font-space font-bold">13</div>
+        <div className="text-primary text-2xl font-space font-bold mb-2">ROOTS</div>
+        <div className="text-muted-foreground text-xl font-space font-bold">13</div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-6xl md:text-8xl font-bold text-white leading-tight font-space mb-8">
-            {slideContent?.subtitle?.toUpperCase() || 'REGISTER'} <span className="text-white/80">TODAY</span>
+          <h1 className="text-6xl md:text-8xl font-bold text-foreground leading-tight font-space mb-8">
+            {slideContent?.subtitle?.toUpperCase() || 'REGISTER'} <span className="text-muted-foreground">{slideContent?.subtitle?.split(' ')[1]?.toUpperCase() || 'TODAY'}</span>
           </h1>
-          <div className="w-32 h-1 bg-white/80 mx-auto mb-8 animate-scale-in"></div>
-          <p className="text-xl text-white/90 max-w-4xl mx-auto font-inter leading-relaxed font-medium">
+          <div className="w-32 h-1 bg-gradient-to-r from-primary to-accent mx-auto mb-8 animate-scale-in"></div>
+          <p className="text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed font-medium">
             {slideContent?.description || "Don't miss this meaningful opportunity to join our community celebration and support network"}
           </p>
         </div>

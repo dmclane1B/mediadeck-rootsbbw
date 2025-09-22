@@ -16,12 +16,15 @@ const SalesStrategySlide = () => {
   const slideContent = getSlideContent('workout-session');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-success flex items-center justify-center relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/6 w-32 h-32 bg-white rounded-full animate-float"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-white rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-white rounded-full animate-float" style={{ animationDelay: '2s' }}></div>
+    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/src/assets/roots-logo-brand.png" 
+          alt="Roots Community Health Logo" 
+          className="w-full h-full object-contain opacity-5"
+          loading="lazy"
+        />
       </div>
 
       {/* Navigation */}

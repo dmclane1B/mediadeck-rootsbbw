@@ -15,19 +15,15 @@ const MarketOverviewSlide = () => {
   const slideContent = getSlideContent('community-voices');
 
   return (
-    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <picture>
-          <source srcSet="/src/assets/background-community-optimized.webp" type="image/webp" />
-          <img 
-            src="/src/assets/roots-logo.png" 
-            alt="Community Panel" 
-            className="w-full h-full object-cover opacity-10"
-            loading="lazy"
-          />
-        </picture>
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50/95 to-slate-100/95"></div>
+        <img 
+          src="/src/assets/roots-logo-brand.png" 
+          alt="Roots Community Health Logo" 
+          className="w-full h-full object-contain opacity-5"
+          loading="lazy"
+        />
       </div>
 
       {/* Navigation */}

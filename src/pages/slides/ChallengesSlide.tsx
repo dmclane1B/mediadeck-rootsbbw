@@ -31,15 +31,15 @@ const ChallengesSlide = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center relative overflow-hidden">
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-0 left-0 w-full h-full" 
-             style={{
-               backgroundImage: `radial-gradient(circle at 25% 25%, hsl(var(--accent)) 2px, transparent 2px)`,
-               backgroundSize: '50px 50px'
-             }}>
-        </div>
+    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/src/assets/roots-logo-brand.png" 
+          alt="Roots Community Health Logo" 
+          className="w-full h-full object-contain opacity-5"
+          loading="lazy"
+        />
       </div>
 
       {/* Navigation */}

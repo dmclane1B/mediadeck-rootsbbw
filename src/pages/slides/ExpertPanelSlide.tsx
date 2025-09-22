@@ -18,14 +18,16 @@ const ExpertPanelSlide = () => {
   const slideImage = getSlideImageForDisplay('expert-panel');
   const slideContent = getSlideContent('expert-panel');
   const handleHome = () => navigate('/');
-  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10 relative overflow-hidden">
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[url('/src/assets/geometric-pattern.png')] bg-repeat animate-pulse"></div>
+  return <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/src/assets/roots-logo-brand.png" 
+          alt="Roots Community Health Logo" 
+          className="w-full h-full object-contain opacity-5"
+          loading="lazy"
+        />
       </div>
-      
-      {/* Background Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/90 to-background/95"></div>
 
       {/* Navigation */}
       <div className="absolute top-8 left-8 z-10">

@@ -28,18 +28,16 @@ const MagazineLayout: React.FC<MagazineLayoutProps> = ({
 }) => {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Background Image */}
-      {backgroundImage && (
-        <div className="absolute inset-0 z-0">
-          <img 
-            src={backgroundImage}
-            alt="Community background" 
-            className="w-full h-full object-cover opacity-5"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-background/98 to-muted/95"></div>
-        </div>
-      )}
+      {/* Background Image - Always show subtle logo */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/src/assets/roots-logo-brand.png"
+          alt="Roots Community Health Logo" 
+          className="w-full h-full object-contain opacity-5"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-background"></div>
+      </div>
 
       {/* Magazine Header */}
       <div className="relative z-10 border-b border-border/20">

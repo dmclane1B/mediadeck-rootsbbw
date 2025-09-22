@@ -35,14 +35,15 @@ const ValuePropositionsSlide = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-accent to-success relative">
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-full h-full" 
-             style={{
-               backgroundImage: `repeating-linear-gradient(45deg, white 0px, white 2px, transparent 2px, transparent 40px)`,
-             }}>
-        </div>
+    <div className="min-h-screen bg-background relative">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/src/assets/roots-logo-brand.png" 
+          alt="Roots Community Health Logo" 
+          className="w-full h-full object-contain opacity-5"
+          loading="lazy"
+        />
       </div>
 
       {/* Fixed Navigation */}
