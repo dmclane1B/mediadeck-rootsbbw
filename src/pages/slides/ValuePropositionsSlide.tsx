@@ -11,7 +11,7 @@ import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { SlideContent, defaultSlideContent } from '@/data/slideContent';
 import { useSlideContent } from '@/hooks/useSlideContent';
-import SlideBackground from '@/components/SlideBackground';
+import UniversalSlideBackground from '@/components/UniversalSlideBackground';
 import SideTab from '@/components/SideTab';
 
 const ValuePropositionsSlide = () => {
@@ -37,7 +37,7 @@ const ValuePropositionsSlide = () => {
   });
 
   return (
-    <SlideBackground>
+    <UniversalSlideBackground>
       {/* Side Tab */}
       <SideTab text="RESOURCES & SUPPORT" />
 
@@ -276,7 +276,7 @@ const ValuePropositionsSlide = () => {
         previousRoute="/slides/smoothie-demo"
         nextRoute="/slides/community-partners"
       />
-    </SlideBackground>
+    </UniversalSlideBackground>
   );
 };
 

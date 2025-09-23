@@ -1,27 +1,42 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
-import SlideBackground from '@/components/SlideBackground';
+import UniversalSlideBackground from '@/components/UniversalSlideBackground';
 import SideTab from '@/components/SideTab';
 
 const SalesStrategySlide = () => {
   const navigate = useNavigate();
 
   return (
-    <SlideBackground className="flex items-center justify-center">
-      {/* Side Tab */}
+    <UniversalSlideBackground variant="hero">
       <SideTab text="WORKOUT SESSION" />
-
-      {/* Navigation */}
-      <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
+      
+      {/* Fixed Navigation */}
+      <div className="fixed top-4 sm:top-6 left-4 sm:left-6 z-50">
         <Button 
           variant="green" 
           onClick={() => navigate('/')}
           className="transition-all duration-300 hover:scale-105 min-h-[44px] text-xs sm:text-sm px-2 sm:px-4"
+          aria-label="Go to home page"
         >
-          ← <span className="hidden sm:inline">Home</span>
+          <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Home</span>
         </Button>
+      </div>
+
+      {/* Fixed Roots Community Health Branding */}
+      <div className="fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="text-center">
+          <div className="text-primary text-lg sm:text-xl font-space font-bold">ROOTS</div>
+          <div className="text-muted-foreground text-xs sm:text-sm font-inter">Community Health</div>
+        </div>
+      </div>
+
+      {/* Fixed Slide Number */}
+      <div className="fixed top-4 sm:top-6 right-4 sm:right-6 z-50 text-right">
+        <div className="text-primary text-lg sm:text-xl font-space font-bold">08</div>
       </div>
 
       {/* Main Content */}
@@ -49,7 +64,7 @@ const SalesStrategySlide = () => {
         previousRoute="/slides/nutrition-education"
         nextRoute="/slides/smoothie-demo"
       />
-    </SlideBackground>
+    </UniversalSlideBackground>
   );
 };
 

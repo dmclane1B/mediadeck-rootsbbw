@@ -18,7 +18,7 @@ const SlideBackground: React.FC<SlideBackgroundProps> = ({
         <img 
           src="/src/assets/roots-logo-new.png" 
           alt="Roots Community Health Logo" 
-          className="w-full h-full object-contain opacity-5 sm:opacity-10"
+          className={`w-full h-full object-contain opacity-5 sm:opacity-10`}
           loading="lazy"
         />
         <div className={`absolute inset-0 ${
