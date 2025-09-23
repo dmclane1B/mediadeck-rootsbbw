@@ -75,6 +75,23 @@ export function useSlideImageResolver() {
       }
     }
 
+    // Enhanced fallback: Try to find any image from the media library that matches published slide patterns
+    if (!localConfig && !publishedImage) {
+      const cloudImage = images.find(img => img.source === 'cloud' && img.cloudPath?.includes(slideId));
+      if (cloudImage) {
+        return {
+          id: cloudImage.id,
+          name: cloudImage.name,
+          url: cloudImage.url,
+          alt: `Image for ${slideId}`,
+          dimensions: cloudImage.dimensions,
+          size: cloudImage.size,
+          isPublished: false,
+          source: 'local',
+        };
+      }
+    }
+
     return null;
   };
 

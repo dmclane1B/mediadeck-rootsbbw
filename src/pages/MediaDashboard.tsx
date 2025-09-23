@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import StorageMonitor from '@/components/StorageMonitor';
+import ImageRestoreStatus from '@/components/ImageRestoreStatus';
+import MediaDiagnostics from '@/components/MediaDiagnostics';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import MediaLibrary from '@/components/MediaLibrary';
@@ -13,7 +15,7 @@ import { useSlideImageValidation } from '@/hooks/useSlideImageValidation';
 import { usePublishedSlides } from '@/hooks/usePublishedSlides';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import SlideImageStatus from '@/components/SlideImageStatus';
-import { MediaFile } from '@/hooks/useMediaLibrary';
+import { MediaFile, useMediaLibrary } from '@/hooks/useMediaLibrary';
 import { ArrowLeft, Settings, Image, Presentation, Download, Upload, HardDrive, CheckCircle, AlertTriangle, RotateCcw, Play, Save, Type, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SlideContentEditor from '@/components/SlideContentEditor';
@@ -27,6 +29,7 @@ const MediaDashboard = () => {
   const { slideConfig, setSlideImage, getSlideImage, clearAllConfigurations } = useSlideImages();
   const { publishAllSlides, isLoading: isPublishing } = usePublishedSlides();
   const { isSlidePublished } = useSlideImageResolver();
+  const { restoreFromPublishedSlides, restoring } = useMediaLibrary();
   const [selectedSlide, setSelectedSlide] = useState<string | null>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -324,6 +327,31 @@ const MediaDashboard = () => {
     linkElement.click();
   };
 
+  const handleRestoreAllImages = async () => {
+    try {
+      const restoredCount = await restoreFromPublishedSlides();
+      
+      if (restoredCount > 0) {
+        toast({
+          title: "Images Restored Successfully!",
+          description: `Restored ${restoredCount} images from published slides.`,
+        });
+      } else {
+        toast({
+          title: "No Images to Restore",
+          description: "All published images are already available in your media library.",
+        });
+      }
+    } catch (error) {
+      console.error('Error restoring images:', error);
+      toast({
+        title: "Restoration Failed",
+        description: error instanceof Error ? error.message : "Failed to restore images from published slides.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-muted p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -417,6 +445,15 @@ const MediaDashboard = () => {
               <Download className="w-4 h-4 mr-2" />
               Export Config
             </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={handleRestoreAllImages}
+              disabled={restoring}
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              {restoring ? 'Restoring...' : 'Restore Images'}
+            </Button>
             <Button variant="destructive" onClick={clearAllConfigurations}>
               <Settings className="w-4 h-4 mr-2" />
               Reset All
@@ -469,6 +506,10 @@ const MediaDashboard = () => {
             <TabsTrigger value="storage" className="flex items-center gap-2">
               <HardDrive className="w-4 h-4" />
               Storage
+            </TabsTrigger>
+            <TabsTrigger value="diagnostics" className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Diagnostics
             </TabsTrigger>
           </TabsList>
 
@@ -558,6 +599,11 @@ const MediaDashboard = () => {
 
           <TabsContent value="storage" className="space-y-4">
             <StorageMonitor />
+            <ImageRestoreStatus />
+          </TabsContent>
+
+          <TabsContent value="diagnostics">
+            <MediaDiagnostics />
           </TabsContent>
         </Tabs>
       </div>

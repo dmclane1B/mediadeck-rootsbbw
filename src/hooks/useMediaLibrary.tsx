@@ -392,7 +392,7 @@ export const useMediaLibrary = () => {
       // Convert published slides to MediaFile objects
       for (const slide of publishedSlides) {
         // Skip if we already have this image
-        const existingImage = images.find(img => img.cloudPath === slide.cloud_path);
+        const existingImage = images.find(img => img.cloudPath === slide.cloud_path || img.id === slide.image_id);
         if (existingImage) {
           console.log(`[MediaLibrary] Skipping ${slide.image_name} - already exists`);
           continue;
@@ -422,8 +422,10 @@ export const useMediaLibrary = () => {
 
       // Update local state by reloading all images
       const updatedLocalImages = await indexedDBManager.getAllImages();
-      const mergedImages = getMergedImages(updatedLocalImages, cloudImages);
+      const updatedCloudImages = await loadCloudImages();
+      const mergedImages = getMergedImages(updatedLocalImages, updatedCloudImages);
       setImages(mergedImages);
+      setCloudImages(updatedCloudImages);
       
       console.log(`[MediaLibrary] Successfully restored ${restoredImages.length} images from published slides`);
       return restoredImages.length;
@@ -434,7 +436,7 @@ export const useMediaLibrary = () => {
     } finally {
       setRestoring(false);
     }
-  }, [images]);
+  }, [images, loadCloudImages, getMergedImages]);
 
   const addImages = async (
     files: FileList,
