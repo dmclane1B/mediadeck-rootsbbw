@@ -465,7 +465,7 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
           )}
 
           {!cloudError && lastCloudSyncDisplay && (
-            <Alert variant="secondary">
+            <Alert>
               <div>
                 <AlertTitle>Cloud library healthy</AlertTitle>
                 <AlertDescription>

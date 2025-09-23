@@ -19,9 +19,28 @@ export function useSlideImageResolver() {
   const { images } = useMediaLibrary();
 
   const getSlideImageForDisplay = (slideId: string): ResolvedSlideImage | null => {
-    // First check for published version
-    const publishedImage = getPublishedSlideImage(slideId);
+    // Apply legacy mappings FIRST to ensure proper published slide resolution
+    const legacyMappings: Record<string, string> = {
+      'community-voices': 'market-overview',
+      'monday-kickoff': 'product-glimpse',
+      'expert-panel': 'expert-panel',
+      'nutrition-education': 'proof-demand',
+      'workout-session': 'sales-strategy',
+      'smoothie-demo': 'customer-persona',
+      'resources-support': 'resources-support',
+      'community-partners': 'team-leadership',
+      'roadmap': 'roadmap',
+      'ask': 'ask',
+      'contact': 'contact'
+    };
+    
+    const mappedSlideId = legacyMappings[slideId] || slideId;
+    console.log(`[SlideImageResolver] Resolving image for slideId: ${slideId}, mapped to: ${mappedSlideId}`);
+
+    // Check for published version using mapped ID
+    const publishedImage = getPublishedSlideImage(mappedSlideId);
     if (publishedImage) {
+      console.log(`[SlideImageResolver] Found published image for ${mappedSlideId}:`, publishedImage.image_name);
       return {
         id: publishedImage.image_id,
         name: publishedImage.image_name,
@@ -34,29 +53,11 @@ export function useSlideImageResolver() {
       };
     }
 
-    // Fall back to local configuration with legacy ID fallback
-    let localConfig = getSlideImage(slideId);
-    
-    // Try legacy ID mappings if current slideId doesn't work
-    if (!localConfig) {
-      const legacyMappings: Record<string, string> = {
-        'community-voices': 'market-overview',
-        'monday-kickoff': 'product-glimpse',
-        'expert-panel': 'expert-panel',
-        'nutrition-education': 'proof-demand',
-        'workout-session': 'sales-strategy',
-        'smoothie-demo': 'customer-persona',
-        'resources-support': 'resources-support',
-        'community-partners': 'team-leadership',
-        'roadmap': 'roadmap',
-        'ask': 'ask',
-        'contact': 'contact'
-      };
-      
-      const legacyId = legacyMappings[slideId];
-      if (legacyId) {
-        localConfig = getSlideImage(legacyId);
-      }
+    // Fall back to local configuration
+    let localConfig = getSlideImage(mappedSlideId);
+    if (!localConfig && slideId !== mappedSlideId) {
+      // Also try original slideId for local config
+      localConfig = getSlideImage(slideId);
     }
     
     if (localConfig) {
