@@ -64,8 +64,8 @@ const RoadmapSlide = () => {
         <div className="max-w-7xl mx-auto w-full pt-16 sm:pt-20 pb-24 sm:pb-32">
           {/* Header */}
           <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight font-space mb-6 sm:mb-8">
-              HOW TO <span className="text-white/80">PARTICIPATE</span>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight font-space mb-6 sm:mb-8 drop-shadow-2xl [text-shadow:_2px_2px_8px_rgb(0_0_0_/_80%)]">
+              HOW TO <span className="text-white/90 drop-shadow-2xl [text-shadow:_2px_2px_8px_rgb(0_0_0_/_80%)]">PARTICIPATE</span>
             </h1>
             <div className="w-24 sm:w-32 h-1 bg-white/80 mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
             <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto font-inter leading-relaxed px-4">
