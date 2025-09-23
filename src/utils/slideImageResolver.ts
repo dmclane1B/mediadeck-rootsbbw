@@ -23,11 +23,11 @@ export function useSlideImageResolver() {
     const legacyMappings: Record<string, string> = {
       'community-voices': 'market-overview',
       'monday-kickoff': 'product-glimpse',
-      'expert-panel': 'expert-panel',
+      'expert-panel': 'team-leadership',
       'nutrition-education': 'proof-demand',
       'workout-session': 'sales-strategy',
       'smoothie-demo': 'customer-persona',
-      'resources-support': 'resources-support',
+      'resources-support': 'value-propositions',
       'community-partners': 'team-leadership',
       'roadmap': 'roadmap',
       'ask': 'ask',
