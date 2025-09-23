@@ -11,7 +11,6 @@ import MigrationManager from "@/components/MigrationManager";
 import '@/utils/instantValidation'; // Auto-runs validation
 
 // Lazy load pages for better code splitting
-const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const MediaDashboard = lazy(() => import("./pages/MediaDashboard"));
 
@@ -45,7 +44,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<LazySlideWrapper><TitleSlide /></LazySlideWrapper>} />
             <Route path="/slides/title" element={<LazySlideWrapper><TitleSlide /></LazySlideWrapper>} />
-            <Route path="/builder" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}><Index /></Suspense>} />
+            <Route path="/builder" element={<Navigate to="/slides/title" replace />} />
             <Route path="/slides/overview" element={<LazySlideWrapper><OverviewSlide /></LazySlideWrapper>} />
             <Route path="/slides/challenges" element={<LazySlideWrapper><ChallengesSlide /></LazySlideWrapper>} />
             <Route path="/slides/monday-kickoff" element={<LazySlideWrapper><ProductGlimpseSlide /></LazySlideWrapper>} />
