@@ -68,7 +68,7 @@ const RoadmapSlide = () => {
               HOW TO <span className="text-white/90 drop-shadow-2xl [text-shadow:_2px_2px_8px_rgb(0_0_0_/_80%)]">PARTICIPATE</span>
             </h1>
             <div className="w-24 sm:w-32 h-1 bg-white/80 mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
-            <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto font-inter leading-relaxed px-4">
+            <p className="text-lg sm:text-xl text-white/90 max-w-3xl mx-auto font-inter leading-relaxed px-4 drop-shadow-lg [text-shadow:_1px_1px_6px_rgb(0_0_0_/_70%)]">
               {slideContent?.description || 'Join our community celebration and support network'}
             </p>
           </div>
