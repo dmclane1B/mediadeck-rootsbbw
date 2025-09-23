@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 const ImageRestoreStatus: React.FC = () => {
-  const { images, cloudImages, restoreFromPublishedSlides, restoring } = useMediaLibrary();
+  const { images, cloudImages, restoreFromPublishedSlides, restoreFromCloudImages, restoring } = useMediaLibrary();
   const { toast } = useToast();
 
   const localCount = images.filter(img => img.source === 'local').length;
@@ -18,17 +18,20 @@ const ImageRestoreStatus: React.FC = () => {
 
   const handleQuickRestore = async () => {
     try {
-      const restoredCount = await restoreFromPublishedSlides();
+      // Try restoring from all cloud sources
+      const slideCount = await restoreFromPublishedSlides();
+      const cloudCount = await restoreFromCloudImages();
+      const totalRestored = Math.max(slideCount, cloudCount);
       
-      if (restoredCount > 0) {
+      if (totalRestored > 0) {
         toast({
           title: "Images Restored",
-          description: `Successfully restored ${restoredCount} images.`,
+          description: `Successfully restored ${totalRestored} images from cloud storage.`,
         });
       } else {
         toast({
           title: "All Images Current",
-          description: "All images are already available locally.",
+          description: "All cloud images are already available locally.",
         });
       }
     } catch (error) {

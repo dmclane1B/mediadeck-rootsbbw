@@ -18,21 +18,22 @@ interface MediaLibraryProps {
 }
 
 const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: MediaLibraryProps) => {
-  const { 
-    images, 
-    loading, 
-    uploadProgress, 
-    restoring, 
-    addImages, 
-    removeImage, 
-    updateImage, 
-    getStorageInfo, 
-    restoreFromPublishedSlides,
+  // Get data from the hook
+  const {
+    images,
+    cloudImages,
+    loading,
+    uploadProgress,
+    addImages,
+    removeImage,
+    updateImage,
+    clearAll,
+    getStorageInfo,
     cacheImageLocally,
     resetLocalCache,
-    listCloudOnlyImages,
-    isEphemeralStorage,
-    cloudImages 
+    restoreFromPublishedSlides,
+    restoreFromCloudImages,
+    isEphemeralStorage
   } = useMediaLibrary();
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -67,8 +68,25 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
 
   const storageInfo = getStorageInfo();
 
-  const filteredImages = images.filter(img => 
-    img.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Get combined images for display - show both local and cloud images
+  const allImages = [...images];
+  
+  // Add cloud images that aren't already cached locally
+  cloudImages.forEach(cloudImg => {
+    const existsLocally = images.some(img => 
+      img.id === cloudImg.id || img.cloudPath === cloudImg.cloudPath
+    );
+    if (!existsLocally) {
+      allImages.push({
+        ...cloudImg,
+        // Mark as cloud-only for UI display
+        isCloudOnly: true
+      } as any);
+    }
+  });
+
+  const filteredImages = allImages.filter(image =>
+    image.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleFileUpload = async (files: FileList) => {
@@ -185,18 +203,19 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
     }
   };
 
-  const handleResetCache = async () => {
+  const handleSyncFromCloud = async () => {
     try {
-      await resetLocalCache();
+      const restoredCount = await restoreFromCloudImages();
       toast({
-        title: "Cache reset",
-        description: "Local cache cleared. Showing cloud images."
+        title: "Cloud Sync Complete",
+        description: `Restored ${restoredCount} images from cloud storage`,
       });
     } catch (error) {
+      console.error('Error syncing from cloud:', error);
       toast({
+        title: "Sync Failed",
+        description: "Failed to sync images from cloud storage",
         variant: "destructive",
-        title: "Reset failed",
-        description: "Failed to reset local cache."
       });
     }
   };
@@ -367,7 +386,7 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
           <div className="flex gap-2 justify-center">
             <Button 
               onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading || restoring}
+              disabled={isUploading}
             >
               <Upload className="w-4 h-4 mr-2" />
               {isUploading ? 'Uploading...' : 'Choose Files'}
@@ -375,17 +394,17 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
             <Button 
               variant="outline"
               onClick={handleRestoreFromPublishedSlides}
-              disabled={isUploading || restoring}
+              disabled={isUploading}
             >
-              {restoring ? 'Restoring...' : 'Restore Published Images'}
+              Restore from Slides
             </Button>
             <Button 
               variant="outline"
-              onClick={handleResetCache}
-              disabled={isUploading || restoring}
+              onClick={handleSyncFromCloud}
+              disabled={isUploading}
               size="sm"
             >
-              Reset Local Cache
+              Sync from Cloud
             </Button>
           </div>
         </div>
@@ -424,11 +443,20 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               fallbackToPlaceholder={true}
             />
             
-            {/* Cloud badge */}
-            {image.source === 'cloud' && (
+            {/* Cloud status badges */}
+            {image.source === 'cloud' && (image as any).isCloudOnly && (
               <div className="absolute top-2 left-2">
-                <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                  Cloud
+                <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                  <Upload className="w-3 h-3" />
+                  Cloud Only
+                </div>
+              </div>
+            )}
+            {image.source === 'cloud' && !(image as any).isCloudOnly && (
+              <div className="absolute top-2 left-2">
+                <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                  <Check className="w-3 h-3" />
+                  Synced
                 </div>
               </div>
             )}
@@ -461,20 +489,33 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               </div>
               
               <div className="absolute top-2 right-2 flex gap-1">
-                {image.source === 'cloud' && (
+                {(image as any).isCloudOnly ? (
                   <Button
+                    variant="outline"
                     size="sm"
-                    variant="secondary"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleCacheLocally(image);
                     }}
                     className="h-6 w-6 p-0"
-                    title="Cache locally"
+                    title="Download to local cache"
                   >
                     <Download className="w-3 h-3" />
                   </Button>
-                )}
+                ) : image.source === 'cloud' ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCacheLocally(image);
+                    }}
+                    className="h-6 w-6 p-0"
+                    title="Update local cache"
+                  >
+                    <Download className="w-3 h-3" />
+                  </Button>
+                ) : null}
                 <Button
                   size="sm"
                   variant="secondary"
@@ -528,10 +569,10 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               <Button 
                 variant="outline"
                 onClick={handleRestoreFromPublishedSlides}
-                disabled={restoring}
+                disabled={loading}
                 className="mx-auto"
               >
-                {restoring ? 'Restoring...' : 'Restore Published Images'}
+                Restore Published Images
               </Button>
             </div>
           )}

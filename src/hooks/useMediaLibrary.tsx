@@ -139,52 +139,70 @@ export const useMediaLibrary = () => {
     }
   }, []);
 
-  // Load cloud images
+  // Load cloud images from multiple sources
   const loadCloudImages = useCallback(async (): Promise<MediaFile[]> => {
-    console.log('[MediaLibrary] Loading cloud images...');
+    console.log('[MediaLibrary] Loading cloud images from all sources...');
     try {
-      // Get published slides
       const { supabase } = await import('@/integrations/supabase/client');
-      const { data: publishedSlides, error } = await supabase
+      
+      // Load from published_media table
+      const { data: mediaData, error: mediaError } = await supabase
+        .from('published_media')
+        .select('*')
+        .order('published_at', { ascending: false });
+
+      if (mediaError) {
+        console.error('[MediaLibrary] Error loading published_media:', mediaError);
+      }
+
+      // Load from published_slide_configurations table
+      const { data: slideData, error: slideError } = await supabase
         .from('published_slide_configurations')
-        .select('image_id, image_name, image_url, cloud_path, alt_text, dimensions, size')
-        .eq('status', 'active');
+        .select('*')
+        .eq('status', 'active')
+        .order('published_at', { ascending: false });
 
-      const cloudImages: MediaFile[] = [];
+      if (slideError) {
+        console.error('[MediaLibrary] Error loading published_slide_configurations:', slideError);
+      }
 
-      if (!error && publishedSlides) {
-        // Convert published slides to MediaFile objects
-        for (const slide of publishedSlides) {
-          cloudImages.push({
+      const allCloudImages: MediaFile[] = [];
+      
+      // Process published_media
+      if (mediaData) {
+        allCloudImages.push(...mediaData.map(img => ({
+          id: img.image_id,
+          name: img.image_name,
+          url: img.cloud_url,
+          uploadDate: new Date(img.published_at).toISOString(),
+          dimensions: img.dimensions as { width: number; height: number } | undefined,
+          size: img.file_size || 0,
+          cloudPath: img.cloud_path,
+          publicUrl: img.cloud_url,
+          source: 'cloud' as const
+        })));
+      }
+
+      // Process published_slide_configurations (avoiding duplicates)
+      if (slideData) {
+        const existingIds = new Set(allCloudImages.map(img => img.id));
+        allCloudImages.push(...slideData
+          .filter(slide => !existingIds.has(slide.image_id))
+          .map(slide => ({
             id: slide.image_id,
             name: slide.image_name,
             url: slide.image_url,
-            uploadDate: new Date().toISOString(),
+            uploadDate: new Date(slide.published_at).toISOString(),
             dimensions: slide.dimensions as { width: number; height: number } | undefined,
-            size: slide.size,
+            size: slide.size || 0,
             cloudPath: slide.cloud_path,
             publicUrl: slide.image_url,
-            source: 'cloud'
-          });
-        }
+            source: 'cloud' as const
+          })));
       }
 
-      // Also get direct cloud files
-      try {
-        const directCloudFiles = await CloudMediaManager.listCloudFiles();
-        // Add files that aren't already in published slides
-        for (const cloudFile of directCloudFiles) {
-          const existsInPublished = cloudImages.some(img => img.cloudPath === cloudFile.cloudPath);
-          if (!existsInPublished) {
-            cloudImages.push(cloudFile);
-          }
-        }
-      } catch (cloudError) {
-        console.warn('[MediaLibrary] Failed to load direct cloud files:', cloudError);
-      }
-
-      console.log(`[MediaLibrary] Loaded ${cloudImages.length} cloud images`);
-      return cloudImages;
+      console.log(`[MediaLibrary] Loaded ${allCloudImages.length} total cloud images`);
+      return allCloudImages;
     } catch (error) {
       console.error('[MediaLibrary] Error loading cloud images:', error);
       return [];
@@ -362,6 +380,55 @@ export const useMediaLibrary = () => {
   const listCloudOnlyImages = useCallback((): MediaFile[] => {
     return images.filter(img => img.source === 'cloud');
   }, [images]);
+  // Restore images from cloud storage 
+  const restoreFromCloudImages = useCallback(async (cloudImagesToRestore?: MediaFile[]): Promise<number> => {
+    try {
+      const imagesToRestore = cloudImagesToRestore || cloudImages;
+      if (imagesToRestore.length === 0) {
+        console.log('[MediaLibrary] No cloud images to restore');
+        return 0;
+      }
+
+      console.log(`[MediaLibrary] Restoring ${imagesToRestore.length} cloud images to local cache...`);
+      let restoredCount = 0;
+
+      for (const cloudImg of imagesToRestore) {
+        // Check if we already have this image locally
+        const existsLocally = images.some(img => 
+          img.id === cloudImg.id || img.cloudPath === cloudImg.cloudPath
+        );
+        
+        if (!existsLocally) {
+          try {
+            await indexedDBManager.addOrUpdateImage({
+              ...cloudImg,
+              source: 'synced'
+            });
+            console.log(`[MediaLibrary] Restored image: ${cloudImg.name}`);
+            restoredCount++;
+          } catch (error) {
+            console.error(`[MediaLibrary] Failed to restore image ${cloudImg.name}:`, error);
+          }
+        }
+      }
+
+      if (restoredCount > 0) {
+        // Refresh the images list
+        const updatedLocalImages = await indexedDBManager.getAllImages();
+        const updatedCloudImages = await loadCloudImages();
+        const mergedImages = getMergedImages(updatedLocalImages, updatedCloudImages);
+        setImages(mergedImages);
+        setCloudImages(updatedCloudImages);
+      }
+
+      console.log(`[MediaLibrary] Successfully restored ${restoredCount} cloud images`);
+      return restoredCount;
+    } catch (error) {
+      console.error('[MediaLibrary] Failed to restore cloud images:', error);
+      throw error;
+    }
+  }, [images, cloudImages, loadCloudImages, getMergedImages]);
+
   // Restore images from published slides in Supabase
   const restoreFromPublishedSlides = useCallback(async (): Promise<number> => {
     console.log('[MediaLibrary] Starting published slides restore...');
@@ -373,7 +440,7 @@ export const useMediaLibrary = () => {
       // Fetch published slide configurations from Supabase
       const { data: publishedSlides, error } = await supabase
         .from('published_slide_configurations')
-        .select('image_id, image_name, image_url, cloud_path, alt_text, dimensions, size')
+        .select('image_id, image_name, image_url, cloud_path, alt_text, dimensions, size, published_at, slide_id')
         .eq('status', 'active');
 
       if (error) {
@@ -386,49 +453,37 @@ export const useMediaLibrary = () => {
         return 0;
       }
 
-      console.log(`[MediaLibrary] Found ${publishedSlides.length} published slides`);
-      const restoredImages: MediaFile[] = [];
+      // Convert to MediaFile format and restore using restoreFromCloudImages
+      const slideImages: MediaFile[] = publishedSlides.map(slide => ({
+        id: slide.image_id,
+        name: slide.image_name,
+        url: slide.image_url,
+        uploadDate: new Date(slide.published_at).toISOString(),
+        dimensions: slide.dimensions as { width: number; height: number } | undefined,
+        size: slide.size || 0,
+        cloudPath: slide.cloud_path,
+        publicUrl: slide.image_url,
+        source: 'cloud' as const
+      }));
 
-      // Convert published slides to MediaFile objects
+      const restoredCount = await restoreFromCloudImages(slideImages);
+
+      // Update slide configurations in IndexedDB for proper slide assignments
       for (const slide of publishedSlides) {
-        // Skip if we already have this image
-        const existingImage = images.find(img => img.cloudPath === slide.cloud_path || img.id === slide.image_id);
-        if (existingImage) {
-          console.log(`[MediaLibrary] Skipping ${slide.image_name} - already exists`);
-          continue;
-        }
-
-        const mediaFile: MediaFile = {
-          id: slide.image_id,
-          name: slide.image_name,
-          url: slide.image_url, // Use the published URL directly
-          uploadDate: new Date().toISOString(),
-          dimensions: slide.dimensions as { width: number; height: number } | undefined,
-          size: slide.size,
-          cloudPath: slide.cloud_path,
-          publicUrl: slide.image_url,
-          source: 'cloud'
-        };
-
-        // Save to IndexedDB using addOrUpdate to avoid conflicts
         try {
-          await indexedDBManager.addOrUpdateImage(mediaFile);
-          restoredImages.push(mediaFile);
-          console.log(`[MediaLibrary] Restored ${slide.image_name} from published slides`);
+          await indexedDBManager.setSlideConfiguration({
+            slideId: slide.slide_id,
+            imageId: slide.image_id,
+            imageAlt: slide.alt_text || slide.image_name,
+            lastUpdated: new Date().toISOString()
+          });
         } catch (error) {
-          console.error(`[MediaLibrary] Failed to save restored image ${slide.image_name}:`, error);
+          console.warn(`[MediaLibrary] Failed to update slide configuration for ${slide.slide_id}:`, error);
         }
       }
 
-      // Update local state by reloading all images
-      const updatedLocalImages = await indexedDBManager.getAllImages();
-      const updatedCloudImages = await loadCloudImages();
-      const mergedImages = getMergedImages(updatedLocalImages, updatedCloudImages);
-      setImages(mergedImages);
-      setCloudImages(updatedCloudImages);
-      
-      console.log(`[MediaLibrary] Successfully restored ${restoredImages.length} images from published slides`);
-      return restoredImages.length;
+      console.log(`[MediaLibrary] Successfully restored ${restoredCount} images from published slides`);
+      return restoredCount;
       
     } catch (error) {
       console.error('[MediaLibrary] Error during published slides restore:', error);
@@ -436,7 +491,7 @@ export const useMediaLibrary = () => {
     } finally {
       setRestoring(false);
     }
-  }, [images, loadCloudImages, getMergedImages]);
+  }, [restoreFromCloudImages]);
 
   const addImages = async (
     files: FileList,
@@ -869,6 +924,7 @@ export const useMediaLibrary = () => {
     clearAll,
     restoreFromCloud,
     restoreFromPublishedSlides,
+    restoreFromCloudImages,
     getStorageInfo,
     getCloudStorageInfo,
     cacheImageLocally,
