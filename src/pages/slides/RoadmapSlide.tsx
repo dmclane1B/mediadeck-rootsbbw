@@ -10,47 +10,37 @@ import { useSlideContent } from '@/hooks/useSlideContent';
 import UniversalSlideBackground from '@/components/UniversalSlideBackground';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
-
 const RoadmapSlide = () => {
   const navigate = useNavigate();
-  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const {
+    getSlideImageForDisplay
+  } = useSlideImageResolver();
   const slideImage = getSlideImageForDisplay('roadmap');
-  const { getSlideContent } = useSlideContent();
+  const {
+    getSlideContent
+  } = useSlideContent();
   const slideContent = getSlideContent('roadmap');
-
   const handlePrevious = () => navigate('/slides/team-leadership');
   const handleNext = () => navigate('/slides/ask');
   const handleHome = () => navigate('/');
-
   useSwipeNavigation({
     onPrevious: handlePrevious,
-    onNext: handleNext,
+    onNext: handleNext
   });
-
   useKeyboardNavigation({
     onPrevious: handlePrevious,
     onNext: handleNext,
-    onHome: handleHome,
+    onHome: handleHome
   });
-
   if (!slideContent) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-foreground">Loading...</div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <UniversalSlideBackground variant="hero">
+  return <UniversalSlideBackground variant="hero">
       {/* Fixed Navigation */}
       <div className="fixed top-4 sm:top-6 left-4 sm:left-6 z-50">
-        <Button 
-          variant="outline" 
-          onClick={handleHome} 
-          className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
-          aria-label="Go to home page"
-        >
+        <Button variant="outline" onClick={handleHome} className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2" aria-label="Go to home page">
           <Home className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
           <span className="hidden sm:inline">Home</span>
         </Button>
@@ -84,57 +74,43 @@ const RoadmapSlide = () => {
           </div>
 
           {/* Image Showcase */}
-          <div className="mb-8 sm:mb-12 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <ImageShowcase
-              imageUrl={slideImage?.url}
-              imageAlt={slideImage?.alt}
-              onImageSelect={() => navigate('/media')}
-              variant="hero"
-            />
+          <div className="mb-8 sm:mb-12 animate-fade-in" style={{
+          animationDelay: '0.3s'
+        }}>
+            <ImageShowcase imageUrl={slideImage?.url} imageAlt={slideImage?.alt} onImageSelect={() => navigate('/media')} variant="hero" />
           </div>
 
           {/* Participation Sections */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            {Array.isArray(slideContent?.sections) && slideContent.sections.map((section, sectionIndex) => (
-              <Card key={sectionIndex} className="bg-white/10 backdrop-blur-sm p-4 sm:p-6 md:p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16 animate-fade-in" style={{
+          animationDelay: '0.5s'
+        }}>
+            {Array.isArray(slideContent?.sections) && slideContent.sections.map((section, sectionIndex) => <Card key={sectionIndex} className="bg-white/10 backdrop-blur-sm p-4 sm:p-6 md:p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                   <div className="p-2 sm:p-3 rounded-full bg-white/20 flex-shrink-0">
-                    {sectionIndex === 0 ? (
-                      <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                    ) : (
-                      <HandHeart className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                    )}
+                    {sectionIndex === 0 ? <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-white" /> : <HandHeart className="w-6 h-6 sm:w-8 sm:h-8 text-white" />}
                   </div>
                   <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white font-space">{section.title}</h3>
                 </div>
                 <div className="space-y-3 sm:space-y-4">
-                  {Array.isArray(section.content) && section.content.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex items-start gap-2 sm:gap-3">
+                  {Array.isArray(section.content) && section.content.map((item, itemIndex) => <div key={itemIndex} className="flex items-start gap-2 sm:gap-3">
                       <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white/80 mt-0.5 flex-shrink-0" />
                       <span className="text-white/80 font-inter leading-relaxed text-sm sm:text-base">{item}</span>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
-              </Card>
-            ))}
+              </Card>)}
           </div>
 
           {/* Community Action Call-to-Action */}
-          <div className="text-center mb-12 sm:mb-16 animate-fade-in" style={{ animationDelay: '0.7s' }}>
-            <div className="bg-gradient-to-r from-accent/20 to-primary/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 md:p-8 border border-accent/30">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-                <Users className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-accent flex-shrink-0" />
-                <div className="text-center">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white font-space mb-1 sm:mb-2">JOIN THE MOVEMENT</div>
-                  <div className="text-white/80 text-sm sm:text-base md:text-lg font-inter">Be part of Black Breastfeeding Week 2025</div>
-                </div>
-                <Share className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-accent flex-shrink-0" />
-              </div>
-            </div>
+          <div className="text-center mb-12 sm:mb-16 animate-fade-in" style={{
+          animationDelay: '0.7s'
+        }}>
+            
           </div>
 
           {/* Event Highlights */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16 animate-fade-in" style={{ animationDelay: '1s' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16 animate-fade-in" style={{
+          animationDelay: '1s'
+        }}>
             <div className="text-center">
               <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2 font-space">AUG 25-31</div>
               <div className="text-white/80 font-inter text-sm sm:text-base">Black Breastfeeding Week</div>
@@ -151,7 +127,9 @@ const RoadmapSlide = () => {
 
           {/* Bottom Tagline */}
           <div className="text-center mt-8 sm:mt-12 mb-8">
-            <div className="text-white/80 font-space font-medium text-base sm:text-lg animate-fade-in" style={{ animationDelay: '2s' }}>
+            <div className="text-white/80 font-space font-medium text-base sm:text-lg animate-fade-in" style={{
+            animationDelay: '2s'
+          }}>
               PARTICIPATE. LEARN. CELEBRATE.
             </div>
           </div>
@@ -159,13 +137,7 @@ const RoadmapSlide = () => {
       </div>
 
       {/* Slide Navigation */}
-      <SlideNavigation 
-        currentSlide={12}
-        previousRoute="/slides/team-leadership"
-        nextRoute="/slides/ask"
-      />
-    </UniversalSlideBackground>
-  );
+      <SlideNavigation currentSlide={12} previousRoute="/slides/team-leadership" nextRoute="/slides/ask" />
+    </UniversalSlideBackground>;
 };
-
 export default RoadmapSlide;
