@@ -75,11 +75,11 @@ const MediaDashboard = () => {
     };
   };
 
-  const handleImageSelect = (image: MediaFile) => {
+  const handleImageSelect = async (image: MediaFile) => {
     if (selectedSlide) {
       try {
         const slideImage = convertMediaFileToSlideImage(image);
-        setSlideImage(selectedSlide, slideImage);
+        await setSlideImage(selectedSlide, slideImage);
         setShowImageSelector(false);
         setSelectedSlide(null);
         toast({

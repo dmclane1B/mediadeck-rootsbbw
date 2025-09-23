@@ -100,17 +100,12 @@ export const useSlideImages = () => {
   };
 
   const setSlideImage = async (slideId: string, image: SlideImage | null) => {
+    // Store previous state for rollback
+    const previousConfig = slideConfig[slideId] || null;
+    
     try {
       if (image) {
-        // Add/update slide configuration
-        await indexedDBManager.setSlideConfiguration({
-          slideId,
-          imageId: image.id,
-          imageAlt: image.name,
-          lastUpdated: new Date().toISOString()
-        });
-        
-        // Update local state
+        // Update UI immediately (optimistic update)
         setSlideConfig(prev => ({
           ...prev,
           [slideId]: {
@@ -118,19 +113,42 @@ export const useSlideImages = () => {
             imageAlt: image.name
           }
         }));
-      } else {
-        // Remove slide configuration
-        await indexedDBManager.removeSlideConfiguration(slideId);
         
-        // Update local state
+        // Persist to IndexedDB in background
+        await indexedDBManager.setSlideConfiguration({
+          slideId,
+          imageId: image.id,
+          imageAlt: image.name,
+          lastUpdated: new Date().toISOString()
+        });
+      } else {
+        // Update UI immediately (optimistic update)
+        setSlideConfig(prev => {
+          const newConfig = { ...prev };
+          delete newConfig[slideId];
+          return newConfig;
+        });
+        
+        // Persist to IndexedDB in background
+        await indexedDBManager.removeSlideConfiguration(slideId);
+      }
+    } catch (error) {
+      console.error('Error persisting slide image:', error);
+      
+      // Rollback UI state on persistence failure
+      if (previousConfig) {
+        setSlideConfig(prev => ({
+          ...prev,
+          [slideId]: previousConfig
+        }));
+      } else {
         setSlideConfig(prev => {
           const newConfig = { ...prev };
           delete newConfig[slideId];
           return newConfig;
         });
       }
-    } catch (error) {
-      console.error('Error setting slide image:', error);
+      
       setError(error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
