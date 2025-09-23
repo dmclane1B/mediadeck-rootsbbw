@@ -84,7 +84,7 @@ const RoadmapSlide = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16 animate-fade-in" style={{
           animationDelay: '0.5s'
         }}>
-            {Array.isArray(slideContent?.sections) && slideContent.sections.map((section, sectionIndex) => <Card key={sectionIndex} className="bg-white/10 backdrop-blur-sm p-4 sm:p-6 md:p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
+            {Array.isArray(slideContent?.sections) && slideContent.sections.map((section, sectionIndex) => <Card key={sectionIndex} className="bg-black/60 backdrop-blur-sm p-4 sm:p-6 md:p-8 border border-white/30 hover:bg-black/70 transition-all duration-300 hover:scale-105">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                   <div className="p-2 sm:p-3 rounded-full bg-white/20 flex-shrink-0">
                     {sectionIndex === 0 ? <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-white" /> : <HandHeart className="w-6 h-6 sm:w-8 sm:h-8 text-white" />}
@@ -112,16 +112,16 @@ const RoadmapSlide = () => {
           animationDelay: '1s'
         }}>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2 font-space">AUG 25-31</div>
-              <div className="text-white/80 font-inter text-sm sm:text-base">Black Breastfeeding Week</div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2 font-space drop-shadow-lg [text-shadow:_2px_2px_6px_rgb(0_0_0_/_80%)]">AUG 25-31</div>
+              <div className="text-white/80 font-inter text-sm sm:text-base drop-shadow-md [text-shadow:_1px_1px_4px_rgb(0_0_0_/_70%)]">Black Breastfeeding Week</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2 font-space">FREE</div>
-              <div className="text-white/80 font-inter text-sm sm:text-base">Community Events</div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2 font-space drop-shadow-lg [text-shadow:_2px_2px_6px_rgb(0_0_0_/_80%)]">FREE</div>
+              <div className="text-white/80 font-inter text-sm sm:text-base drop-shadow-md [text-shadow:_1px_1px_4px_rgb(0_0_0_/_70%)]">Community Events</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2 font-space">ALL</div>
-              <div className="text-white/80 font-inter text-sm sm:text-base">Are Welcome</div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2 font-space drop-shadow-lg [text-shadow:_2px_2px_6px_rgb(0_0_0_/_80%)]">ALL</div>
+              <div className="text-white/80 font-inter text-sm sm:text-base drop-shadow-md [text-shadow:_1px_1px_4px_rgb(0_0_0_/_70%)]">Are Welcome</div>
             </div>
           </div>
 

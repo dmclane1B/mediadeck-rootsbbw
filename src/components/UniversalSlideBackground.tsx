@@ -20,14 +20,14 @@ const UniversalSlideBackground: React.FC<UniversalSlideBackgroundProps> = ({
     switch (variant) {
       case 'magazine': return 'bg-background/98';
       case 'minimal': return 'bg-background/90';
-      case 'hero': return 'bg-background/85';
+      case 'hero': return 'bg-black/40';
       default: return 'bg-background/95';
     }
   };
 
   // Determine logo opacity based on variant and screen size
   const getLogoOpacity = () => {
-    return 'opacity-3 sm:opacity-5 md:opacity-8';
+    return 'opacity-[0.03] sm:opacity-[0.05] md:opacity-[0.08]';
   };
 
   return (
