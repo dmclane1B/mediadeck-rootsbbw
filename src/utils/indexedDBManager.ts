@@ -115,8 +115,11 @@ class IndexedDBManager {
   private isConnectionHealthy(db: IDBDatabase): boolean {
     try {
       // Simple health check - try to access basic properties
-      return db && db.name === DB_NAME && !db.onerror;
-    } catch {
+      return db && 
+             db.name === DB_NAME && 
+             db.objectStoreNames.length > 0;
+    } catch (error) {
+      console.warn('[IndexedDB] Health check failed:', error);
       return false;
     }
   }
@@ -133,7 +136,16 @@ class IndexedDBManager {
         
         const db = await this.openDB();
         if (!this.isConnectionHealthy(db)) {
-          throw new Error('Database connection unhealthy');
+          console.warn('[IndexedDB] Database connection unhealthy, attempting reset...');
+          this.connectionHealthy = false;
+          this.db = null;
+          this.dbPromise = null;
+          // Try one more time with fresh connection
+          const freshDb = await this.openDB();
+          if (!this.isConnectionHealthy(freshDb)) {
+            throw new Error('Database connection unhealthy after reset');
+          }
+          return await operation(freshDb);
         }
         
         const result = await operation(db);
