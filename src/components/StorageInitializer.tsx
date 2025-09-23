@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { indexedDBManager } from '@/utils/indexedDBManager';
+import { databaseInitializer } from '@/utils/databaseInitializer';
 import { Card } from '@/components/ui/card';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 
@@ -18,27 +18,21 @@ export const StorageInitializer = ({ children }: StorageInitializerProps) => {
         setIsInitializing(true);
         setError(null);
         
-        // Initialize IndexedDB
-        await indexedDBManager.initialize();
+        console.log('[StorageInitializer] Starting centralized database initialization...');
         
-        // Attempt migration from localStorage
-        const migrationResult = await indexedDBManager.migrateFromLocalStorage();
+        // Use centralized database initializer
+        await databaseInitializer.ensureInitialized();
         
-        if (migrationResult.migrated > 0) {
-          setMigrationInfo(`Migrated ${migrationResult.migrated} slide configurations from browser storage`);
-        }
-        
-        if (migrationResult.errors.length > 0) {
-          console.warn('Migration warnings:', migrationResult.errors);
-        }
+        console.log('[StorageInitializer] Database initialization completed');
+        setMigrationInfo('Database initialized successfully');
         
         // Small delay to show success state
         setTimeout(() => {
           setIsInitializing(false);
-        }, 1000);
+        }, 800);
         
       } catch (error) {
-        console.error('Storage initialization failed:', error);
+        console.error('[StorageInitializer] Storage initialization failed:', error);
         setError(error instanceof Error ? error.message : 'Unknown storage error');
         setIsInitializing(false);
       }

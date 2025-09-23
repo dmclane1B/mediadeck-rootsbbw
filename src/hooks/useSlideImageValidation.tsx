@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ensureDatabaseInitialized } from '@/utils/databaseInitializer';
 import { useSlideImages } from './useSlideImages';
 import { useMediaLibrary } from './useMediaLibrary';
 import { toast } from 'sonner';
@@ -19,29 +20,36 @@ export const useSlideImageValidation = (slideIds: string[]) => {
   useEffect(() => {
     if (slideIds.length === 0) return;
     
-    const validateSlideImages = () => {
-      const results: SlideImageValidation[] = slideIds.map(slideId => {
-        const slideImage = slideConfig[slideId];
+    const validateSlideImages = async () => {
+      try {
+        // Ensure database is ready before validation
+        await ensureDatabaseInitialized();
         
-        if (!slideImage?.imageId) {
+        const results: SlideImageValidation[] = slideIds.map(slideId => {
+          const slideImage = slideConfig[slideId];
+          
+          if (!slideImage?.imageId) {
+            return {
+              slideId,
+              hasImage: false,
+              imageExists: false
+            };
+          }
+
+          const imageExists = images.some(img => img.id === slideImage.imageId);
+          
           return {
             slideId,
-            hasImage: false,
-            imageExists: false
+            hasImage: true,
+            imageExists,
+            error: !imageExists ? 'Image file not found' : undefined
           };
-        }
+        });
 
-        const imageExists = images.some(img => img.id === slideImage.imageId);
-        
-        return {
-          slideId,
-          hasImage: true,
-          imageExists,
-          error: !imageExists ? 'Image file not found' : undefined
-        };
-      });
-
-      setValidations(results);
+        setValidations(results);
+      } catch (error) {
+        console.error('Error during slide image validation:', error);
+      }
     };
 
     validateSlideImages();

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { indexedDBManager, type MediaFile } from '@/utils/indexedDBManager';
+import { ensureDatabaseInitialized } from '@/utils/databaseInitializer';
+import { indexedDBManager } from '@/utils/indexedDBManager';
 
 export interface StorageInfo {
   usedSize: number;
@@ -20,6 +21,9 @@ export const useIndexedDBStorage = () => {
   
   const updateStorageInfo = async () => {
     try {
+      // Ensure database is initialized first
+      await ensureDatabaseInitialized();
+      
       const [usage, images] = await Promise.all([
         indexedDBManager.getStorageUsage(),
         indexedDBManager.getAllImages()

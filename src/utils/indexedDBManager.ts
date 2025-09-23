@@ -29,33 +29,72 @@ class IndexedDBManager {
   private dbPromise: Promise<IDBDatabase> | null = null;
   private initialized = false;
   private initPromise: Promise<void> | null = null;
+  private connectionHealthy = false;
+  private readonly maxRetries = 3;
+  private readonly baseRetryDelay = 100;
 
   private async openDB(): Promise<IDBDatabase> {
-    if (this.db) {
+    // If we have a healthy connection, return it
+    if (this.db && this.connectionHealthy) {
       return this.db;
     }
 
+    // If there's already a connection attempt in progress, wait for it
     if (this.dbPromise) {
-      return this.dbPromise;
+      try {
+        const db = await this.dbPromise;
+        if (this.isConnectionHealthy(db)) {
+          this.db = db;
+          this.connectionHealthy = true;
+          return db;
+        }
+      } catch (error) {
+        console.warn('[IndexedDB] Previous connection attempt failed, retrying...', error);
+        this.dbPromise = null;
+      }
     }
 
+    // Create new connection
     this.dbPromise = new Promise((resolve, reject) => {
+      console.log('[IndexedDB] Opening new database connection...');
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
       request.onerror = () => {
+        console.error('[IndexedDB] Database open failed:', request.error);
+        this.connectionHealthy = false;
+        this.dbPromise = null;
         reject(new Error(`IndexedDB error: ${request.error?.message}`));
       };
 
       request.onsuccess = () => {
-        this.db = request.result;
-        resolve(this.db);
+        console.log('[IndexedDB] Database opened successfully');
+        const db = request.result;
+        
+        // Set up connection event handlers
+        db.onclose = () => {
+          console.warn('[IndexedDB] Database connection closed unexpectedly');
+          this.connectionHealthy = false;
+          this.db = null;
+          this.dbPromise = null;
+        };
+
+        db.onerror = (event) => {
+          console.error('[IndexedDB] Database error:', event);
+          this.connectionHealthy = false;
+        };
+
+        this.db = db;
+        this.connectionHealthy = true;
+        resolve(db);
       };
 
       request.onupgradeneeded = (event) => {
+        console.log('[IndexedDB] Database upgrade needed');
         const db = (event.target as IDBOpenDBRequest).result;
         
         // Create media files store if it doesn't exist
         if (!db.objectStoreNames.contains(STORE_NAME)) {
+          console.log('[IndexedDB] Creating media files store');
           const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
           store.createIndex('uploadDate', 'uploadDate', { unique: false });
           store.createIndex('size', 'size', { unique: false });
@@ -63,6 +102,7 @@ class IndexedDBManager {
         
         // Create slide configurations store if it doesn't exist
         if (!db.objectStoreNames.contains(SLIDE_CONFIG_STORE)) {
+          console.log('[IndexedDB] Creating slide configurations store');
           const slideStore = db.createObjectStore(SLIDE_CONFIG_STORE, { keyPath: 'slideId' });
           slideStore.createIndex('lastUpdated', 'lastUpdated', { unique: false });
         }
@@ -72,15 +112,80 @@ class IndexedDBManager {
     return this.dbPromise;
   }
 
+  private isConnectionHealthy(db: IDBDatabase): boolean {
+    try {
+      // Simple health check - try to access basic properties
+      return db && db.name === DB_NAME && !db.onerror;
+    } catch {
+      return false;
+    }
+  }
+
+  private async executeWithRetry<T>(
+    operation: (db: IDBDatabase) => Promise<T>,
+    context: string
+  ): Promise<T> {
+    let lastError: Error | null = null;
+    
+    for (let attempt = 0; attempt < this.maxRetries; attempt++) {
+      try {
+        console.log(`[IndexedDB] ${context} - Attempt ${attempt + 1}/${this.maxRetries}`);
+        
+        const db = await this.openDB();
+        if (!this.isConnectionHealthy(db)) {
+          throw new Error('Database connection unhealthy');
+        }
+        
+        const result = await operation(db);
+        console.log(`[IndexedDB] ${context} - Success on attempt ${attempt + 1}`);
+        return result;
+        
+      } catch (error) {
+        lastError = error as Error;
+        console.warn(`[IndexedDB] ${context} - Attempt ${attempt + 1} failed:`, error);
+        
+        // Mark connection as unhealthy for certain errors
+        if (error instanceof Error && (
+          error.message.includes('connection is closing') ||
+          error.message.includes('InvalidStateError') ||
+          error.message.includes('database connection')
+        )) {
+          console.log('[IndexedDB] Marking connection as unhealthy due to error type');
+          this.connectionHealthy = false;
+          this.db = null;
+          this.dbPromise = null;
+        }
+        
+        // Don't retry on the last attempt
+        if (attempt === this.maxRetries - 1) {
+          break;
+        }
+        
+        // Exponential backoff with jitter
+        const delay = this.baseRetryDelay * Math.pow(2, attempt) + Math.random() * 50;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    
+    console.error(`[IndexedDB] ${context} - All attempts failed`);
+    throw lastError || new Error(`${context} failed after ${this.maxRetries} attempts`);
+  }
+
   async initialize(): Promise<void> {
-    if (this.initialized) {
-      console.log('[IndexedDB] Already initialized');
+    if (this.initialized && this.connectionHealthy) {
+      console.log('[IndexedDB] Already initialized and healthy');
       return;
     }
     
     if (this.initPromise) {
       console.log('[IndexedDB] Initialization in progress, waiting...');
-      return this.initPromise;
+      try {
+        await this.initPromise;
+        return;
+      } catch (error) {
+        console.warn('[IndexedDB] Previous initialization failed, retrying...', error);
+        this.initPromise = null;
+      }
     }
     
     this.initPromise = (async () => {
@@ -112,6 +217,7 @@ class IndexedDBManager {
       } catch (error) {
         console.error('[IndexedDB] Failed to initialize:', error);
         this.initialized = false;
+        this.connectionHealthy = false;
         this.initPromise = null;
         throw error;
       }
@@ -121,34 +227,15 @@ class IndexedDBManager {
   }
 
   async getAllImages(): Promise<MediaFile[]> {
-    try {
-      console.log('[IndexedDB] Getting all images...');
-      
-      // Ensure we're initialized first
-      await this.initialize();
-      
-      const db = await this.openDB();
-      const transaction = db.transaction([STORE_NAME], 'readonly');
-      const store = transaction.objectStore(STORE_NAME);
-      
-      return new Promise((resolve, reject) => {
+    return this.executeWithRetry(async (db) => {
+      return new Promise<MediaFile[]>((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
         const request = store.getAll();
         
         request.onsuccess = () => {
           const result = request.result || [];
           console.log(`[IndexedDB] Retrieved ${result.length} images from database`);
-          
-          // Log each image for debugging
-          result.forEach((img, index) => {
-            console.log(`[IndexedDB] Image ${index + 1}:`, {
-              id: img.id,
-              name: img.name,
-              uploadDate: img.uploadDate,
-              size: img.size,
-              urlLength: img.url?.length || 0
-            });
-          });
-          
           resolve(result);
         };
         
@@ -158,7 +245,6 @@ class IndexedDBManager {
           reject(new Error(errorMsg));
         };
         
-        // Add transaction error handling
         transaction.onerror = () => {
           const errorMsg = `Transaction error in getAllImages: ${transaction.error?.message}`;
           console.error('[IndexedDB]', errorMsg);
@@ -171,103 +257,76 @@ class IndexedDBManager {
           reject(new Error(errorMsg));
         };
       });
-    } catch (error) {
-      console.error('[IndexedDB] Error in getAllImages:', error);
-      
-      // Provide detailed error information
-      if (error instanceof Error) {
-        console.error('[IndexedDB] Error details:', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        });
-      }
-      
-      // Return empty array as fallback
-      return [];
-    }
+    }, 'getAllImages');
   }
 
   async addImage(image: MediaFile): Promise<void> {
-    const db = await this.openDB();
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    
-    return new Promise((resolve, reject) => {
-      const request = store.add(image);
-      
-      request.onsuccess = () => {
-        resolve();
-      };
-      
-      request.onerror = () => {
-        reject(new Error(`Error adding image: ${request.error?.message}`));
-      };
-    });
+    return this.executeWithRetry(async (db) => {
+      return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.add(image);
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error(`Error adding image: ${request.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
+      });
+    }, 'addImage');
   }
 
   async updateImage(id: string, updates: Partial<MediaFile>): Promise<void> {
-    const db = await this.openDB();
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    
-    return new Promise((resolve, reject) => {
-      const getRequest = store.get(id);
-      
-      getRequest.onsuccess = () => {
-        const existingImage = getRequest.result;
-        if (!existingImage) {
-          reject(new Error('Image not found'));
-          return;
-        }
+    return this.executeWithRetry(async (db) => {
+      return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const getRequest = store.get(id);
         
-        const updatedImage = { ...existingImage, ...updates };
-        const putRequest = store.put(updatedImage);
+        getRequest.onsuccess = () => {
+          const existingImage = getRequest.result;
+          if (!existingImage) {
+            reject(new Error('Image not found'));
+            return;
+          }
+          
+          const updatedImage = { ...existingImage, ...updates };
+          const putRequest = store.put(updatedImage);
+          
+          putRequest.onsuccess = () => resolve();
+          putRequest.onerror = () => reject(new Error(`Error updating image: ${putRequest.error?.message}`));
+        };
         
-        putRequest.onsuccess = () => resolve();
-        putRequest.onerror = () => reject(new Error(`Error updating image: ${putRequest.error?.message}`));
-      };
-      
-      getRequest.onerror = () => {
-        reject(new Error(`Error retrieving image: ${getRequest.error?.message}`));
-      };
-    });
+        getRequest.onerror = () => reject(new Error(`Error retrieving image: ${getRequest.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
+      });
+    }, 'updateImage');
   }
 
   async removeImage(id: string): Promise<void> {
-    const db = await this.openDB();
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    
-    return new Promise((resolve, reject) => {
-      const request = store.delete(id);
-      
-      request.onsuccess = () => {
-        resolve();
-      };
-      
-      request.onerror = () => {
-        reject(new Error(`Error removing image: ${request.error?.message}`));
-      };
-    });
+    return this.executeWithRetry(async (db) => {
+      return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.delete(id);
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error(`Error removing image: ${request.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
+      });
+    }, 'removeImage');
   }
 
   async clearAll(): Promise<void> {
-    const db = await this.openDB();
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    
-    return new Promise((resolve, reject) => {
-      const request = store.clear();
-      
-      request.onsuccess = () => {
-        resolve();
-      };
-      
-      request.onerror = () => {
-        reject(new Error(`Error clearing images: ${request.error?.message}`));
-      };
-    });
+    return this.executeWithRetry(async (db) => {
+      return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.clear();
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error(`Error clearing images: ${request.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
+      });
+    }, 'clearAll');
   }
 
   async getStorageUsage(): Promise<{ usedSize: number; estimatedQuota: number }> {
@@ -367,108 +426,73 @@ class IndexedDBManager {
 
   // Slide Configuration Management
   async getSlideConfiguration(slideId: string): Promise<SlideConfiguration | null> {
-    try {
-      await this.initialize();
-      const db = await this.openDB();
-      const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readonly');
-      const store = transaction.objectStore(SLIDE_CONFIG_STORE);
-      
-      return new Promise((resolve, reject) => {
+    return this.executeWithRetry(async (db) => {
+      return new Promise<SlideConfiguration | null>((resolve, reject) => {
+        const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readonly');
+        const store = transaction.objectStore(SLIDE_CONFIG_STORE);
         const request = store.get(slideId);
         
-        request.onsuccess = () => {
-          resolve(request.result || null);
-        };
-        
-        request.onerror = () => {
-          reject(new Error(`Error getting slide configuration: ${request.error?.message}`));
-        };
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(new Error(`Error getting slide configuration: ${request.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
       });
-    } catch (error) {
-      console.error('Error in getSlideConfiguration:', error);
-      return null;
-    }
+    }, 'getSlideConfiguration');
   }
 
   async setSlideConfiguration(config: SlideConfiguration): Promise<void> {
-    await this.initialize();
-    const db = await this.openDB();
-    const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readwrite');
-    const store = transaction.objectStore(SLIDE_CONFIG_STORE);
-    
-    return new Promise((resolve, reject) => {
-      const request = store.put(config);
-      
-      request.onsuccess = () => {
-        resolve();
-      };
-      
-      request.onerror = () => {
-        reject(new Error(`Error setting slide configuration: ${request.error?.message}`));
-      };
-    });
+    return this.executeWithRetry(async (db) => {
+      return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readwrite');
+        const store = transaction.objectStore(SLIDE_CONFIG_STORE);
+        const request = store.put(config);
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error(`Error setting slide configuration: ${request.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
+      });
+    }, 'setSlideConfiguration');
   }
 
   async getAllSlideConfigurations(): Promise<SlideConfiguration[]> {
-    try {
-      await this.initialize();
-      const db = await this.openDB();
-      const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readonly');
-      const store = transaction.objectStore(SLIDE_CONFIG_STORE);
-      
-      return new Promise((resolve, reject) => {
+    return this.executeWithRetry(async (db) => {
+      return new Promise<SlideConfiguration[]>((resolve, reject) => {
+        const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readonly');
+        const store = transaction.objectStore(SLIDE_CONFIG_STORE);
         const request = store.getAll();
         
-        request.onsuccess = () => {
-          resolve(request.result || []);
-        };
-        
-        request.onerror = () => {
-          reject(new Error(`Error getting all slide configurations: ${request.error?.message}`));
-        };
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(new Error(`Error getting all slide configurations: ${request.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
       });
-    } catch (error) {
-      console.error('Error in getAllSlideConfigurations:', error);
-      return [];
-    }
+    }, 'getAllSlideConfigurations');
   }
 
   async removeSlideConfiguration(slideId: string): Promise<void> {
-    await this.initialize();
-    const db = await this.openDB();
-    const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readwrite');
-    const store = transaction.objectStore(SLIDE_CONFIG_STORE);
-    
-    return new Promise((resolve, reject) => {
-      const request = store.delete(slideId);
-      
-      request.onsuccess = () => {
-        resolve();
-      };
-      
-      request.onerror = () => {
-        reject(new Error(`Error removing slide configuration: ${request.error?.message}`));
-      };
-    });
+    return this.executeWithRetry(async (db) => {
+      return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readwrite');
+        const store = transaction.objectStore(SLIDE_CONFIG_STORE);
+        const request = store.delete(slideId);
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error(`Error removing slide configuration: ${request.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
+      });
+    }, 'removeSlideConfiguration');
   }
 
   async clearAllSlideConfigurations(): Promise<void> {
-    await this.initialize();
-    const db = await this.openDB();
-    const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readwrite');
-    const store = transaction.objectStore(SLIDE_CONFIG_STORE);
-    
-    return new Promise((resolve, reject) => {
-      const request = store.clear();
-      
-      request.onsuccess = () => {
-        resolve();
-      };
-      
-      request.onerror = () => {
-        reject(new Error(`Error clearing slide configurations: ${request.error?.message}`));
-      };
-    });
+    return this.executeWithRetry(async (db) => {
+      return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([SLIDE_CONFIG_STORE], 'readwrite');
+        const store = transaction.objectStore(SLIDE_CONFIG_STORE);
+        const request = store.clear();
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error(`Error clearing slide configurations: ${request.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
+      });
+    }, 'clearAllSlideConfigurations');
   }
 
   // Migration from localStorage

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ensureDatabaseInitialized } from '@/utils/databaseInitializer';
 import { indexedDBManager } from '@/utils/indexedDBManager';
 import { CloudMediaManager } from '@/utils/cloudMedia';
 
@@ -105,8 +106,8 @@ export function usePublishedSlides(): UsePublishedSlidesReturn {
     console.log('📥 Input slide config:', slideConfig);
     
     try {
-      await indexedDBManager.initialize();
-      console.log('✅ IndexedDB initialized');
+      await ensureDatabaseInitialized();
+      console.log('✅ Database initialized for publish configuration building');
       
       const allImages = await indexedDBManager.getAllImages();
       console.log(`📷 Found ${allImages.length} images in IndexedDB`);
