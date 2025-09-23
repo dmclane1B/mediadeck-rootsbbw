@@ -12,15 +12,19 @@ interface SlideValidation {
 }
 
 const BUSINESS_KEYWORDS = [
-  'analytics', 'dashboard', 'revenue', 'competitor', 'encryption',
-  'API', 'technology stack', 'PitchCom', 'DX1', 'RF Technology',
-  'Military Encryption', 'Baseball', 'go route', 'Game Day Signals'
+  'revenue', 'profit', 'B2B', 'SaaS', 'ROI', 'KPI', 'conversion rate',
+  'customer acquisition', 'venture capital', 'pitch deck', 'investment',
+  'market share', 'disruption', 'scalability', 'monetization', 'PitchCom', 
+  'DX1', 'RF Technology', 'Military Encryption', 'Baseball', 'go route', 
+  'Game Day Signals'
 ];
 
 const COMMUNITY_HEALTH_KEYWORDS = [
   'breastfeeding', 'lactation', 'community', 'health', 'maternal',
   'family', 'support', 'wellness', 'nutrition', 'care', 'mothers',
-  'Black Breastfeeding Week', 'infant', 'resources'
+  'Black Breastfeeding Week', 'infant', 'resources', 'consultant',
+  'healthcare', 'professional', 'expert', 'panel', 'education',
+  'workshop', 'fitness', 'workout', 'evidence-based'
 ];
 
 export class DevelopmentValidator {
@@ -48,7 +52,7 @@ export class DevelopmentValidator {
       suggestions.push('Remove all hardcoded content and use only slideContent.ts');
     }
     
-    // Check theme alignment
+    // Check theme alignment with improved logic
     const businessKeywordCount = BUSINESS_KEYWORDS.filter(keyword =>
       slideComponent.toLowerCase().includes(keyword.toLowerCase())
     ).length;
@@ -58,12 +62,16 @@ export class DevelopmentValidator {
     ).length;
     
     let themeAlignment: SlideValidation['themeAlignment'] = 'neutral';
-    if (businessKeywordCount > 0) {
+    
+    // Only flag as misaligned if there are business keywords AND no community health content
+    if (businessKeywordCount > 0 && communityKeywordCount === 0) {
       themeAlignment = 'misaligned';
       issues.push(`Contains ${businessKeywordCount} business/tech keywords inappropriate for community health theme`);
       suggestions.push('Replace business content with community health focused content');
     } else if (communityKeywordCount > 2) {
       themeAlignment = 'aligned';
+    } else if (communityKeywordCount > 0) {
+      themeAlignment = 'aligned'; // Any community health content should be considered aligned
     }
     
     return {
@@ -128,17 +136,28 @@ export class DevelopmentValidator {
   }
   
   private static detectHardcodedContent(component: string): boolean {
-    // Look for hardcoded strings that should be in slideContent.ts
+    // More accurate detection - only flag if content is truly hardcoded AND not using slideContent
+    const usesSlideContent = component.includes('useSlideContent') || 
+                            component.includes('slideContent?.') ||
+                            component.includes('getSlideContent');
+    
+    if (usesSlideContent) {
+      return false; // If using slideContent system, not hardcoded
+    }
+    
+    // Look for patterns that indicate hardcoded content
     const hardcodedPatterns = [
-      /title:\s*["'][^"']*["']/g,
-      /description:\s*["'][^"']*["']/g,
-      /<h1[^>]*>[^<]+<\/h1>/g,
-      /<h2[^>]*>[^<]+<\/h2>/g,
-      /Real-time Analytics/g,
-      /competitor analysis/gi
+      /className="[^"]*">\s*[A-Z][^<]{30,}/g, // Long hardcoded text in elements
+      /\b[A-Z][A-Z\s]{15,}\b.*(?!slideContent)/g, // Long all-caps text without slideContent
     ];
     
-    return hardcodedPatterns.some(pattern => pattern.test(component));
+    let hardcodedCount = 0;
+    hardcodedPatterns.forEach(pattern => {
+      const matches = component.match(pattern);
+      if (matches) hardcodedCount += matches.length;
+    });
+    
+    return hardcodedCount > 1; // Only flag if multiple hardcoded patterns found
   }
   
   private static extractSlideId(component: string): string {

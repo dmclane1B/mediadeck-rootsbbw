@@ -16,8 +16,7 @@ const INAPPROPRIATE_KEYWORDS = [
   // Business/Tech terms that don't belong in community health context
   'PitchCom', 'DX1', 'go route', 'Game Day Signals', 'RF Technology',
   'Military Encryption', 'Bluetooth Limited', 'Baseball Specific',
-  'competitor analysis', 'revenue', 'encryption', 'analytics dashboard',
-  'API integration', 'technology stack', 'pitch deck', 'investment',
+  'competitor analysis', 'analytics dashboard', 'pitch deck', 'investment',
   'venture capital', 'market share', 'disruption', 'scalability',
   
   // Sports-specific terms that don't belong

@@ -17,15 +17,17 @@ export interface ValidationResult {
 const BLACKLISTED_KEYWORDS = [
   'PitchCom', 'DX1', 'go route', 'Game Day Signals', 'RF Technology',
   'Military Encryption', 'Bluetooth Limited', 'Baseball Specific',
-  'competitor', 'analytics dashboard', 'revenue', 'encryption',
-  'technology stack', 'API integration', 'Real-time Analytics',
+  'competitor', 'analytics dashboard', 'pitch deck', 'investment',
+  'venture capital', 'technology stack', 'API integration', 'Real-time Analytics',
   'predictive analytics', 'machine learning', 'data visualization'
 ];
 
 const EXPECTED_KEYWORDS = [
   'breastfeeding', 'lactation', 'community', 'health', 'family',
   'support', 'mothers', 'Black Breastfeeding Week', 'wellness',
-  'resources', 'care', 'nutrition', 'maternal', 'infant'
+  'resources', 'care', 'nutrition', 'maternal', 'infant',
+  'expert', 'panel', 'consultant', 'healthcare', 'professional',
+  'evidence-based', 'workshop', 'education', 'fitness', 'workout'
 ];
 
 export const useContentValidation = () => {

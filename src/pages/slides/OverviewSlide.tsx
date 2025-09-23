@@ -216,52 +216,94 @@ const OverviewSlide = () => {
         />
       </div>
 
-      {/* Program Schedule Navigation */}
+      {/* Program Schedule Navigation - Dynamic content from slideContent.ts */}
       <CommunitySection
         title="Week Schedule Overview"
         description="Navigate through our comprehensive program designed to support, educate, and celebrate our community."
-        items={slides.slice(2).map((slide, index) => ({
+        items={slideContent?.sections?.map((section, index) => ({
+          title: section.title,
+          content: Array.isArray(section.content) ? section.content[0] : section.content,
+          highlight: index === 0
+        })) || slides.slice(2).map((slide, index) => ({
           title: `Day ${index + 1}: ${slide.title}`,
           content: slide.description,
           highlight: index === 0
         }))}
       />
 
-      {/* Quick Access Cards */}
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {slides.slice(0, 6).map((slide) => {
-          const IconComponent = slide.icon;
-          return (
-            <Card 
-              key={slide.number}
-              className="p-6 cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border border-border/20"
-              onClick={() => handleSlideClick(slide.route)}
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <IconComponent className="w-6 h-6 text-primary" />
+        {/* Hardcoded slide data - Replace with dynamic content from slideContent.ts */}
+        {slideContent?.sections ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {slideContent.sections.map((section, index) => {
+              const IconComponent = slides[index + 2]?.icon || Target;
+              return (
+                <Card 
+                  key={index}
+                  className="p-6 cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border border-border/20"
+                  onClick={() => handleSlideClick(slides[index + 2]?.route || '/')}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <IconComponent className="w-6 h-6 text-primary" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-1 rounded">
+                          {(index + 3).toString().padStart(2, '0')}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-foreground mb-1 font-space">
+                        {section.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        {Array.isArray(section.content) ? section.content[0] : section.content}
+                      </p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                   </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-1 rounded">
-                      {slide.number.toString().padStart(2, '0')}
-                    </span>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          /* Fallback with hardcoded data */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {slides.slice(0, 6).map((slide) => {
+              const IconComponent = slide.icon;
+              return (
+                <Card 
+                  key={slide.number}
+                  className="p-6 cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border border-border/20"
+                  onClick={() => handleSlideClick(slide.route)}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <IconComponent className="w-6 h-6 text-primary" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-1 rounded">
+                          {slide.number.toString().padStart(2, '0')}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-foreground mb-1 font-space">
+                        {slide.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm">
+                        {slide.description}
+                      </p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                   </div>
-                  <h3 className="text-lg font-bold text-foreground mb-1 font-space">
-                    {slide.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {slide.description}
-                  </p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
 
       {/* Event Details */}
       <div className="text-center mt-12 p-6 bg-muted/30 rounded-lg">

@@ -5,9 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import SlideNavigation from '@/components/SlideNavigation';
 import UniversalSlideBackground from '@/components/UniversalSlideBackground';
 import SideTab from '@/components/SideTab';
+import ImageShowcase from '@/components/ImageShowcase';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
+import { useSlideContent } from '@/hooks/useSlideContent';
 
-const SalesStrategySlide = () => {
+const WorkoutSessionSlide = () => {
   const navigate = useNavigate();
+  const { getSlideContent } = useSlideContent();
+  const { getSlideImageForDisplay } = useSlideImageResolver();
+  const slideContent = getSlideContent('workout-session');
+  const slideImage = getSlideImageForDisplay('workout-session');
 
   return (
     <UniversalSlideBackground variant="hero">
@@ -44,18 +51,44 @@ const SalesStrategySlide = () => {
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 animate-fade-in">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-bold text-foreground leading-tight font-space mb-6 sm:mb-8 px-4">
-            WORKOUT SESSION
+            {slideContent?.title || 'WORKOUT SESSION'}
           </h1>
           <div className="w-20 sm:w-24 lg:w-32 h-1 bg-gradient-to-r from-primary to-accent mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
           <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed px-4">
-            Stay active and healthy with community fitness activities designed for all levels.
+            {slideContent?.description || 'Stay active and healthy with community fitness activities designed for all levels.'}
           </p>
         </div>
 
-        {/* Placeholder for content */}
-        <div className="text-center text-muted-foreground py-16">
-          <p>Slide content will be restored once import issue is resolved.</p>
+        {/* Image Showcase */}
+        <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <ImageShowcase
+            imageUrl={slideImage?.url}
+            imageAlt={slideImage?.alt}
+            onImageSelect={() => navigate('/media')}
+            variant="hero"
+          />
         </div>
+
+        {/* Content Sections */}
+        {slideContent?.sections && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            {slideContent.sections.map((section, index) => (
+              <div key={index} className="bg-card/50 backdrop-blur-sm p-6 rounded-lg border border-primary/20">
+                <h3 className="text-xl font-bold text-primary mb-4 font-space">{section.title}</h3>
+                <div className="space-y-3">
+                  {Array.isArray(section.content) ? section.content.map((item, itemIndex) => (
+                    <div key={itemIndex} className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-muted-foreground">{item}</span>
+                    </div>
+                  )) : (
+                    <p className="text-muted-foreground">{section.content}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Slide Navigation */}
@@ -68,4 +101,4 @@ const SalesStrategySlide = () => {
   );
 };
 
-export default SalesStrategySlide;
+export default WorkoutSessionSlide;

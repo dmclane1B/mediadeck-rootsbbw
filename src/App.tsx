@@ -22,7 +22,7 @@ const ProductGlimpseSlide = lazy(() => import("./pages/slides/ProductGlimpseSlid
 const ExpertPanelSlide = lazy(() => import("./pages/slides/ExpertPanelSlide"));
 const MarketOverviewSlide = lazy(() => import("./pages/slides/MarketOverviewSlide"));
 const ProofDemandSlide = lazy(() => import("./pages/slides/ProofDemandSlide"));
-const SalesStrategySlide = lazy(() => import("./pages/slides/SalesStrategySlide"));
+const WorkoutSessionSlide = lazy(() => import("./pages/slides/WorkoutSessionSlide"));
 const CustomerPersonaSlide = lazy(() => import("./pages/slides/CustomerPersonaSlide"));
 const ValuePropositionsSlide = lazy(() => import("./pages/slides/ValuePropositionsSlide"));
 const TeamLeadershipSlide = lazy(() => import("./pages/slides/TeamLeadershipSlide"));
@@ -51,7 +51,7 @@ const App = () => (
             <Route path="/slides/expert-panel" element={<LazySlideWrapper><ExpertPanelSlide /></LazySlideWrapper>} />
             <Route path="/slides/community-voices" element={<LazySlideWrapper><MarketOverviewSlide /></LazySlideWrapper>} />
             <Route path="/slides/nutrition-education" element={<LazySlideWrapper><ProofDemandSlide /></LazySlideWrapper>} />
-            <Route path="/slides/workout-session" element={<LazySlideWrapper><SalesStrategySlide /></LazySlideWrapper>} />
+            <Route path="/slides/workout-session" element={<LazySlideWrapper><WorkoutSessionSlide /></LazySlideWrapper>} />
             <Route path="/slides/smoothie-demo" element={<LazySlideWrapper><CustomerPersonaSlide /></LazySlideWrapper>} />
             <Route path="/slides/resources-support" element={<LazySlideWrapper><ValuePropositionsSlide /></LazySlideWrapper>} />
             <Route path="/slides/community-partners" element={<LazySlideWrapper><TeamLeadershipSlide /></LazySlideWrapper>} />

@@ -91,43 +91,60 @@ const ChallengesSlide = () => {
           </div>
         </div>
 
-        {/* Challenges List */}
+        {/* Challenges List - Uses centralized content */}
         <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 px-4 sm:px-0">
-          <div className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">1.</div>
-            <div className="space-y-2 sm:space-y-3 flex-1">
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">Lower Breastfeeding Rates</h3>
-              <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
-              <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
-                Black women have <span className="font-medium text-foreground bg-accent/10 px-1 rounded">significantly lower</span> breastfeeding initiation and duration rates compared to other racial groups, affecting long-term health outcomes
-              </p>
-              <div className="text-xs sm:text-sm text-accent font-medium">→ Health disparities start early</div>
+          {slideContent?.sections?.map((section, index) => (
+            <div key={index} className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: `${0.4 + index * 0.2}s` }}>
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">{index + 1}.</div>
+              <div className="space-y-2 sm:space-y-3 flex-1">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">{section.title}</h3>
+                <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
+                <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
+                  {Array.isArray(section.content) ? section.content[0] : section.content}
+                </p>
+                <div className="text-xs sm:text-sm text-accent font-medium">→ {section.title.includes('Lower') ? 'Health disparities start early' : section.title.includes('Mortality') ? 'Lives depend on addressing this crisis' : 'Change requires community action'}</div>
+              </div>
             </div>
-          </div>
+          )) || (
+            /* Fallback hardcoded content */
+            <>
+              <div className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">1.</div>
+                <div className="space-y-2 sm:space-y-3 flex-1">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">Lower Breastfeeding Rates</h3>
+                  <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
+                  <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
+                    Black women have <span className="font-medium text-foreground bg-accent/10 px-1 rounded">significantly lower</span> breastfeeding initiation and duration rates compared to other racial groups, affecting long-term health outcomes
+                  </p>
+                  <div className="text-xs sm:text-sm text-accent font-medium">→ Health disparities start early</div>
+                </div>
+              </div>
 
-          <div className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">2.</div>
-            <div className="space-y-2 sm:space-y-3 flex-1">
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">Maternal Mortality Crisis</h3>
-              <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
-              <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
-                Black women are <span className="font-medium text-foreground bg-accent/10 px-1 rounded">three to four times</span> more likely to die from pregnancy-related complications, highlighting critical gaps in maternal healthcare
-              </p>
-              <div className="text-xs sm:text-sm text-accent font-medium">→ Lives depend on addressing this crisis</div>
-            </div>
-          </div>
+              <div className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">2.</div>
+                <div className="space-y-2 sm:space-y-3 flex-1">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">Maternal Mortality Crisis</h3>
+                  <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
+                  <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
+                    Black women are <span className="font-medium text-foreground bg-accent/10 px-1 rounded">three to four times</span> more likely to die from pregnancy-related complications, highlighting critical gaps in maternal healthcare
+                  </p>
+                  <div className="text-xs sm:text-sm text-accent font-medium">→ Lives depend on addressing this crisis</div>
+                </div>
+              </div>
 
-          <div className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: '0.8s' }}>
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">3.</div>
-            <div className="space-y-2 sm:space-y-3 flex-1">
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">Structural Barriers</h3>
-              <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
-              <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
-                <span className="font-medium text-foreground bg-accent/10 px-1 rounded">Systemic inequities</span> in healthcare access, workplace support, and community resources create barriers to successful breastfeeding journeys
-              </p>
-              <div className="text-xs sm:text-sm text-accent font-medium">→ Change requires community action</div>
-            </div>
-          </div>
+              <div className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: '0.8s' }}>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">3.</div>
+                <div className="space-y-2 sm:space-y-3 flex-1">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">Structural Barriers</h3>
+                  <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
+                  <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
+                    <span className="font-medium text-foreground bg-accent/10 px-1 rounded">Systemic inequities</span> in healthcare access, workplace support, and community resources create barriers to successful breastfeeding journeys
+                  </p>
+                  <div className="text-xs sm:text-sm text-accent font-medium">→ Change requires community action</div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
