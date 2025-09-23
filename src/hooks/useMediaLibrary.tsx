@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { compressImage } from '@/utils/imageCompression';
 import { indexedDBManager } from '@/utils/indexedDBManager';
 import { CloudMediaManager, MediaFile as CloudMediaFile } from '@/utils/cloudMedia';
@@ -25,11 +25,22 @@ export interface UploadProgress {
   stage: string;
 }
 
+type MediaStatusLevel = 'info' | 'warning' | 'error';
+
+export interface MediaStatusEntry {
+  id: string;
+  message: string;
+  level: MediaStatusLevel;
+  timestamp: string;
+  details?: string;
+}
+
 // Constants
 const MAX_INPUT_FILE_SIZE = 50 * 1024 * 1024; // 50MB input limit
 const MAX_FINAL_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB final compressed size
 const MAX_TOTAL_SIZE = 500 * 1024 * 1024; // 500MB total storage (IndexedDB)
 const SUPPORTED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const MAX_STATUS_ENTRIES = 50;
 
 // Helper functions
 const fileToBase64 = (file: File): Promise<string> => {
@@ -67,24 +78,59 @@ export const useMediaLibrary = () => {
   const [restoring, setRestoring] = useState(false);
   const [cloudImages, setCloudImages] = useState<MediaFile[]>([]);
   const [isEphemeralStorage, setIsEphemeralStorage] = useState(false);
+  const [cloudLoading, setCloudLoading] = useState(false);
+  const [cloudError, setCloudError] = useState<string | null>(null);
+  const [cloudLoadAttempts, setCloudLoadAttempts] = useState(0);
+  const [lastCloudSync, setLastCloudSync] = useState<string | null>(null);
+  const [statusLog, setStatusLog] = useState<MediaStatusEntry[]>([]);
+  const autoRestoreAttemptedRef = useRef(false);
+  const retryTimeoutRef = useRef<number | null>(null);
+
+  const appendStatusEntry = useCallback((message: string, level: MediaStatusLevel = 'info', details?: string) => {
+    setStatusLog(prev => {
+      const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2);
+
+      const newEntry: MediaStatusEntry = {
+        id,
+        message,
+        level,
+        details,
+        timestamp: new Date().toISOString()
+      };
+
+      const nextEntries = [...prev, newEntry];
+      if (nextEntries.length > MAX_STATUS_ENTRIES) {
+        return nextEntries.slice(nextEntries.length - MAX_STATUS_ENTRIES);
+      }
+      return nextEntries;
+    });
+  }, []);
 
   // Restore images from cloud storage
   const restoreFromCloud = useCallback(async (): Promise<number> => {
     console.log('[MediaLibrary] Starting cloud restore...');
-    
+    appendStatusEntry('Starting cloud restore from storage bucket...', 'info');
+    setCloudLoading(true);
+
     try {
       // Check if cloud is available
       const isCloudAvailable = await CloudMediaManager.isCloudAvailable();
       if (!isCloudAvailable) {
         console.log('[MediaLibrary] Cloud storage not available');
+        appendStatusEntry('Cloud storage is not available. Skipping restore.', 'warning');
+        setCloudLoading(false);
         return 0;
       }
 
       // List cloud files
       const cloudFiles = await CloudMediaManager.listCloudFiles();
       console.log(`[MediaLibrary] Found ${cloudFiles.length} files in cloud storage`);
-      
+      appendStatusEntry(`Cloud storage returned ${cloudFiles.length} file(s).`, 'info');
+
       if (cloudFiles.length === 0) {
+        setCloudLoading(false);
         return 0;
       }
 
@@ -116,15 +162,22 @@ export const useMediaLibrary = () => {
 
       // Update local state
       setImages(prev => [...prev, ...restoredImages]);
-      
+
       console.log(`[MediaLibrary] Successfully restored ${restoredImages.length} images from cloud`);
+      appendStatusEntry(`Restored ${restoredImages.length} image(s) from cloud storage.`, 'info');
+      setLastCloudSync(new Date().toISOString());
+      setCloudError(null);
+      setCloudLoading(false);
       return restoredImages.length;
-      
+
     } catch (error) {
       console.error('[MediaLibrary] Error during cloud restore:', error);
+      appendStatusEntry('Error during cloud restore.', 'error', error instanceof Error ? error.message : undefined);
+      setCloudError(error instanceof Error ? error.message : 'Unknown cloud restore error');
+      setCloudLoading(false);
       throw error;
     }
-  }, []);
+  }, [appendStatusEntry]);
 
   // Detect ephemeral storage
   const detectEphemeralStorage = useCallback(async (): Promise<boolean> => {
@@ -141,73 +194,114 @@ export const useMediaLibrary = () => {
 
   // Load cloud images from multiple sources
   const loadCloudImages = useCallback(async (): Promise<MediaFile[]> => {
-    console.log('[MediaLibrary] Loading cloud images from all sources...');
-    try {
-      const { supabase } = await import('@/integrations/supabase/client');
-      
-      // Load from published_media table
-      const { data: mediaData, error: mediaError } = await supabase
-        .from('published_media')
-        .select('*')
-        .order('published_at', { ascending: false });
+    appendStatusEntry('Loading cloud images from Supabase...', 'info');
+    setCloudLoading(true);
+    setCloudError(null);
 
-      if (mediaError) {
-        console.error('[MediaLibrary] Error loading published_media:', mediaError);
-      }
+    const maxAttempts = 3;
 
-      // Load from published_slide_configurations table
-      const { data: slideData, error: slideError } = await supabase
-        .from('published_slide_configurations')
-        .select('*')
-        .eq('status', 'active')
-        .order('published_at', { ascending: false });
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const fetchErrors: string[] = [];
 
-      if (slideError) {
-        console.error('[MediaLibrary] Error loading published_slide_configurations:', slideError);
-      }
+        // Load from published_media table
+        const { data: mediaData, error: mediaError } = await supabase
+          .from('published_media')
+          .select('*')
+          .order('published_at', { ascending: false });
 
-      const allCloudImages: MediaFile[] = [];
-      
-      // Process published_media
-      if (mediaData) {
-        allCloudImages.push(...mediaData.map(img => ({
-          id: img.image_id,
-          name: img.image_name,
-          url: img.cloud_url,
-          uploadDate: new Date(img.published_at).toISOString(),
-          dimensions: img.dimensions as { width: number; height: number } | undefined,
-          size: img.file_size || 0,
-          cloudPath: img.cloud_path,
-          publicUrl: img.cloud_url,
-          source: 'cloud' as const
-        })));
-      }
+        if (mediaError) {
+          const message = `Error loading published_media: ${mediaError.message}`;
+          console.error('[MediaLibrary]', message, mediaError);
+          fetchErrors.push(message);
+        }
 
-      // Process published_slide_configurations (avoiding duplicates)
-      if (slideData) {
-        const existingIds = new Set(allCloudImages.map(img => img.id));
-        allCloudImages.push(...slideData
-          .filter(slide => !existingIds.has(slide.image_id))
-          .map(slide => ({
-            id: slide.image_id,
-            name: slide.image_name,
-            url: slide.image_url,
-            uploadDate: new Date(slide.published_at).toISOString(),
-            dimensions: slide.dimensions as { width: number; height: number } | undefined,
-            size: slide.size || 0,
-            cloudPath: slide.cloud_path,
-            publicUrl: slide.image_url,
+        // Load from published_slide_configurations table
+        const { data: slideData, error: slideError } = await supabase
+          .from('published_slide_configurations')
+          .select('*')
+          .eq('status', 'active')
+          .order('published_at', { ascending: false });
+
+        if (slideError) {
+          const message = `Error loading published_slide_configurations: ${slideError.message}`;
+          console.error('[MediaLibrary]', message, slideError);
+          fetchErrors.push(message);
+        }
+
+        const allCloudImages: MediaFile[] = [];
+
+        if (mediaData) {
+          allCloudImages.push(...mediaData.map(img => ({
+            id: img.image_id,
+            name: img.image_name,
+            url: img.cloud_url,
+            uploadDate: new Date(img.published_at).toISOString(),
+            dimensions: img.dimensions as { width: number; height: number } | undefined,
+            size: img.file_size || 0,
+            cloudPath: img.cloud_path,
+            publicUrl: img.cloud_url,
             source: 'cloud' as const
           })));
-      }
+        }
 
-      console.log(`[MediaLibrary] Loaded ${allCloudImages.length} total cloud images`);
-      return allCloudImages;
-    } catch (error) {
-      console.error('[MediaLibrary] Error loading cloud images:', error);
-      return [];
+        if (slideData) {
+          const existingIds = new Set(allCloudImages.map(img => img.id));
+          allCloudImages.push(...slideData
+            .filter(slide => !existingIds.has(slide.image_id))
+            .map(slide => ({
+              id: slide.image_id,
+              name: slide.image_name,
+              url: slide.image_url,
+              uploadDate: new Date(slide.published_at).toISOString(),
+              dimensions: slide.dimensions as { width: number; height: number } | undefined,
+              size: slide.size || 0,
+              cloudPath: slide.cloud_path,
+              publicUrl: slide.image_url,
+              source: 'cloud' as const
+            })));
+        }
+
+        const hasErrors = fetchErrors.length > 0;
+        const hasData = allCloudImages.length > 0;
+
+        if (hasErrors) {
+          const errorMessage = fetchErrors.join(' | ');
+          setCloudError(errorMessage);
+          appendStatusEntry(`Cloud image load completed with warnings: ${errorMessage}`, 'warning');
+        } else {
+          setCloudError(null);
+        }
+
+        if (hasErrors && !hasData && attempt < maxAttempts - 1) {
+          appendStatusEntry('Retrying cloud image load due to empty results.', 'warning');
+          await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+          continue;
+        }
+
+        appendStatusEntry(`Loaded ${allCloudImages.length} cloud image(s).`, hasErrors ? 'warning' : 'info');
+        setCloudLoadAttempts(attempt + 1);
+        setLastCloudSync(new Date().toISOString());
+        setCloudLoading(false);
+        return allCloudImages;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('[MediaLibrary] Error loading cloud images:', error);
+        setCloudError(errorMessage);
+        appendStatusEntry(`Failed to load cloud images (attempt ${attempt + 1}/${maxAttempts}): ${errorMessage}`, 'error');
+
+        if (attempt < maxAttempts - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+        }
+      }
     }
-  }, []);
+
+    appendStatusEntry('Exceeded maximum retries while loading cloud images.', 'error');
+    setCloudLoadAttempts(maxAttempts);
+    setCloudLoading(false);
+    return [];
+  }, [appendStatusEntry]);
 
   // Merge cloud and local images, removing duplicates
   const getMergedImages = useCallback((localImages: MediaFile[], cloudImages: MediaFile[]): MediaFile[] => {
@@ -233,148 +327,56 @@ export const useMediaLibrary = () => {
     return merged;
   }, []);
 
-  // Load images from IndexedDB and cloud on mount
   useEffect(() => {
-    let retryCount = 0;
-    const maxRetries = 3;
-    const retryDelay = 1000; // 1 second
-
-    const loadAllImages = async (attempt: number = 0): Promise<void> => {
-      console.log(`[MediaLibrary] Loading images (attempt ${attempt + 1}/${maxRetries + 1})`);
-      
-      try {
-        // Check for ephemeral storage
-        const isEphemeral = await detectEphemeralStorage();
-        setIsEphemeralStorage(isEphemeral);
-        
-        // Load cloud images first (always available)
-        const cloudImgs = await loadCloudImages();
-        setCloudImages(cloudImgs);
-
-        // Try to load local images
-        let localImages: MediaFile[] = [];
-        try {
-          console.log('[MediaLibrary] Initializing IndexedDB...');
-          await indexedDBManager.initialize();
-          console.log('[MediaLibrary] IndexedDB initialized successfully');
-          
-          localImages = await indexedDBManager.getAllImages();
-          console.log(`[MediaLibrary] Successfully loaded ${localImages.length} images from IndexedDB`);
-        } catch (localError) {
-          console.warn('[MediaLibrary] IndexedDB failed, using cloud-only view:', localError);
-          // Don't fail completely, just use cloud images
-        }
-
-        // Merge and set images
-        const mergedImages = getMergedImages(localImages, cloudImgs);
-        setImages(mergedImages);
-        setLoading(false);
-
-        // Auto-restore logic (only if we have cloud images but no local ones)
-        if (localImages.length === 0 && cloudImgs.length > 0 && !isEphemeral) {
-          const lastRestore = localStorage.getItem('last-cloud-restore');
-          const shouldRestore = !lastRestore || (Date.now() - parseInt(lastRestore) > 24 * 60 * 60 * 1000); // 24 hours
-          
-          if (shouldRestore) {
-            console.log('[MediaLibrary] Auto-restoring from cloud...');
-            try {
-              // Inline the restore logic to avoid dependency issues
-              const { supabase } = await import('@/integrations/supabase/client');
-              const { data: publishedSlides, error } = await supabase
-                .from('published_slide_configurations')
-                .select('image_id, image_name, image_url, cloud_path, alt_text, dimensions, size')
-                .eq('status', 'active');
-
-              if (!error && publishedSlides && publishedSlides.length > 0) {
-                for (const slide of publishedSlides.slice(0, 5)) { // Limit auto-restore to first 5
-                  const mediaFile: MediaFile = {
-                    id: slide.image_id,
-                    name: slide.image_name,
-                    url: slide.image_url,
-                    uploadDate: new Date().toISOString(),
-                    dimensions: slide.dimensions as { width: number; height: number } | undefined,
-                    size: slide.size,
-                    cloudPath: slide.cloud_path,
-                    publicUrl: slide.image_url,
-                    source: 'cloud'
-                  };
-
-                  try {
-                    await indexedDBManager.addOrUpdateImage(mediaFile);
-                  } catch (addError) {
-                    console.warn('[MediaLibrary] Failed to auto-cache image:', addError);
-                  }
-                }
-                
-                // Refresh merged images
-                const refreshedLocal = await indexedDBManager.getAllImages();
-                const refreshedMerged = getMergedImages(refreshedLocal, cloudImgs);
-                setImages(refreshedMerged);
-              }
-              
-              localStorage.setItem('last-cloud-restore', Date.now().toString());
-            } catch (error) {
-              console.warn('[MediaLibrary] Auto-restore failed:', error);
-            }
-          }
-        }
-        
-      } catch (error) {
-        console.error(`[MediaLibrary] Error loading images (attempt ${attempt + 1}):`, error);
-        
-        if (attempt < maxRetries) {
-          console.log(`[MediaLibrary] Retrying in ${retryDelay}ms...`);
-          setTimeout(() => {
-            loadAllImages(attempt + 1);
-          }, retryDelay * (attempt + 1));
-        } else {
-          console.error('[MediaLibrary] All retry attempts failed. Using cloud-only view.');
-          // Fallback to cloud-only
-          const cloudImgs = await loadCloudImages();
-          setImages(cloudImgs);
-          setLoading(false);
-        }
+    return () => {
+      if (retryTimeoutRef.current) {
+        window.clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
       }
     };
-
-    loadAllImages();
-  }, [detectEphemeralStorage, loadCloudImages, getMergedImages]);
+  }, []);
 
   // Cache a cloud image locally
   const cacheImageLocally = useCallback(async (image: MediaFile): Promise<void> => {
     try {
       console.log(`[MediaLibrary] Caching ${image.name} locally...`);
+      appendStatusEntry(`Caching ${image.name} locally...`, 'info');
       await indexedDBManager.addOrUpdateImage({ ...image, source: 'synced' });
-      
+
       // Refresh merged images
       const updatedLocalImages = await indexedDBManager.getAllImages();
       const mergedImages = getMergedImages(updatedLocalImages, cloudImages);
       setImages(mergedImages);
-      
+
       console.log(`[MediaLibrary] Successfully cached ${image.name} locally`);
+      appendStatusEntry(`${image.name} cached locally.`, 'info');
     } catch (error) {
       console.error(`[MediaLibrary] Failed to cache ${image.name} locally:`, error);
+      appendStatusEntry(`Failed to cache ${image.name} locally.`, 'error', error instanceof Error ? error.message : undefined);
       throw error;
     }
-  }, [getMergedImages, cloudImages]);
+  }, [getMergedImages, cloudImages, appendStatusEntry]);
 
   // Reset local cache and reload from cloud
   const resetLocalCache = useCallback(async (): Promise<void> => {
     try {
       console.log('[MediaLibrary] Resetting local cache...');
+      appendStatusEntry('Resetting local media cache...', 'warning');
       await indexedDBManager.clearAll();
-      
+
       // Reload cloud images and update state
       const cloudImgs = await loadCloudImages();
       setCloudImages(cloudImgs);
       setImages(cloudImgs); // Show only cloud images
-      
+
       console.log('[MediaLibrary] Local cache reset complete');
+      appendStatusEntry('Local cache reset complete. Reloaded cloud images.', 'info');
     } catch (error) {
       console.error('[MediaLibrary] Failed to reset local cache:', error);
+      appendStatusEntry('Failed to reset local cache.', 'error', error instanceof Error ? error.message : undefined);
       throw error;
     }
-  }, [loadCloudImages]);
+  }, [loadCloudImages, appendStatusEntry]);
 
   // List cloud-only images (not cached locally)
   const listCloudOnlyImages = useCallback((): MediaFile[] => {
@@ -386,30 +388,36 @@ export const useMediaLibrary = () => {
       const imagesToRestore = cloudImagesToRestore || cloudImages;
       if (imagesToRestore.length === 0) {
         console.log('[MediaLibrary] No cloud images to restore');
+        appendStatusEntry('No cloud images available to restore.', 'info');
+        setCloudLoading(false);
         return 0;
       }
 
       console.log(`[MediaLibrary] Restoring ${imagesToRestore.length} cloud images to local cache...`);
+      appendStatusEntry(`Restoring ${imagesToRestore.length} cloud image(s) to local cache...`, 'info');
+      setCloudLoading(true);
       let restoredCount = 0;
 
       for (const cloudImg of imagesToRestore) {
         // Check if we already have this image locally
-        const existsLocally = images.some(img => 
+        const existsLocally = images.some(img =>
           img.id === cloudImg.id || img.cloudPath === cloudImg.cloudPath
         );
         
-        if (!existsLocally) {
-          try {
-            await indexedDBManager.addOrUpdateImage({
-              ...cloudImg,
-              source: 'synced'
-            });
-            console.log(`[MediaLibrary] Restored image: ${cloudImg.name}`);
-            restoredCount++;
-          } catch (error) {
-            console.error(`[MediaLibrary] Failed to restore image ${cloudImg.name}:`, error);
+          if (!existsLocally) {
+            try {
+              await indexedDBManager.addOrUpdateImage({
+                ...cloudImg,
+                source: 'synced'
+              });
+              console.log(`[MediaLibrary] Restored image: ${cloudImg.name}`);
+              appendStatusEntry(`Restored image ${cloudImg.name} from cloud.`, 'info');
+              restoredCount++;
+            } catch (error) {
+              console.error(`[MediaLibrary] Failed to restore image ${cloudImg.name}:`, error);
+              appendStatusEntry(`Failed to restore ${cloudImg.name} from cloud.`, 'error', error instanceof Error ? error.message : undefined);
+            }
           }
-        }
       }
 
       if (restoredCount > 0) {
@@ -419,24 +427,33 @@ export const useMediaLibrary = () => {
         const mergedImages = getMergedImages(updatedLocalImages, updatedCloudImages);
         setImages(mergedImages);
         setCloudImages(updatedCloudImages);
+        setLastCloudSync(new Date().toISOString());
+        setCloudError(null);
       }
 
       console.log(`[MediaLibrary] Successfully restored ${restoredCount} cloud images`);
+      appendStatusEntry(`Restored ${restoredCount} cloud image(s).`, 'info');
+      setCloudLoading(false);
       return restoredCount;
     } catch (error) {
       console.error('[MediaLibrary] Failed to restore cloud images:', error);
+      appendStatusEntry('Failed to restore cloud images.', 'error', error instanceof Error ? error.message : undefined);
+      setCloudError(error instanceof Error ? error.message : 'Unknown restore error');
+      setCloudLoading(false);
       throw error;
     }
-  }, [images, cloudImages, loadCloudImages, getMergedImages]);
+  }, [images, cloudImages, loadCloudImages, getMergedImages, appendStatusEntry]);
 
   // Restore images from published slides in Supabase
   const restoreFromPublishedSlides = useCallback(async (): Promise<number> => {
     console.log('[MediaLibrary] Starting published slides restore...');
     setRestoring(true);
-    
+    appendStatusEntry('Restoring images from published slide configurations...', 'info');
+    setCloudLoading(true);
+
     try {
       const { supabase } = await import('@/integrations/supabase/client');
-      
+
       // Fetch published slide configurations from Supabase
       const { data: publishedSlides, error } = await supabase
         .from('published_slide_configurations')
@@ -445,11 +462,14 @@ export const useMediaLibrary = () => {
 
       if (error) {
         console.error('[MediaLibrary] Error fetching published slides:', error);
+        appendStatusEntry('Error fetching published slides from Supabase.', 'error', error.message);
         throw new Error(`Failed to fetch published slides: ${error.message}`);
       }
 
       if (!publishedSlides || publishedSlides.length === 0) {
         console.log('[MediaLibrary] No published slides found');
+        appendStatusEntry('No published slide configurations found.', 'warning');
+        setCloudLoading(false);
         return 0;
       }
 
@@ -483,15 +503,129 @@ export const useMediaLibrary = () => {
       }
 
       console.log(`[MediaLibrary] Successfully restored ${restoredCount} images from published slides`);
+      appendStatusEntry(`Restored ${restoredCount} image(s) from published slides.`, 'info');
+      setLastCloudSync(new Date().toISOString());
+      setCloudError(null);
       return restoredCount;
-      
+
     } catch (error) {
       console.error('[MediaLibrary] Error during published slides restore:', error);
+      appendStatusEntry('Failed to restore images from published slides.', 'error', error instanceof Error ? error.message : undefined);
+      setCloudError(error instanceof Error ? error.message : 'Unknown slide restore error');
       throw error;
     } finally {
       setRestoring(false);
+      setCloudLoading(false);
     }
-  }, [restoreFromCloudImages]);
+  }, [restoreFromCloudImages, appendStatusEntry]);
+
+  interface LoadOptions {
+    forceAutoRestore?: boolean;
+  }
+
+  const loadAllImages = useCallback(async (attempt: number = 0, options: LoadOptions = {}): Promise<void> => {
+    const maxRetries = 3;
+    const retryDelay = 1000;
+
+    if (retryTimeoutRef.current) {
+      window.clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+
+    if (attempt === 0) {
+      if (options.forceAutoRestore) {
+        autoRestoreAttemptedRef.current = false;
+      }
+      setLoading(true);
+    }
+
+    appendStatusEntry(`Loading media library (attempt ${attempt + 1}/${maxRetries})...`, 'info');
+
+    try {
+      const isEphemeral = await detectEphemeralStorage();
+      setIsEphemeralStorage(isEphemeral);
+
+      const cloudImgs = await loadCloudImages();
+      setCloudImages(cloudImgs);
+
+      let localImages: MediaFile[] = [];
+      try {
+        await indexedDBManager.initialize();
+        localImages = await indexedDBManager.getAllImages();
+        appendStatusEntry(`Loaded ${localImages.length} local image(s) from IndexedDB.`, 'info');
+      } catch (localError) {
+        console.warn('[MediaLibrary] IndexedDB failed, using cloud-only view:', localError);
+        appendStatusEntry('Failed to load local images from IndexedDB. Showing cloud images only.', 'warning', localError instanceof Error ? localError.message : undefined);
+      }
+
+      const mergedImages = getMergedImages(localImages, cloudImgs);
+      setImages(mergedImages);
+      setLoading(false);
+
+      if (!autoRestoreAttemptedRef.current && localImages.length === 0 && cloudImgs.length > 0 && !isEphemeral) {
+        autoRestoreAttemptedRef.current = true;
+        appendStatusEntry('No local images detected. Attempting automatic restore from published slides.', 'warning');
+        try {
+          const restoredCount = await restoreFromPublishedSlides();
+          if (restoredCount > 0) {
+            appendStatusEntry(`Automatic restore added ${restoredCount} image(s) from published slides.`, 'info');
+          } else {
+            appendStatusEntry('Automatic restore completed. No additional images were needed.', 'info');
+          }
+        } catch (autoError) {
+          appendStatusEntry('Automatic restore from published slides failed.', 'error', autoError instanceof Error ? autoError.message : undefined);
+        }
+      }
+    } catch (error) {
+      console.error(`[MediaLibrary] Error loading images (attempt ${attempt + 1}):`, error);
+      appendStatusEntry(`Failed to load media library (attempt ${attempt + 1}).`, 'error', error instanceof Error ? error.message : undefined);
+
+      if (attempt < maxRetries) {
+        const delay = retryDelay * (attempt + 1);
+        appendStatusEntry(`Retrying media library load in ${delay}ms.`, 'warning');
+        if (retryTimeoutRef.current) {
+          window.clearTimeout(retryTimeoutRef.current);
+        }
+        retryTimeoutRef.current = window.setTimeout(() => {
+          loadAllImages(attempt + 1, options);
+        }, delay);
+      } else {
+        console.error('[MediaLibrary] All retry attempts failed. Using cloud-only view.');
+        appendStatusEntry('All retry attempts failed. Falling back to cloud-only view.', 'error');
+        const cloudImgs = await loadCloudImages();
+        setImages(cloudImgs);
+        setLoading(false);
+      }
+    }
+  }, [appendStatusEntry, detectEphemeralStorage, loadCloudImages, getMergedImages, restoreFromPublishedSlides]);
+
+  const reloadLibrary = useCallback(async (options?: LoadOptions) => {
+    appendStatusEntry('Manual media library reload requested.', 'info');
+    await loadAllImages(0, options ?? {});
+  }, [appendStatusEntry, loadAllImages]);
+
+  const reloadCloudImages = useCallback(async () => {
+    appendStatusEntry('Manually reloading cloud image catalog...', 'info');
+    const cloudImgs = await loadCloudImages();
+    setCloudImages(cloudImgs);
+
+    try {
+      const localImages = await indexedDBManager.getAllImages();
+      const mergedImages = getMergedImages(localImages, cloudImgs);
+      setImages(mergedImages);
+      appendStatusEntry('Cloud images reloaded and merged with local cache.', 'info');
+    } catch (error) {
+      console.error('[MediaLibrary] Failed to merge local images during cloud reload:', error);
+      appendStatusEntry('Cloud images reloaded but failed to read local cache.', 'warning', error instanceof Error ? error.message : undefined);
+      setImages(cloudImgs);
+    }
+
+    return cloudImgs;
+  }, [appendStatusEntry, loadCloudImages, getMergedImages]);
+
+  useEffect(() => {
+    loadAllImages();
+  }, [loadAllImages]);
 
   const addImages = async (
     files: FileList,
@@ -918,6 +1052,12 @@ export const useMediaLibrary = () => {
     loading,
     uploadProgress,
     restoring,
+    cloudImages,
+    cloudLoading,
+    cloudError,
+    cloudLoadAttempts,
+    lastCloudSync,
+    statusLog,
     addImages,
     removeImage,
     updateImage,
@@ -931,6 +1071,7 @@ export const useMediaLibrary = () => {
     resetLocalCache,
     listCloudOnlyImages,
     isEphemeralStorage,
-    cloudImages
+    reloadLibrary,
+    reloadCloudImages
   };
 };

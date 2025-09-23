@@ -11,11 +11,12 @@ import {
   Database, 
   Cloud, 
   HardDrive, 
-  RefreshCw, 
-  CheckCircle2, 
-  XCircle, 
-  AlertTriangle 
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle
 } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 interface DiagnosticResult {
   component: string;
@@ -28,7 +29,7 @@ const MediaDiagnostics: React.FC = () => {
   const [diagnosticResults, setDiagnosticResults] = useState<DiagnosticResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   
-  const { images, cloudImages } = useMediaLibrary();
+  const { images, cloudImages, cloudLoading, cloudError, lastCloudSync, statusLog } = useMediaLibrary();
   const { publishedSlides } = usePublishedSlides();
   const { slideConfig } = useSlideImages();
 
@@ -103,6 +104,42 @@ const MediaDiagnostics: React.FC = () => {
           status: 'warning',
           message: 'No images found',
           details: ['Consider uploading images or restoring from published slides']
+        });
+      }
+
+      const lastSyncText = lastCloudSync
+        ? formatDistanceToNow(new Date(lastCloudSync), { addSuffix: true })
+        : 'never';
+
+      if (cloudError) {
+        results.push({
+          component: 'Cloud Sync',
+          status: 'error',
+          message: 'Cloud sync reported an error',
+          details: [cloudError, `Last successful sync ${lastSyncText}`]
+        });
+      } else if (cloudLoading) {
+        results.push({
+          component: 'Cloud Sync',
+          status: 'warning',
+          message: 'Cloud sync currently in progress',
+          details: [`Last successful sync ${lastSyncText}`]
+        });
+      } else {
+        results.push({
+          component: 'Cloud Sync',
+          status: 'healthy',
+          message: `Cloud sync healthy (last checked ${lastSyncText})`
+        });
+      }
+
+      const recentStatus = statusLog.slice(-3).reverse();
+      if (recentStatus.length > 0) {
+        results.push({
+          component: 'Recent Media Activity',
+          status: 'healthy',
+          message: recentStatus[0].message,
+          details: recentStatus.map(entry => `${entry.level}: ${entry.message}`)
         });
       }
 
