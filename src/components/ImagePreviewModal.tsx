@@ -33,7 +33,7 @@ const ImagePreviewModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] sm:max-w-5xl w-full h-[85vh] sm:h-[90vh] p-0 overflow-hidden mx-2 sm:mx-auto" aria-describedby="image-preview-description">
+      <DialogContent className="!left-2 !right-2 !top-[5%] !bottom-[5%] sm:!left-[50%] sm:!right-auto sm:!top-[50%] sm:!bottom-auto !translate-x-0 !translate-y-0 sm:!translate-x-[-50%] sm:!translate-y-[-50%] !w-auto sm:!w-full !max-w-[calc(100vw-1rem)] sm:!max-w-5xl !h-[calc(100vh-10%)] sm:!h-[90vh] !p-0 !flex !flex-col !gap-0 !overflow-hidden !mx-0 sm:!mx-auto [&>button[data-dialog-close]]:hidden" aria-describedby="image-preview-description">
         {/* Header */}
         <div className="absolute top-0 left-0 right-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-2 sm:p-4">
           <div className="flex items-center justify-between">
