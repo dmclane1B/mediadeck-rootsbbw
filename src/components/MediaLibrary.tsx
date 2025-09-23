@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Upload, Search, Trash2, Edit, Image, Check, Eye } from 'lucide-react';
+import { Upload, Search, Trash2, Edit, Image, Check, Eye, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import LazyImage from '@/components/LazyImage';
 import ImagePreviewModal from '@/components/ImagePreviewModal';
@@ -18,7 +18,22 @@ interface MediaLibraryProps {
 }
 
 const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: MediaLibraryProps) => {
-  const { images, loading, uploadProgress, restoring, addImages, removeImage, updateImage, getStorageInfo, restoreFromPublishedSlides } = useMediaLibrary();
+  const { 
+    images, 
+    loading, 
+    uploadProgress, 
+    restoring, 
+    addImages, 
+    removeImage, 
+    updateImage, 
+    getStorageInfo, 
+    restoreFromPublishedSlides,
+    cacheImageLocally,
+    resetLocalCache,
+    listCloudOnlyImages,
+    isEphemeralStorage,
+    cloudImages 
+  } = useMediaLibrary();
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -154,6 +169,38 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
     });
   };
 
+  const handleCacheLocally = async (image: MediaFile) => {
+    try {
+      await cacheImageLocally(image);
+      toast({
+        title: "Image cached",
+        description: `${image.name} is now cached locally.`
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Cache failed",
+        description: "Failed to cache image locally."
+      });
+    }
+  };
+
+  const handleResetCache = async () => {
+    try {
+      await resetLocalCache();
+      toast({
+        title: "Cache reset",
+        description: "Local cache cleared. Showing cloud images."
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Reset failed",
+        description: "Failed to reset local cache."
+      });
+    }
+  };
+
   const handleRestoreFromPublishedSlides = async () => {
     try {
       const restoredCount = await restoreFromPublishedSlides();
@@ -214,6 +261,14 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
                 className="w-full h-full object-cover"
                 fallbackToPlaceholder={true}
               />
+              {/* Cloud badge for compact view */}
+              {image.source === 'cloud' && (
+                <div className="absolute top-1 left-1">
+                  <div className="bg-blue-500 text-white text-xs px-1 py-0.5 rounded">
+                    Cloud
+                  </div>
+                </div>
+              )}
               {selectedImageId === image.id && (
                 <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
                   <Check className="w-6 h-6 text-primary" />
@@ -281,7 +336,18 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               <span>{Math.round(storageInfo.usagePercent)}%</span>
             </div>
             <Progress value={storageInfo.usagePercent} className="w-full max-w-xs mx-auto" />
+            <div className="flex justify-between items-center mt-2 text-xs">
+              <span>Local: {images.filter(img => img.source !== 'cloud').length}</span>
+              <span>Cloud: {cloudImages.length}</span>
+            </div>
           </div>
+
+          {/* Ephemeral Storage Warning */}
+          {isEphemeralStorage && (
+            <div className="mb-4 p-2 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-xs text-yellow-800 dark:text-yellow-200">
+              Local cache isn't persistent on this browser. Images will still show from the cloud.
+            </div>
+          )}
           
           {/* Upload Progress */}
           {isUploading && currentProgress.length > 0 && (
@@ -312,6 +378,14 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               disabled={isUploading || restoring}
             >
               {restoring ? 'Restoring...' : 'Restore Published Images'}
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={handleResetCache}
+              disabled={isUploading || restoring}
+              size="sm"
+            >
+              Reset Local Cache
             </Button>
           </div>
         </div>
@@ -350,6 +424,15 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               fallbackToPlaceholder={true}
             />
             
+            {/* Cloud badge */}
+            {image.source === 'cloud' && (
+              <div className="absolute top-2 left-2">
+                <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                  Cloud
+                </div>
+              </div>
+            )}
+            
             {selectedImageId === image.id && (
               <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
                 <Check className="w-8 h-8 text-primary" />
@@ -378,6 +461,20 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
               </div>
               
               <div className="absolute top-2 right-2 flex gap-1">
+                {image.source === 'cloud' && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCacheLocally(image);
+                    }}
+                    className="h-6 w-6 p-0"
+                    title="Cache locally"
+                  >
+                    <Download className="w-3 h-3" />
+                  </Button>
+                )}
                 <Button
                   size="sm"
                   variant="secondary"

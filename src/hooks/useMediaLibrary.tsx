@@ -65,6 +65,8 @@ export const useMediaLibrary = () => {
   const [loading, setLoading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const [restoring, setRestoring] = useState(false);
+  const [cloudImages, setCloudImages] = useState<MediaFile[]>([]);
+  const [isEphemeralStorage, setIsEphemeralStorage] = useState(false);
 
   // Restore images from cloud storage
   const restoreFromCloud = useCallback(async (): Promise<number> => {
@@ -124,84 +126,242 @@ export const useMediaLibrary = () => {
     }
   }, []);
 
-  // Load images from IndexedDB on mount with debugging and retry logic
+  // Detect ephemeral storage
+  const detectEphemeralStorage = useCallback(async (): Promise<boolean> => {
+    try {
+      if ('storage' in navigator && 'persisted' in navigator.storage) {
+        const isPersistent = await navigator.storage.persisted();
+        return !isPersistent;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  // Load cloud images
+  const loadCloudImages = useCallback(async (): Promise<MediaFile[]> => {
+    console.log('[MediaLibrary] Loading cloud images...');
+    try {
+      // Get published slides
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: publishedSlides, error } = await supabase
+        .from('published_slide_configurations')
+        .select('image_id, image_name, image_url, cloud_path, alt_text, dimensions, size')
+        .eq('status', 'active');
+
+      const cloudImages: MediaFile[] = [];
+
+      if (!error && publishedSlides) {
+        // Convert published slides to MediaFile objects
+        for (const slide of publishedSlides) {
+          cloudImages.push({
+            id: slide.image_id,
+            name: slide.image_name,
+            url: slide.image_url,
+            uploadDate: new Date().toISOString(),
+            dimensions: slide.dimensions as { width: number; height: number } | undefined,
+            size: slide.size,
+            cloudPath: slide.cloud_path,
+            publicUrl: slide.image_url,
+            source: 'cloud'
+          });
+        }
+      }
+
+      // Also get direct cloud files
+      try {
+        const directCloudFiles = await CloudMediaManager.listCloudFiles();
+        // Add files that aren't already in published slides
+        for (const cloudFile of directCloudFiles) {
+          const existsInPublished = cloudImages.some(img => img.cloudPath === cloudFile.cloudPath);
+          if (!existsInPublished) {
+            cloudImages.push(cloudFile);
+          }
+        }
+      } catch (cloudError) {
+        console.warn('[MediaLibrary] Failed to load direct cloud files:', cloudError);
+      }
+
+      console.log(`[MediaLibrary] Loaded ${cloudImages.length} cloud images`);
+      return cloudImages;
+    } catch (error) {
+      console.error('[MediaLibrary] Error loading cloud images:', error);
+      return [];
+    }
+  }, []);
+
+  // Merge cloud and local images, removing duplicates
+  const getMergedImages = useCallback((localImages: MediaFile[], cloudImages: MediaFile[]): MediaFile[] => {
+    const merged: MediaFile[] = [];
+    const seenPaths = new Set<string>();
+    const seenIds = new Set<string>();
+
+    // Add local images first (they have priority)
+    for (const img of localImages) {
+      if (img.cloudPath) seenPaths.add(img.cloudPath);
+      seenIds.add(img.id);
+      merged.push(img);
+    }
+
+    // Add cloud images that aren't already local
+    for (const img of cloudImages) {
+      const isDuplicate = (img.cloudPath && seenPaths.has(img.cloudPath)) || seenIds.has(img.id);
+      if (!isDuplicate) {
+        merged.push({ ...img, source: 'cloud' as const });
+      }
+    }
+
+    return merged;
+  }, []);
+
+  // Load images from IndexedDB and cloud on mount
   useEffect(() => {
     let retryCount = 0;
     const maxRetries = 3;
     const retryDelay = 1000; // 1 second
 
-    const loadImages = async (attempt: number = 0): Promise<void> => {
-      console.log(`[MediaLibrary] Loading images from IndexedDB (attempt ${attempt + 1}/${maxRetries + 1})`);
+    const loadAllImages = async (attempt: number = 0): Promise<void> => {
+      console.log(`[MediaLibrary] Loading images (attempt ${attempt + 1}/${maxRetries + 1})`);
       
       try {
-        // Initialize IndexedDB first
-        console.log('[MediaLibrary] Initializing IndexedDB...');
-        await indexedDBManager.initialize();
-        console.log('[MediaLibrary] IndexedDB initialized successfully');
+        // Check for ephemeral storage
+        const isEphemeral = await detectEphemeralStorage();
+        setIsEphemeralStorage(isEphemeral);
         
-        // Load images
-        console.log('[MediaLibrary] Fetching images...');
-        const storedImages = await indexedDBManager.getAllImages();
-        console.log(`[MediaLibrary] Successfully loaded ${storedImages.length} images from IndexedDB`, storedImages);
-        
-        setImages(storedImages);
+        // Load cloud images first (always available)
+        const cloudImgs = await loadCloudImages();
+        setCloudImages(cloudImgs);
+
+        // Try to load local images
+        let localImages: MediaFile[] = [];
+        try {
+          console.log('[MediaLibrary] Initializing IndexedDB...');
+          await indexedDBManager.initialize();
+          console.log('[MediaLibrary] IndexedDB initialized successfully');
+          
+          localImages = await indexedDBManager.getAllImages();
+          console.log(`[MediaLibrary] Successfully loaded ${localImages.length} images from IndexedDB`);
+        } catch (localError) {
+          console.warn('[MediaLibrary] IndexedDB failed, using cloud-only view:', localError);
+          // Don't fail completely, just use cloud images
+        }
+
+        // Merge and set images
+        const mergedImages = getMergedImages(localImages, cloudImgs);
+        setImages(mergedImages);
         setLoading(false);
-        
-        // Auto-restore from cloud if no local images exist
-        if (storedImages.length === 0) {
-          const restoreFlag = localStorage.getItem('cloud-restore-attempted');
-          if (!restoreFlag) {
-            console.log('[MediaLibrary] No local images found, attempting cloud restore...');
+
+        // Auto-restore logic (only if we have cloud images but no local ones)
+        if (localImages.length === 0 && cloudImgs.length > 0 && !isEphemeral) {
+          const lastRestore = localStorage.getItem('last-cloud-restore');
+          const shouldRestore = !lastRestore || (Date.now() - parseInt(lastRestore) > 24 * 60 * 60 * 1000); // 24 hours
+          
+          if (shouldRestore) {
+            console.log('[MediaLibrary] Auto-restoring from cloud...');
             try {
-              const restoredCount = await restoreFromCloud();
-              localStorage.setItem('cloud-restore-attempted', 'true');
-              if (restoredCount > 0) {
-                console.log(`[MediaLibrary] Auto-restored ${restoredCount} images from cloud`);
+              // Inline the restore logic to avoid dependency issues
+              const { supabase } = await import('@/integrations/supabase/client');
+              const { data: publishedSlides, error } = await supabase
+                .from('published_slide_configurations')
+                .select('image_id, image_name, image_url, cloud_path, alt_text, dimensions, size')
+                .eq('status', 'active');
+
+              if (!error && publishedSlides && publishedSlides.length > 0) {
+                for (const slide of publishedSlides.slice(0, 5)) { // Limit auto-restore to first 5
+                  const mediaFile: MediaFile = {
+                    id: slide.image_id,
+                    name: slide.image_name,
+                    url: slide.image_url,
+                    uploadDate: new Date().toISOString(),
+                    dimensions: slide.dimensions as { width: number; height: number } | undefined,
+                    size: slide.size,
+                    cloudPath: slide.cloud_path,
+                    publicUrl: slide.image_url,
+                    source: 'cloud'
+                  };
+
+                  try {
+                    await indexedDBManager.addOrUpdateImage(mediaFile);
+                  } catch (addError) {
+                    console.warn('[MediaLibrary] Failed to auto-cache image:', addError);
+                  }
+                }
+                
+                // Refresh merged images
+                const refreshedLocal = await indexedDBManager.getAllImages();
+                const refreshedMerged = getMergedImages(refreshedLocal, cloudImgs);
+                setImages(refreshedMerged);
               }
+              
+              localStorage.setItem('last-cloud-restore', Date.now().toString());
             } catch (error) {
-              console.error('[MediaLibrary] Auto-restore failed:', error);
+              console.warn('[MediaLibrary] Auto-restore failed:', error);
             }
           }
         }
         
-        // Log storage info for debugging
-        try {
-          const storageUsage = await indexedDBManager.getStorageUsage();
-          console.log('[MediaLibrary] Storage usage:', storageUsage);
-        } catch (storageError) {
-          console.warn('[MediaLibrary] Could not get storage usage:', storageError);
-        }
-        
       } catch (error) {
-        console.error(`[MediaLibrary] Error loading images from IndexedDB (attempt ${attempt + 1}):`, error);
+        console.error(`[MediaLibrary] Error loading images (attempt ${attempt + 1}):`, error);
         
         if (attempt < maxRetries) {
-          console.log(`[MediaLibrary] Retrying in ${retryDelay}ms... (${maxRetries - attempt} attempts remaining)`);
+          console.log(`[MediaLibrary] Retrying in ${retryDelay}ms...`);
           setTimeout(() => {
-            loadImages(attempt + 1);
-          }, retryDelay * (attempt + 1)); // Exponential backoff
+            loadAllImages(attempt + 1);
+          }, retryDelay * (attempt + 1));
         } else {
-          console.error('[MediaLibrary] All retry attempts failed. Setting images to empty array.');
-          setImages([]);
+          console.error('[MediaLibrary] All retry attempts failed. Using cloud-only view.');
+          // Fallback to cloud-only
+          const cloudImgs = await loadCloudImages();
+          setImages(cloudImgs);
           setLoading(false);
-          
-          // Try to provide helpful debugging info
-          console.log('[MediaLibrary] Browser storage check:');
-          console.log('- IndexedDB supported:', 'indexedDB' in window);
-          console.log('- Local storage available:', typeof(Storage) !== "undefined");
-          
-          if ('storage' in navigator && 'estimate' in navigator.storage) {
-            navigator.storage.estimate().then(estimate => {
-              console.log('- Storage estimate:', estimate);
-            }).catch(e => console.log('- Storage estimate failed:', e));
-          }
         }
       }
     };
 
-    loadImages();
-  }, [restoreFromCloud]);
+    loadAllImages();
+  }, [detectEphemeralStorage, loadCloudImages, getMergedImages]);
 
+  // Cache a cloud image locally
+  const cacheImageLocally = useCallback(async (image: MediaFile): Promise<void> => {
+    try {
+      console.log(`[MediaLibrary] Caching ${image.name} locally...`);
+      await indexedDBManager.addOrUpdateImage({ ...image, source: 'synced' });
+      
+      // Refresh merged images
+      const updatedLocalImages = await indexedDBManager.getAllImages();
+      const mergedImages = getMergedImages(updatedLocalImages, cloudImages);
+      setImages(mergedImages);
+      
+      console.log(`[MediaLibrary] Successfully cached ${image.name} locally`);
+    } catch (error) {
+      console.error(`[MediaLibrary] Failed to cache ${image.name} locally:`, error);
+      throw error;
+    }
+  }, [getMergedImages, cloudImages]);
+
+  // Reset local cache and reload from cloud
+  const resetLocalCache = useCallback(async (): Promise<void> => {
+    try {
+      console.log('[MediaLibrary] Resetting local cache...');
+      await indexedDBManager.clearAll();
+      
+      // Reload cloud images and update state
+      const cloudImgs = await loadCloudImages();
+      setCloudImages(cloudImgs);
+      setImages(cloudImgs); // Show only cloud images
+      
+      console.log('[MediaLibrary] Local cache reset complete');
+    } catch (error) {
+      console.error('[MediaLibrary] Failed to reset local cache:', error);
+      throw error;
+    }
+  }, [loadCloudImages]);
+
+  // List cloud-only images (not cached locally)
+  const listCloudOnlyImages = useCallback((): MediaFile[] => {
+    return images.filter(img => img.source === 'cloud');
+  }, [images]);
   // Restore images from published slides in Supabase
   const restoreFromPublishedSlides = useCallback(async (): Promise<number> => {
     console.log('[MediaLibrary] Starting published slides restore...');
@@ -250,9 +410,9 @@ export const useMediaLibrary = () => {
           source: 'cloud'
         };
 
-        // Save to IndexedDB
+        // Save to IndexedDB using addOrUpdate to avoid conflicts
         try {
-          await indexedDBManager.addImage(mediaFile);
+          await indexedDBManager.addOrUpdateImage(mediaFile);
           restoredImages.push(mediaFile);
           console.log(`[MediaLibrary] Restored ${slide.image_name} from published slides`);
         } catch (error) {
@@ -260,8 +420,10 @@ export const useMediaLibrary = () => {
         }
       }
 
-      // Update local state
-      setImages(prev => [...prev, ...restoredImages]);
+      // Update local state by reloading all images
+      const updatedLocalImages = await indexedDBManager.getAllImages();
+      const mergedImages = getMergedImages(updatedLocalImages, cloudImages);
+      setImages(mergedImages);
       
       console.log(`[MediaLibrary] Successfully restored ${restoredImages.length} images from published slides`);
       return restoredImages.length;
@@ -703,9 +865,14 @@ export const useMediaLibrary = () => {
     removeImage,
     updateImage,
     clearAll,
-    restoreFromCloud, // Add restore function
+    restoreFromCloud,
     restoreFromPublishedSlides,
     getStorageInfo,
-    getCloudStorageInfo
+    getCloudStorageInfo,
+    cacheImageLocally,
+    resetLocalCache,
+    listCloudOnlyImages,
+    isEphemeralStorage,
+    cloudImages
   };
 };

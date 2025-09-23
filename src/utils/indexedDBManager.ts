@@ -274,6 +274,20 @@ class IndexedDBManager {
     }, 'addImage');
   }
 
+  async addOrUpdateImage(image: MediaFile): Promise<void> {
+    return this.executeWithRetry(async (db) => {
+      return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.put(image); // Use put instead of add to allow updates
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error(`Error adding/updating image: ${request.error?.message}`));
+        transaction.onerror = () => reject(new Error(`Transaction error: ${transaction.error?.message}`));
+      });
+    }, 'addOrUpdateImage');
+  }
+
   async updateImage(id: string, updates: Partial<MediaFile>): Promise<void> {
     return this.executeWithRetry(async (db) => {
       return new Promise<void>((resolve, reject) => {
