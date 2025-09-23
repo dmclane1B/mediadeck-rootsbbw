@@ -35,48 +35,48 @@ const ChallengesSlide = () => {
   return (
     <SlideBackground className="flex items-center justify-center">
       {/* Navigation */}
-      <div className="absolute top-8 left-8 z-10">
+      <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
         <Button 
           variant="outline" 
           onClick={() => navigate('/')}
-          className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          className="transition-all duration-300 hover:scale-105 hover:shadow-lg min-h-[44px] text-xs sm:text-sm px-2 sm:px-4"
         >
-          ← Home
+          ← <span className="hidden sm:inline">Home</span>
         </Button>
       </div>
 
       {/* Roots Community Health Branding */}
-      <div className="absolute top-8 right-8 z-10 text-right">
-        <div className="text-primary text-2xl font-space font-bold mb-2">ROOTS</div>
-        <div className="text-accent text-xl font-space font-bold">03</div>
+      <div className="absolute top-4 sm:top-8 right-4 sm:right-8 z-10 text-right">
+        <div className="text-primary text-lg sm:text-2xl font-space font-bold mb-1 sm:mb-2">ROOTS</div>
+        <div className="text-accent text-base sm:text-xl font-space font-bold">03</div>
       </div>
 
       {/* Side Tab */}
       <SideTab text="WHY THIS MATTERS" />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 items-start mb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-start mb-12 sm:mb-16">
           {/* Left Column - Title */}
-          <div className="space-y-8 animate-fade-in lg:col-span-2">
+          <div className="space-y-6 sm:space-y-8 animate-fade-in lg:col-span-2">
             <div>
-              <h1 className="text-5xl md:text-7xl font-black text-foreground mb-4 font-space leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-foreground mb-4 font-space leading-tight">
                 {slideContent?.title?.split(' ')[0] || 'WHY'}
               </h1>
-              <h1 className="text-5xl md:text-7xl font-black text-accent mb-4 font-space leading-tight animate-slide-in">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-accent mb-4 font-space leading-tight animate-slide-in">
                 {slideContent?.title?.split(' ').slice(1).join(' ') || 'THIS MATTERS'}
               </h1>
-              <div className="w-32 h-1 bg-gradient-to-r from-accent to-primary animate-scale-in"></div>
+              <div className="w-20 sm:w-24 lg:w-32 h-1 bg-gradient-to-r from-accent to-primary animate-scale-in"></div>
             </div>
             
-            <p className="text-xl text-muted-foreground leading-relaxed font-inter animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed font-inter animate-fade-in px-4 sm:px-0" style={{ animationDelay: '0.3s' }}>
               {slideContent?.description || 'Addressing critical challenges in our community'}. Here are the <span className="font-semibold text-accent">key challenges</span> we're working to overcome:
             </p>
             
             {/* Problem Statement */}
-            <div className="bg-card/50 backdrop-blur-sm p-6 rounded-lg border border-accent/20 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-              <div className="text-accent font-medium text-sm mb-2">CURRENT REALITY</div>
-              <div className="text-foreground font-semibold">In the Black community, breastfeeding rates are lower compared to other communities, contributing to health disparities.</div>
+            <div className="bg-card/50 backdrop-blur-sm p-4 sm:p-6 rounded-lg border border-accent/20 animate-fade-in mx-4 sm:mx-0" style={{ animationDelay: '0.6s' }}>
+              <div className="text-accent font-medium text-xs sm:text-sm mb-2">CURRENT REALITY</div>
+              <div className="text-foreground font-semibold text-sm sm:text-base">In the Black community, breastfeeding rates are lower compared to other communities, contributing to health disparities.</div>
             </div>
           </div>
 
@@ -92,49 +92,49 @@ const ChallengesSlide = () => {
         </div>
 
         {/* Challenges List */}
-        <div className="max-w-5xl mx-auto space-y-8">
-          <div className="flex items-start gap-6 group animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <div className="text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300">1.</div>
-            <div className="space-y-3 flex-1">
-              <h3 className="text-2xl font-bold text-accent font-space">Lower Breastfeeding Rates</h3>
-              <div className="w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
-              <p className="text-muted-foreground font-inter leading-relaxed">
+        <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 px-4 sm:px-0">
+          <div className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">1.</div>
+            <div className="space-y-2 sm:space-y-3 flex-1">
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">Lower Breastfeeding Rates</h3>
+              <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
+              <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
                 Black women have <span className="font-medium text-foreground bg-accent/10 px-1 rounded">significantly lower</span> breastfeeding initiation and duration rates compared to other racial groups, affecting long-term health outcomes
               </p>
-              <div className="text-sm text-accent font-medium">→ Health disparities start early</div>
+              <div className="text-xs sm:text-sm text-accent font-medium">→ Health disparities start early</div>
             </div>
           </div>
 
-          <div className="flex items-start gap-6 group animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300">2.</div>
-            <div className="space-y-3 flex-1">
-              <h3 className="text-2xl font-bold text-accent font-space">Maternal Mortality Crisis</h3>
-              <div className="w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
-              <p className="text-muted-foreground font-inter leading-relaxed">
+          <div className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">2.</div>
+            <div className="space-y-2 sm:space-y-3 flex-1">
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">Maternal Mortality Crisis</h3>
+              <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
+              <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
                 Black women are <span className="font-medium text-foreground bg-accent/10 px-1 rounded">three to four times</span> more likely to die from pregnancy-related complications, highlighting critical gaps in maternal healthcare
               </p>
-              <div className="text-sm text-accent font-medium">→ Lives depend on addressing this crisis</div>
+              <div className="text-xs sm:text-sm text-accent font-medium">→ Lives depend on addressing this crisis</div>
             </div>
           </div>
 
-          <div className="flex items-start gap-6 group animate-fade-in" style={{ animationDelay: '0.8s' }}>
-            <div className="text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300">3.</div>
-            <div className="space-y-3 flex-1">
-              <h3 className="text-2xl font-bold text-accent font-space">Structural Barriers</h3>
-              <div className="w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
-              <p className="text-muted-foreground font-inter leading-relaxed">
+          <div className="flex items-start gap-4 sm:gap-6 group animate-fade-in" style={{ animationDelay: '0.8s' }}>
+            <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent font-space group-hover:scale-110 transition-transform duration-300 flex-shrink-0">3.</div>
+            <div className="space-y-2 sm:space-y-3 flex-1">
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-accent font-space">Structural Barriers</h3>
+              <div className="w-8 sm:w-10 lg:w-12 h-0.5 bg-gradient-to-r from-accent to-primary"></div>
+              <p className="text-muted-foreground font-inter leading-relaxed text-sm sm:text-base">
                 <span className="font-medium text-foreground bg-accent/10 px-1 rounded">Systemic inequities</span> in healthcare access, workplace support, and community resources create barriers to successful breastfeeding journeys
               </p>
-              <div className="text-sm text-accent font-medium">→ Change requires community action</div>
+              <div className="text-xs sm:text-sm text-accent font-medium">→ Change requires community action</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Bottom Tagline */}
-      <div className="absolute bottom-16 left-8 animate-fade-in" style={{ animationDelay: '1s' }}>
-        <div className="text-accent font-bold font-space text-lg">TOGETHER WE THRIVE.</div>
-        <div className="text-muted-foreground text-sm font-inter">Educate. Support. Empower.</div>
+      <div className="absolute bottom-20 sm:bottom-16 left-4 sm:left-8 animate-fade-in px-4 sm:px-0" style={{ animationDelay: '1s' }}>
+        <div className="text-accent font-bold font-space text-base sm:text-lg">TOGETHER WE THRIVE.</div>
+        <div className="text-muted-foreground text-xs sm:text-sm font-inter">Educate. Support. Empower.</div>
       </div>
 
       {/* Slide Navigation */}

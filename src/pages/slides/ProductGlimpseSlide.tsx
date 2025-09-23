@@ -16,15 +16,16 @@ const ProductGlimpseSlide = () => {
   const slideContent = getSlideContent('monday-kickoff');
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen min-h-[100dvh] bg-background flex items-center justify-center relative overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="/src/assets/roots-logo-brand.png" 
+          src="/src/assets/roots-logo-new.png" 
           alt="Roots Community Health Logo" 
-          className="w-full h-full object-contain opacity-5"
+          className="w-full h-full object-contain opacity-5 sm:opacity-10"
           loading="lazy"
         />
+        <div className="absolute inset-0 bg-background/95"></div>
       </div>
       {/* Navigation */}
       <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">

@@ -15,25 +15,26 @@ const MarketOverviewSlide = () => {
   const slideContent = getSlideContent('community-voices');
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen min-h-[100dvh] bg-background flex items-center justify-center relative overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="/src/assets/roots-logo-brand.png" 
+          src="/src/assets/roots-logo-new.png" 
           alt="Roots Community Health Logo" 
-          className="w-full h-full object-contain opacity-5"
+          className="w-full h-full object-contain opacity-5 sm:opacity-10"
           loading="lazy"
         />
+        <div className="absolute inset-0 bg-background/95"></div>
       </div>
 
       {/* Navigation */}
-      <div className="absolute top-8 left-8 z-10">
+      <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
         <Button 
           variant="outline" 
           onClick={() => navigate('/')}
-          className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          className="transition-all duration-300 hover:scale-105 hover:shadow-lg min-h-[44px] text-xs sm:text-sm px-2 sm:px-4"
         >
-          ← Home
+          ← <span className="hidden sm:inline">Home</span>
         </Button>
       </div>
 
@@ -57,15 +58,15 @@ const MarketOverviewSlide = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
-          <div className="text-primary/80 text-lg font-inter mb-4 font-semibold">{slideContent?.customFields?.category || 'EVENTS'}</div>
-          <h1 className="text-6xl md:text-8xl font-black text-slate-900 mb-6 font-space leading-tight">
+        <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+          <div className="text-primary/80 text-sm sm:text-lg font-inter mb-4 font-semibold">{slideContent?.customFields?.category || 'EVENTS'}</div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-black text-slate-900 mb-4 sm:mb-6 font-space leading-tight">
             {slideContent?.subtitle || 'Community'} <span className="text-primary">{slideContent?.subtitle?.split(' ')[1] || 'Voices'}</span>
           </h1>
-          <div className="w-32 h-1 bg-gradient-to-r from-primary to-accent mx-auto mb-8 animate-scale-in"></div>
-          <p className="text-xl text-slate-800 max-w-4xl mx-auto font-inter leading-relaxed font-medium">
+          <div className="w-20 sm:w-24 lg:w-32 h-1 bg-gradient-to-r from-primary to-accent mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
+          <p className="text-base sm:text-lg lg:text-xl text-slate-800 max-w-4xl mx-auto font-inter leading-relaxed font-medium px-4">
             {slideContent?.description || 'Hear directly from local Black mothers sharing their breastfeeding journeys, challenges, and triumphs in our community.'}
           </p>
         </div>
@@ -81,18 +82,18 @@ const MarketOverviewSlide = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-start pb-24">
           {/* Left Column - Panel Features */}
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             {/* Panel Participants */}
             <div className="group animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <div className="bg-white/90 backdrop-blur-sm p-8 rounded-xl border border-primary/30 group-hover:shadow-elegant transition-all duration-300 shadow-lg">
+              <div className="bg-white/90 backdrop-blur-sm p-4 sm:p-6 lg:p-8 rounded-xl border border-primary/30 group-hover:shadow-elegant transition-all duration-300 shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-left">
-                    <div className="text-6xl md:text-7xl font-black text-primary mb-2 font-space animate-glow">
+                    <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-primary mb-2 font-space animate-glow">
                       5+
                     </div>
-                    <div className="text-slate-900 font-bold text-lg">Panel Participants</div>
+                    <div className="text-slate-900 font-bold text-base sm:text-lg">Panel Participants</div>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm text-slate-700 font-inter">

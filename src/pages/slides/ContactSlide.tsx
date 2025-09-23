@@ -93,30 +93,30 @@ const ContactSlide = () => {
       <SideTab text="CONNECT WITH US" />
 
       {/* Navigation */}
-      <div className="absolute top-8 left-8 z-10">
+      <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
         <Button 
           variant="green" 
           onClick={handleHome}
-          className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          className="transition-all duration-300 hover:scale-105 hover:shadow-lg min-h-[44px] text-xs sm:text-sm px-2 sm:px-4"
         >
-          ← Home
+          ← <span className="hidden sm:inline">Home</span>
         </Button>
       </div>
 
       {/* Roots Community Health Branding */}
-      <div className="absolute top-8 right-8 z-10 text-right">
-        <img src="/lovable-uploads/8f771217-3f89-469e-9a26-608410b785c2.png" alt="Roots Community Health Logo" className="h-10 w-auto ml-auto mb-2" />
-        <div className="text-primary text-xl font-space font-bold">14</div>
+      <div className="absolute top-4 sm:top-8 right-4 sm:right-8 z-10 text-right">
+        <img src="/lovable-uploads/8f771217-3f89-469e-9a26-608410b785c2.png" alt="Roots Community Health Logo" className="h-8 sm:h-10 w-auto ml-auto mb-1 sm:mb-2" />
+        <div className="text-primary text-base sm:text-xl font-space font-bold">14</div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
-        <div className="max-w-6xl mx-auto text-center mb-8">
-          <div className="mb-8">
-            <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 relative z-10 pb-24">
+        <div className="max-w-6xl mx-auto text-center mb-6 sm:mb-8">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               CONNECT WITH US
             </h1>
-            <p className="text-xl text-foreground/80 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-foreground/80 max-w-3xl mx-auto px-4">
               Ready to access comprehensive community health services? Connect with Roots Community Health and let us help you on your wellness journey.
             </p>
           </div>
@@ -133,35 +133,35 @@ const ContactSlide = () => {
           </div>
 
           {/* Contact Methods Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
             {contactInfo.map((contact, index) => {
             const IconComponent = contact.icon;
-            return <Card key={index} className="p-6 bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 cursor-pointer group hover:scale-105" onClick={() => window.open(contact.action, '_blank')}>
+            return <Card key={index} className="p-4 sm:p-6 bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 cursor-pointer group hover:scale-105 touch-manipulation" onClick={() => window.open(contact.action, '_blank')}>
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                      <IconComponent className="w-6 h-6 text-primary" />
+                    <div className="w-10 sm:w-12 h-10 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-primary/20 transition-colors">
+                      <IconComponent className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-foreground mb-2">{contact.type}</h3>
-                    <p className="text-primary font-medium mb-2">{contact.value}</p>
-                    <p className="text-sm text-foreground/60">{contact.description}</p>
+                    <h3 className="font-semibold text-foreground mb-2 text-sm sm:text-base">{contact.type}</h3>
+                    <p className="text-primary font-medium mb-2 text-xs sm:text-sm break-all">{contact.value}</p>
+                    <p className="text-xs sm:text-sm text-foreground/60">{contact.description}</p>
                   </div>
                 </Card>;
           })}
           </div>
 
           {/* Team Contact Sections */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Our Health Services</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Our Health Services</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               {teamContacts.map((team, index) => {
               const IconComponent = team.icon;
-              return <Card key={index} className="p-6 bg-card/60 backdrop-blur-sm border-border/30">
+              return <Card key={index} className="p-4 sm:p-6 bg-card/60 backdrop-blur-sm border-border/30">
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center mb-3">
-                        <IconComponent className="w-5 h-5 text-secondary" />
+                      <div className="w-8 sm:w-10 h-8 sm:h-10 bg-secondary/10 rounded-full flex items-center justify-center mb-2 sm:mb-3">
+                        <IconComponent className="w-4 sm:w-5 h-4 sm:h-5 text-secondary" />
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2">{team.name}</h3>
-                      <p className="text-sm text-foreground/60">{team.description}</p>
+                      <h3 className="font-semibold text-foreground mb-2 text-sm sm:text-base">{team.name}</h3>
+                      <p className="text-xs sm:text-sm text-foreground/60">{team.description}</p>
                     </div>
                   </Card>;
             })}
