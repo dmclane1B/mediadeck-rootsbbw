@@ -1,15 +1,17 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Upload, Search, Trash2, Edit, Image, Check, Eye, Download } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Upload, Search, Trash2, Edit, Image, Check, Eye, Download, Loader2, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import LazyImage from '@/components/LazyImage';
 import ImagePreviewModal from '@/components/ImagePreviewModal';
 import { useMediaLibrary, type MediaFile, type UploadProgress } from '@/hooks/useMediaLibrary';
 import { formatFileSize } from '@/utils/imageCompression';
+import { formatDistanceToNow } from 'date-fns';
 
 interface MediaLibraryProps {
   onSelectImage?: (image: MediaFile) => void;
@@ -33,7 +35,14 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
     resetLocalCache,
     restoreFromPublishedSlides,
     restoreFromCloudImages,
-    isEphemeralStorage
+    isEphemeralStorage,
+    cloudLoading,
+    cloudError,
+    cloudLoadAttempts,
+    statusLog,
+    reloadCloudImages,
+    reloadLibrary,
+    lastCloudSync
   } = useMediaLibrary();
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -43,6 +52,10 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
   const [previewImage, setPreviewImage] = useState<MediaFile | null>(null);
   const [currentProgress, setCurrentProgress] = useState<UploadProgress[]>([]);
   const [debugInfo, setDebugInfo] = useState<string | null>(null);
+  const [isCloudSyncing, setIsCloudSyncing] = useState(false);
+  const [isSlideRestoring, setIsSlideRestoring] = useState(false);
+  const [isReloadingCloud, setIsReloadingCloud] = useState(false);
+  const [isLibraryReloading, setIsLibraryReloading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -88,6 +101,11 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
   const filteredImages = allImages.filter(image =>
     image.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const recentStatus = statusLog.slice(-6).reverse();
+  const lastCloudSyncDisplay = lastCloudSync
+    ? formatDistanceToNow(new Date(lastCloudSync), { addSuffix: true })
+    : null;
 
   const handleFileUpload = async (files: FileList) => {
     setIsUploading(true);
@@ -204,8 +222,10 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
   };
 
   const handleSyncFromCloud = async () => {
+    setIsCloudSyncing(true);
     try {
       const restoredCount = await restoreFromCloudImages();
+      await reloadLibrary();
       toast({
         title: "Cloud Sync Complete",
         description: `Restored ${restoredCount} images from cloud storage`,
@@ -217,10 +237,13 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
         description: "Failed to sync images from cloud storage",
         variant: "destructive",
       });
+    } finally {
+      setIsCloudSyncing(false);
     }
   };
 
   const handleRestoreFromPublishedSlides = async () => {
+    setIsSlideRestoring(true);
     try {
       const restoredCount = await restoreFromPublishedSlides();
       if (restoredCount > 0) {
@@ -234,6 +257,7 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
           description: "All published slide images are already in your library."
         });
       }
+      await reloadLibrary({ forceAutoRestore: false });
     } catch (error) {
       console.error('Failed to restore from published slides:', error);
       toast({
@@ -241,6 +265,48 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
         title: "Restore failed",
         description: "Failed to restore images from published slides."
       });
+    } finally {
+      setIsSlideRestoring(false);
+    }
+  };
+
+  const handleReloadCloud = async () => {
+    setIsReloadingCloud(true);
+    try {
+      await reloadCloudImages();
+      toast({
+        title: "Cloud images refreshed",
+        description: "Fetched the latest published media from Supabase."
+      });
+    } catch (error) {
+      console.error('Failed to reload cloud images:', error);
+      toast({
+        title: "Cloud reload failed",
+        description: "Unable to refresh cloud images. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsReloadingCloud(false);
+    }
+  };
+
+  const handleReloadLibrary = async () => {
+    setIsLibraryReloading(true);
+    try {
+      await reloadLibrary({ forceAutoRestore: true });
+      toast({
+        title: "Media library refreshed",
+        description: "Rechecked local cache and cloud sources."
+      });
+    } catch (error) {
+      console.error('Failed to reload media library:', error);
+      toast({
+        title: "Reload failed",
+        description: "Could not reload the media library.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLibraryReloading(false);
     }
   };
 
@@ -325,6 +391,93 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
 
   return (
     <div className="space-y-6">
+      {(cloudLoading || cloudError || lastCloudSyncDisplay) && (
+        <div className="space-y-3">
+          {cloudLoading && (
+            <Alert className="border-primary/40 bg-primary/5">
+              <div className="flex items-start gap-3">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                <div>
+                  <AlertTitle>Syncing cloud images…</AlertTitle>
+                  <AlertDescription>
+                    Fetching the latest published media from Supabase storage.
+                  </AlertDescription>
+                </div>
+              </div>
+            </Alert>
+          )}
+
+          {cloudError && (
+            <Alert variant="destructive">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Cloud sync issue</AlertTitle>
+                </div>
+                <AlertDescription>
+                  {cloudError}
+                  {cloudLoadAttempts > 0 && (
+                    <span className="block mt-1 text-xs opacity-80">
+                      Attempted {cloudLoadAttempts} time{cloudLoadAttempts === 1 ? '' : 's'}
+                    </span>
+                  )}
+                </AlertDescription>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={handleReloadCloud}
+                    disabled={isReloadingCloud || cloudLoading}
+                  >
+                    {isReloadingCloud ? (
+                      <>
+                        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                        Reloading…
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="mr-2 h-3 w-3" />
+                        Retry cloud load
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleReloadLibrary}
+                    disabled={isLibraryReloading || cloudLoading}
+                  >
+                    {isLibraryReloading ? (
+                      <>
+                        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                        Reloading library…
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="mr-2 h-3 w-3" />
+                        Full reload
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </Alert>
+          )}
+
+          {!cloudError && lastCloudSyncDisplay && (
+            <Alert variant="secondary">
+              <div>
+                <AlertTitle>Cloud library healthy</AlertTitle>
+                <AlertDescription>
+                  Last checked {lastCloudSyncDisplay}. {cloudImages.length} cloud image
+                  {cloudImages.length === 1 ? '' : 's'} available.
+                </AlertDescription>
+              </div>
+            </Alert>
+          )}
+        </div>
+      )}
+
       {/* Upload Area */}
       <Card
         className={`border-2 border-dashed transition-all ${
@@ -384,27 +537,57 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
           )}
           
           <div className="flex gap-2 justify-center">
-            <Button 
+            <Button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
               <Upload className="w-4 h-4 mr-2" />
               {isUploading ? 'Uploading...' : 'Choose Files'}
             </Button>
-            <Button 
+            <Button
               variant="outline"
               onClick={handleRestoreFromPublishedSlides}
-              disabled={isUploading}
+              disabled={isUploading || isSlideRestoring}
             >
-              Restore from Slides
+              {isSlideRestoring ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Restoring…
+                </>
+              ) : (
+                'Restore from Slides'
+              )}
             </Button>
-            <Button 
+            <Button
               variant="outline"
               onClick={handleSyncFromCloud}
-              disabled={isUploading}
-              size="sm"
+              disabled={isUploading || isCloudSyncing}
             >
-              Sync from Cloud
+              {isCloudSyncing ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Syncing…
+                </>
+              ) : (
+                'Sync from Cloud'
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={handleReloadCloud}
+              disabled={isReloadingCloud || cloudLoading}
+            >
+              {isReloadingCloud ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Refreshing…
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Reload Cloud
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -582,6 +765,38 @@ const MediaLibrary = ({ onSelectImage, selectedImageId, compact = false }: Media
             </div>
           )}
         </div>
+      )}
+
+      {recentStatus.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Recent media activity</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {recentStatus.map(entry => (
+              <div key={entry.id} className="flex items-start gap-2 text-xs">
+                <span
+                  className={entry.level === 'error'
+                    ? 'text-destructive font-semibold'
+                    : entry.level === 'warning'
+                      ? 'text-amber-600 font-semibold'
+                      : 'text-muted-foreground font-semibold'}
+                >
+                  {entry.level}
+                </span>
+                <div>
+                  <p className="leading-snug">{entry.message}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
+                  </p>
+                  {entry.details && (
+                    <p className="text-[10px] text-muted-foreground/80 mt-1">Details: {entry.details}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       )}
 
       <input

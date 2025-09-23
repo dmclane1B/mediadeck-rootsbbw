@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CheckCircle, AlertTriangle, Cloud, HardDrive, RefreshCw } from 'lucide-react';
 import { useMediaLibrary } from '@/hooks/useMediaLibrary';
 import { useToast } from '@/hooks/use-toast';
+import { formatDistanceToNow } from 'date-fns';
 
 interface SyncStatusInfo {
   localImages: number;
@@ -16,10 +18,21 @@ interface SyncStatusInfo {
 }
 
 const MediaSyncStatus: React.FC = () => {
-  const { images, cloudImages, loading, restoreFromCloudImages, restoreFromPublishedSlides } = useMediaLibrary();
+  const {
+    images,
+    cloudImages,
+    loading,
+    restoreFromCloudImages,
+    restoreFromPublishedSlides,
+    cloudLoading,
+    cloudError,
+    lastCloudSync,
+    reloadCloudImages,
+  } = useMediaLibrary();
   const { toast } = useToast();
   const [syncing, setSyncing] = useState(false);
   const [statusInfo, setStatusInfo] = useState<SyncStatusInfo | null>(null);
+  const [refreshingStatus, setRefreshingStatus] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -45,14 +58,38 @@ const MediaSyncStatus: React.FC = () => {
     }
   }, [images, cloudImages, loading]);
 
+  const lastSyncText = lastCloudSync
+    ? formatDistanceToNow(new Date(lastCloudSync), { addSuffix: true })
+    : 'never';
+
+  const handleRefreshStatus = async () => {
+    setRefreshingStatus(true);
+    try {
+      await reloadCloudImages();
+      toast({
+        title: 'Cloud status refreshed',
+        description: 'Pulled the latest image inventory from cloud storage.'
+      });
+    } catch (error) {
+      toast({
+        title: 'Refresh failed',
+        description: error instanceof Error ? error.message : 'Unable to refresh cloud status.',
+        variant: 'destructive',
+      });
+    } finally {
+      setRefreshingStatus(false);
+    }
+  };
+
   const handleFullSync = async () => {
     setSyncing(true);
     try {
       // First restore from published slides to get slide assignments
       const slideRestored = await restoreFromPublishedSlides();
-      
+
       // Then restore any remaining cloud images
       const cloudRestored = await restoreFromCloudImages();
+      await reloadCloudImages();
       
       const totalRestored = Math.max(slideRestored, cloudRestored);
       
@@ -132,6 +169,37 @@ const MediaSyncStatus: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="flex items-start justify-between text-xs text-muted-foreground">
+          <div>
+            <span className="font-medium text-foreground">Last cloud sync:</span>{' '}
+            {cloudLoading ? 'Syncing…' : lastSyncText}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRefreshStatus}
+            disabled={refreshingStatus || cloudLoading}
+          >
+            {refreshingStatus ? (
+              <>
+                <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                Refreshing
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-2 h-3 w-3" />
+                Refresh
+              </>
+            )}
+          </Button>
+        </div>
+
+        {cloudError && (
+          <Alert variant="destructive">
+            <AlertDescription className="text-xs">{cloudError}</AlertDescription>
+          </Alert>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">

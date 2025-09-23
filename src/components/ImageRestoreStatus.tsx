@@ -1,20 +1,38 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Cloud, HardDrive, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Cloud, HardDrive, CheckCircle, AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
 import { useMediaLibrary } from '@/hooks/useMediaLibrary';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { formatDistanceToNow } from 'date-fns';
 
 const ImageRestoreStatus: React.FC = () => {
-  const { images, cloudImages, restoreFromPublishedSlides, restoreFromCloudImages, restoring } = useMediaLibrary();
+  const {
+    images,
+    cloudImages,
+    restoreFromPublishedSlides,
+    restoreFromCloudImages,
+    restoring,
+    cloudLoading,
+    cloudError,
+    lastCloudSync,
+    statusLog,
+    reloadCloudImages,
+  } = useMediaLibrary();
   const { toast } = useToast();
+  const [isReloading, setIsReloading] = React.useState(false);
 
   const localCount = images.filter(img => img.source === 'local').length;
   const cloudCount = cloudImages.length;
-  const missingFromLocal = cloudImages.filter(cloudImg => 
+  const missingFromLocal = cloudImages.filter(cloudImg =>
     !images.some(localImg => localImg.cloudPath === cloudImg.cloudPath)
   ).length;
+  const recentStatus = statusLog.slice(-3).reverse();
+  const lastSyncedText = lastCloudSync
+    ? formatDistanceToNow(new Date(lastCloudSync), { addSuffix: true })
+    : 'Never';
 
   const handleQuickRestore = async () => {
     try {
@@ -22,7 +40,8 @@ const ImageRestoreStatus: React.FC = () => {
       const slideCount = await restoreFromPublishedSlides();
       const cloudCount = await restoreFromCloudImages();
       const totalRestored = Math.max(slideCount, cloudCount);
-      
+      await reloadCloudImages();
+
       if (totalRestored > 0) {
         toast({
           title: "Images Restored",
@@ -43,6 +62,25 @@ const ImageRestoreStatus: React.FC = () => {
     }
   };
 
+  const handleReloadCloudStatus = async () => {
+    setIsReloading(true);
+    try {
+      await reloadCloudImages();
+      toast({
+        title: "Cloud status updated",
+        description: "Refetched cloud media inventory."
+      });
+    } catch (error) {
+      toast({
+        title: "Reload failed",
+        description: error instanceof Error ? error.message : 'Unable to reload cloud images.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsReloading(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -52,6 +90,40 @@ const ImageRestoreStatus: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="flex items-start justify-between text-xs text-muted-foreground">
+          <div>
+            <span className="font-medium text-foreground">Last cloud check:</span>{' '}
+            {cloudLoading ? 'Syncing…' : lastSyncedText}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleReloadCloudStatus}
+            disabled={isReloading || cloudLoading}
+          >
+            {isReloading ? (
+              <>
+                <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                Refreshing
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-2 h-3 w-3" />
+                Refresh
+              </>
+            )}
+          </Button>
+        </div>
+
+        {cloudError && (
+          <Alert variant="destructive">
+            <div className="flex flex-col gap-1">
+              <AlertTitle className="text-sm">Cloud sync issue</AlertTitle>
+              <AlertDescription className="text-xs">{cloudError}</AlertDescription>
+            </div>
+          </Alert>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-center gap-2">
             <HardDrive className="w-4 h-4 text-blue-500" />
@@ -97,6 +169,26 @@ const ImageRestoreStatus: React.FC = () => {
             <Badge variant="secondary" className="text-green-600">
               All images synced
             </Badge>
+          </div>
+        )}
+
+        {recentStatus.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground font-medium">Recent activity</p>
+            <ul className="space-y-1 text-[11px] text-muted-foreground">
+              {recentStatus.map(entry => (
+                <li key={entry.id}>
+                  <span className={entry.level === 'error'
+                    ? 'text-destructive font-semibold'
+                    : entry.level === 'warning'
+                      ? 'text-amber-600 font-semibold'
+                      : 'text-foreground font-semibold'}>
+                    {entry.level}:
+                  </span>{' '}
+                  {entry.message}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </CardContent>
