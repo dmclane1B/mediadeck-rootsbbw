@@ -6,6 +6,7 @@ import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
+import UniversalSlideBackground from '@/components/UniversalSlideBackground';
 
 const MarketOverviewSlide = () => {
   const navigate = useNavigate();
@@ -15,22 +16,11 @@ const MarketOverviewSlide = () => {
   const slideContent = getSlideContent('community-voices');
 
   return (
-    <div className="min-h-screen min-h-[100dvh] bg-background flex items-center justify-center relative overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="/src/assets/roots-logo-new.png" 
-          alt="Roots Community Health Logo" 
-          className="w-full h-full object-contain opacity-5 sm:opacity-10"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-background/95"></div>
-      </div>
-
+    <UniversalSlideBackground variant="hero" className="flex items-center justify-center">
       {/* Navigation */}
       <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
         <Button 
-          variant="outline" 
+          variant="outline-white" 
           onClick={() => navigate('/')}
           className="transition-all duration-300 hover:scale-105 hover:shadow-lg min-h-[44px] text-xs sm:text-sm px-2 sm:px-4"
         >
@@ -40,8 +30,8 @@ const MarketOverviewSlide = () => {
 
       {/* Roots Community Health Branding */}
       <div className="absolute top-8 right-8 z-10 text-right">
-        <div className="text-primary text-2xl font-space font-bold mb-2">ROOTS</div>
-        <div className="text-slate-500 text-xl font-space font-bold">06</div>
+        <div className="text-white text-2xl font-space font-bold mb-2 text-shadow-lg">ROOTS</div>
+        <div className="text-white/70 text-xl font-space font-bold text-shadow-lg">06</div>
       </div>
 
       {/* Decorative Elements */}
@@ -61,12 +51,12 @@ const MarketOverviewSlide = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-          <div className="text-primary/80 text-sm sm:text-lg font-inter mb-4 font-semibold">{slideContent?.customFields?.category || 'EVENTS'}</div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-black text-slate-900 mb-4 sm:mb-6 font-space leading-tight">
+          <div className="text-white/80 text-sm sm:text-lg font-inter mb-4 font-semibold text-shadow-lg">{slideContent?.customFields?.category || 'EVENTS'}</div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-black text-white mb-4 sm:mb-6 font-space leading-tight text-shadow-lg">
             {slideContent?.subtitle || 'Community'} <span className="text-primary">{slideContent?.subtitle?.split(' ')[1] || 'Voices'}</span>
           </h1>
           <div className="w-20 sm:w-24 lg:w-32 h-1 bg-gradient-to-r from-primary to-accent mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
-          <p className="text-base sm:text-lg lg:text-xl text-slate-800 max-w-4xl mx-auto font-inter leading-relaxed font-medium px-4">
+          <p className="text-base sm:text-lg lg:text-xl text-white/90 max-w-4xl mx-auto font-inter leading-relaxed font-medium px-4 text-shadow-lg">
             {slideContent?.description || 'Hear directly from local Black mothers sharing their breastfeeding journeys, challenges, and triumphs in our community.'}
           </p>
         </div>
@@ -220,7 +210,7 @@ const MarketOverviewSlide = () => {
         previousRoute="/slides/expert-panel"
         nextRoute="/slides/nutrition-education"
       />
-    </div>
+    </UniversalSlideBackground>
   );
 };
 
