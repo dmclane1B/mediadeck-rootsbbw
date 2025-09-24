@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ensureDatabaseInitialized } from '@/utils/databaseInitializer';
 import { useSlideImages } from './useSlideImages';
 import { useMediaLibrary } from './useMediaLibrary';
+import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { toast } from 'sonner';
 
 export interface SlideImageValidation {
@@ -14,6 +15,7 @@ export interface SlideImageValidation {
 export const useSlideImageValidation = (slideIds: string[]) => {
   const { slideConfig, cleanInvalidImages } = useSlideImages();
   const { images } = useMediaLibrary();
+  const { getSlideImageForDisplay } = useSlideImageResolver();
   const [validations, setValidations] = useState<SlideImageValidation[]>([]);
   const [isValidating, setIsValidating] = useState(false);
 
@@ -26,9 +28,10 @@ export const useSlideImageValidation = (slideIds: string[]) => {
         await ensureDatabaseInitialized();
         
         const results: SlideImageValidation[] = slideIds.map(slideId => {
-          const slideImage = slideConfig[slideId];
+          // Use the slide image resolver to check for any available image (local or published)
+          const resolvedImage = getSlideImageForDisplay(slideId);
           
-          if (!slideImage?.imageId) {
+          if (!resolvedImage) {
             return {
               slideId,
               hasImage: false,
@@ -36,16 +39,15 @@ export const useSlideImageValidation = (slideIds: string[]) => {
             };
           }
 
-          const imageExists = images.some(img => img.id === slideImage.imageId);
-          
+          // If we have a resolved image, it means the image exists and is displayable
           return {
             slideId,
             hasImage: true,
-            imageExists,
-            error: !imageExists ? 'Image file not found' : undefined
+            imageExists: true
           };
         });
 
+        console.log('[SlideImageValidation] Validation results:', results);
         setValidations(results);
       } catch (error) {
         console.error('Error during slide image validation:', error);
@@ -53,7 +55,7 @@ export const useSlideImageValidation = (slideIds: string[]) => {
     };
 
     validateSlideImages();
-  }, [slideConfig, images, slideIds]);
+  }, [slideConfig, images, slideIds, getSlideImageForDisplay]);
 
   const validateAndCleanup = async (): Promise<number> => {
     setIsValidating(true);
