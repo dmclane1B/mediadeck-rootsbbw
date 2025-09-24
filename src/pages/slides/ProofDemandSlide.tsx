@@ -5,6 +5,7 @@ import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
+import UniversalSlideBackground from '@/components/UniversalSlideBackground';
 
 const ProofDemandSlide = () => {
   const navigate = useNavigate();
@@ -12,20 +13,10 @@ const ProofDemandSlide = () => {
   const { getSlideContent } = useSlideContent();
   const slideImage = getSlideImageForDisplay('nutrition-education');
   const slideContent = getSlideContent('nutrition-education');
-  return <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="/src/assets/roots-logo-brand.png" 
-          alt="Roots Community Health Logo" 
-          className="w-full h-full object-contain opacity-5"
-          loading="lazy"
-        />
-      </div>
-
+  return <UniversalSlideBackground variant="hero" className="flex items-center justify-center">
       {/* Navigation */}
       <div className="absolute top-8 left-8 z-10">
-        <Button variant="outline" onClick={() => navigate('/')} className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105">
+        <Button variant="outline-white" onClick={() => navigate('/')} className="transition-all duration-300 hover:scale-105">
           ← Home
         </Button>
       </div>
@@ -153,6 +144,6 @@ const ProofDemandSlide = () => {
         previousRoute="/slides/community-voices"
         nextRoute="/slides/workout-session"
       />
-    </div>;
+    </UniversalSlideBackground>;
 };
 export default ProofDemandSlide;
