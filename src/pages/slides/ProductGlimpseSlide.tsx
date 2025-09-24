@@ -7,6 +7,8 @@ import SlideNavigation from '@/components/SlideNavigation';
 import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import { useSlideContent } from '@/hooks/useSlideContent';
+import UniversalSlideBackground from '@/components/UniversalSlideBackground';
+import SideTab from '@/components/SideTab';
 
 const ProductGlimpseSlide = () => {
   const navigate = useNavigate();
@@ -16,21 +18,14 @@ const ProductGlimpseSlide = () => {
   const slideContent = getSlideContent('monday-kickoff');
 
   return (
-    <div className="min-h-screen min-h-[100dvh] bg-background flex items-center justify-center relative overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="/src/assets/roots-logo-new.png" 
-          alt="Roots Community Health Logo" 
-          className="w-full h-full object-contain opacity-5 sm:opacity-10"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-background/95"></div>
-      </div>
+    <UniversalSlideBackground variant="hero">
+      {/* Side Tab */}
+      <SideTab text="THE WEEK" />
+
       {/* Navigation */}
       <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10">
         <Button 
-          variant="outline" 
+          variant="outline-white" 
           onClick={() => navigate('/')}
           className="min-h-[44px] text-xs sm:text-sm px-2 sm:px-4"
         >
@@ -38,18 +33,11 @@ const ProductGlimpseSlide = () => {
         </Button>
       </div>
 
-      {/* The Week Tab - Hidden on mobile */}
-      <div className="hidden lg:block absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-success to-accent text-white px-4 lg:px-6 py-12 lg:py-20 rounded-l-lg shadow-elegant animate-slide-in">
-        <div className="transform rotate-90 text-base lg:text-lg font-medium whitespace-nowrap font-space">
-          THE WEEK
-        </div>
-      </div>
-
       {/* Event Branding */}
       <div className="absolute top-4 sm:top-8 left-1/2 transform -translate-x-1/2 z-10">
         <div className="text-center px-4">
           <div className="text-accent text-lg sm:text-xl lg:text-2xl font-space font-bold animate-glow">BLACK BREASTFEEDING WEEK</div>
-          <div className="text-muted-foreground text-xs sm:text-sm font-inter font-semibold">{slideContent?.customFields?.category || 'EVENTS'}</div>
+          <div className="text-white/80 text-xs sm:text-sm font-inter font-semibold">{slideContent?.customFields?.category || 'EVENTS'}</div>
         </div>
       </div>
 
@@ -63,11 +51,11 @@ const ProductGlimpseSlide = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-20 sm:pb-24">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-foreground mb-4 sm:mb-6 font-space leading-tight px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white text-shadow-lg mb-4 sm:mb-6 font-space leading-tight px-4">
             {slideContent?.subtitle?.toUpperCase() || 'MONDAY'} <span className="text-accent">{slideContent?.subtitle?.split(' ')[1]?.toUpperCase() || 'KICK-OFF'}</span>
           </h1>
           <div className="w-20 sm:w-24 lg:w-32 h-1 bg-gradient-to-r from-accent to-success mx-auto mb-6 sm:mb-8 animate-scale-in"></div>
-          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-4xl mx-auto font-inter leading-relaxed px-4 font-medium">
+          <p className="text-base sm:text-lg lg:text-xl text-white/90 max-w-4xl mx-auto font-inter leading-relaxed px-4 font-medium">
             {slideContent?.description || 'Start the week with an inspiring virtual gathering introducing the theme and setting the tone for learning and empowerment'}
           </p>
         </div>
@@ -212,11 +200,11 @@ const ProductGlimpseSlide = () => {
 
           <div className="space-y-6 sm:space-y-8 order-1 lg:order-2">
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground mb-4 sm:mb-6 font-space leading-tight animate-fade-in">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white text-shadow-lg mb-4 sm:mb-6 font-space leading-tight animate-fade-in">
                 BOLD <span className="text-accent">CONVERSATIONS</span>
               </h2>
               
-              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-6 sm:mb-8 font-inter animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <p className="text-base sm:text-lg text-white/90 leading-relaxed mb-6 sm:mb-8 font-inter animate-fade-in" style={{ animationDelay: '0.3s' }}>
                 Join <span className="font-semibold text-accent bg-accent/10 px-1 rounded">meaningful dialogue</span> addressing real challenges and <span className="font-semibold text-accent bg-accent/10 px-1 rounded">community solutions</span>.
               </p>
             </div>
@@ -254,7 +242,7 @@ const ProductGlimpseSlide = () => {
       </div>
 
       {/* Bottom Tagline */}
-      <div className="absolute bottom-12 sm:bottom-16 left-4 sm:left-8 text-muted-foreground/80 font-space font-medium animate-fade-in px-4 sm:px-0" style={{ animationDelay: '1.5s' }}>
+      <div className="absolute bottom-12 sm:bottom-16 left-4 sm:left-8 text-white/60 font-space font-medium animate-fade-in px-4 sm:px-0" style={{ animationDelay: '1.5s' }}>
         <div className="text-sm sm:text-base break-words">BUILDING COMMUNITY THROUGH CONNECTION.</div>
       </div>
 
@@ -265,7 +253,7 @@ const ProductGlimpseSlide = () => {
         previousRoute="/slides/challenges"
         nextRoute="/slides/expert-panel"
       />
-    </div>
+    </UniversalSlideBackground>
   );
 };
 
