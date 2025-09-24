@@ -21,7 +21,12 @@ const ExpertPanelSlide = () => {
   return <div className="min-h-screen min-h-[100dvh] bg-background relative overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img src="/src/assets/roots-logo-new.png" alt="Roots Community Health Logo" className="w-full h-full object-contain opacity-5 sm:opacity-10" loading="lazy" />
+        <img 
+          src="/src/assets/roots-logo-new.png" 
+          alt="Roots Community Health Logo" 
+          className="w-full h-full object-contain opacity-5 sm:opacity-10"
+          loading="lazy"
+        />
         <div className="absolute inset-0 bg-background/95"></div>
       </div>
 
@@ -99,7 +104,37 @@ const ExpertPanelSlide = () => {
 
             {/* Event Details */}
             <div className="space-y-6">
-              
+              <Card className="p-4 sm:p-6 lg:p-8 bg-background/50 backdrop-blur-sm border border-border/50 shadow-lg">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                  <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Calendar className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">Event Details</h3>
+                </div>
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-primary/5 rounded-lg">
+                    <Calendar className="w-4 sm:w-5 h-4 sm:h-5 text-primary flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-foreground text-sm sm:text-base">Tuesday, August 26, 2025</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Black Breastfeeding Week</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-primary/5 rounded-lg">
+                    <Clock className="w-4 sm:w-5 h-4 sm:h-5 text-primary flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-foreground text-sm sm:text-base">7:00 PM - 8:30 PM</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">90 minutes with Q&A</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-primary/5 rounded-lg">
+                    <Video className="w-4 sm:w-5 h-4 sm:h-5 text-primary flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-foreground text-sm sm:text-base">Virtual Event via Zoom</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Link provided after registration</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
 
               {/* Key Topics */}
               <Card className="p-4 sm:p-6 bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20">
