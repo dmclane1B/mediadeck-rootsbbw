@@ -37,7 +37,7 @@ const ValuePropositionsSlide = () => {
   });
 
   return (
-    <UniversalSlideBackground>
+    <UniversalSlideBackground variant="hero">
       {/* Side Tab */}
       <SideTab text="RESOURCES & SUPPORT" />
 
