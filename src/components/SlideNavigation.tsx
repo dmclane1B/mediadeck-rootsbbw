@@ -23,7 +23,7 @@ const SlideNavigation: React.FC<SlideNavigationProps> = ({
   const [timeRemaining, setTimeRemaining] = useState(30);
 
   // Total slides in the presentation
-  const totalSlides = 15;
+  const totalSlides = 14;
   const progressPercentage = (currentSlide / totalSlides) * 100;
 
   // Auto-advance timer
@@ -89,8 +89,7 @@ const SlideNavigation: React.FC<SlideNavigationProps> = ({
     '/slides/community-partners',
     '/slides/roadmap',
     '/slides/ask',
-    '/slides/contact',
-    '/slides/gallery'
+    '/slides/contact'
   ];
 
   return (
