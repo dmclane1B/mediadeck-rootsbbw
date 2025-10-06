@@ -27,8 +27,9 @@ const GallerySlide = () => {
     onHome: handleHome
   });
 
-  // Portfolio gallery link
-  const galleryLink = "https://studio.jamiitech.com/Roots-Clinic-1/BBFW-2025";
+  // Portfolio gallery links
+  const galleryLink1 = "https://studio.jamiitech.com/Roots-Clinic-1/BBFW-2025";
+  const galleryLink2 = "https://studio.jamiitech.com/Roots-Clinic-1/Brown-Table-Talk-Let-it-Flow-Sis";
 
   return (
     <SlideBackground className="flex flex-col">
@@ -66,10 +67,10 @@ const GallerySlide = () => {
               <Camera className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-              EVENT PHOTO GALLERY
+              EVENT PHOTO GALLERIES
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-foreground/80 max-w-3xl mx-auto px-4">
-              Relive the highlights from Black Breastfeeding Week 2025. View the complete collection of event photos, testimonials, and moments that made this celebration special.
+              Explore our complete collection of event photos, testimonials, and memorable moments from our community celebrations.
             </p>
           </div>
 
@@ -93,17 +94,28 @@ const GallerySlide = () => {
             </p>
           </div>
 
-          {/* Main Call-to-Action */}
-          <div className="mb-8">
+          {/* Main Gallery Buttons - Two Featured Events */}
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
             <Button
               size="lg"
               variant="hero"
-              onClick={() => window.open(galleryLink, '_blank')}
-              className="text-base sm:text-lg px-8 sm:px-12 py-6 sm:py-8 rounded-xl shadow-xl min-h-[56px]"
+              onClick={() => window.open(galleryLink1, '_blank')}
+              className="text-sm sm:text-base md:text-lg px-6 sm:px-8 py-6 sm:py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
             >
-              <Camera className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-              View Full Photo Gallery
-              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+              <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="font-semibold">Black Breastfeeding Week 2025</span>
+              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+            </Button>
+
+            <Button
+              size="lg"
+              variant="hero"
+              onClick={() => window.open(galleryLink2, '_blank')}
+              className="text-sm sm:text-base md:text-lg px-6 sm:px-8 py-6 sm:py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
+            >
+              <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="font-semibold">Brown Table Talk: Let it Flow Sis</span>
+              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
 
