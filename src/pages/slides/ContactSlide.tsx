@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mail, Phone, MapPin, Linkedin, Globe, Calendar, MessageSquare, Building2, Users, Camera, ExternalLink } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe, Calendar, MessageSquare, Building2, Users, Camera, ExternalLink, Download, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
@@ -197,6 +197,35 @@ const ContactSlide = () => {
                     </div>
                   </Card>;
             })}
+            </div>
+          </div>
+
+          {/* Gallery Options */}
+          <div className="mb-8 sm:mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+              <Card className="p-4 sm:p-6 bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/30 transition-all duration-300">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-10 sm:w-12 h-10 sm:h-12 bg-accent/10 rounded-full flex items-center justify-center mb-3">
+                    <Download className="w-5 sm:w-6 h-5 sm:h-6 text-accent" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2 text-sm sm:text-base">Download Photos</h3>
+                  <p className="text-xs sm:text-sm text-foreground/60">
+                    High-resolution images available for download
+                  </p>
+                </div>
+              </Card>
+
+              <Card className="p-4 sm:p-6 bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/30 transition-all duration-300">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-10 sm:w-12 h-10 sm:h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-3">
+                    <Share2 className="w-5 sm:w-6 h-5 sm:h-6 text-secondary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2 text-sm sm:text-base">Share Memories</h3>
+                  <p className="text-xs sm:text-sm text-foreground/60">
+                    Tag us on social media with your favorite moments
+                  </p>
+                </div>
+              </Card>
             </div>
           </div>
 
