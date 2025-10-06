@@ -1,7 +1,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mail, Phone, MapPin, Linkedin, Globe, Calendar, MessageSquare, Building2, Users, Camera, ExternalLink, Download, Share2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Mail, Phone, MapPin, Globe, Calendar, MessageSquare, Building2, Users, Camera, ExternalLink, Download, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
@@ -10,6 +11,7 @@ import ImageShowcase from '@/components/ImageShowcase';
 import { useSlideImageResolver } from '@/utils/slideImageResolver';
 import SlideBackground from '@/components/SlideBackground';
 import SideTab from '@/components/SideTab';
+
 const ContactSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
@@ -17,15 +19,18 @@ const ContactSlide = () => {
   const handleNext = () => navigate('/');
   const handlePrevious = () => navigate('/slides/ask');
   const handleHome = () => navigate('/');
+  
   useSwipeNavigation({
     onPrevious: handlePrevious,
     onNext: handleNext
   });
+  
   useKeyboardNavigation({
     onPrevious: handlePrevious,
     onNext: handleNext,
     onHome: handleHome
   });
+
   const contactInfo = [
     {
       type: 'Main Office',
@@ -70,7 +75,7 @@ const ContactSlide = () => {
       action: 'https://rootscommunityhealth.org'
     }
   ];
-  // Portfolio gallery links
+
   const galleryLink1 = "https://studio.jamiitech.com/Roots-Clinic-1/BBFW-2025";
   const galleryLink2 = "https://studio.jamiitech.com/Roots-Clinic-1/Brown-Table-Talk-Let-it-Flow-Sis";
 
@@ -91,6 +96,7 @@ const ContactSlide = () => {
       icon: Building2
     }
   ];
+
   return (
     <SlideBackground className="flex flex-col">
       {/* Side Tab */}
@@ -114,130 +120,152 @@ const ContactSlide = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 relative z-10 pb-24">
-        <div className="max-w-6xl mx-auto text-center mb-6 sm:mb-8">
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+      <div className="flex-1 flex flex-col items-center justify-start px-4 sm:px-6 relative z-10 pb-24 pt-20 sm:pt-24">
+        <div className="max-w-6xl mx-auto w-full">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               CONNECT WITH US
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-foreground/80 max-w-3xl mx-auto px-4">
-              Ready to access comprehensive community health services? Connect with Roots Community Health and let us help you on your wellness journey.
+            <p className="text-sm sm:text-base text-foreground/80 max-w-2xl mx-auto">
+              Ready to access comprehensive community health services? We're here to help.
             </p>
           </div>
 
-          {/* Image Showcase */}
-          <div className="mb-8">
-            <ImageShowcase
-              imageUrl={slideImage?.url}
-              imageAlt={slideImage?.alt}
-              onImageSelect={() => navigate('/media')}
-              variant="standard"
-              className="animate-fade-in"
-            />
-          </div>
+          {/* Tabbed Content */}
+          <Tabs defaultValue="contact" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="contact">Contact Info</TabsTrigger>
+              <TabsTrigger value="events">Events & Galleries</TabsTrigger>
+              <TabsTrigger value="services">Our Services</TabsTrigger>
+            </TabsList>
 
-          {/* Contact Methods Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
-            {contactInfo.map((contact, index) => {
-            const IconComponent = contact.icon;
-            return <Card key={index} className="p-4 sm:p-6 bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 cursor-pointer group hover:scale-105 touch-manipulation" onClick={() => window.open(contact.action, '_blank')}>
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-10 sm:w-12 h-10 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-primary/20 transition-colors">
-                      <IconComponent className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2 text-sm sm:text-base">{contact.type}</h3>
-                    <p className="text-primary font-medium mb-2 text-xs sm:text-sm break-all">{contact.value}</p>
-                    <p className="text-xs sm:text-sm text-foreground/60">{contact.description}</p>
-                  </div>
-                </Card>;
-          })}
-          </div>
+            {/* Tab 1: Contact Info */}
+            <TabsContent value="contact" className="space-y-6">
+              {/* Image Showcase */}
+              <div className="mb-4">
+                <ImageShowcase
+                  imageUrl={slideImage?.url}
+                  imageAlt={slideImage?.alt}
+                  onImageSelect={() => navigate('/media')}
+                  variant="standard"
+                  className="animate-fade-in"
+                />
+              </div>
 
-          {/* Event Photo Galleries */}
-          <div className="mb-8 sm:mb-12">
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Event Photo Galleries</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto mb-8">
-              <Button
-                size="lg"
-                variant="hero"
-                onClick={() => window.open(galleryLink1, '_blank')}
-                className="text-sm sm:text-base md:text-lg px-6 sm:px-8 py-6 sm:py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
-              >
-                <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span className="font-semibold">Black Breastfeeding Week 2025</span>
-                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
-              </Button>
-
-              <Button
-                size="lg"
-                variant="hero"
-                onClick={() => window.open(galleryLink2, '_blank')}
-                className="text-sm sm:text-base md:text-lg px-6 sm:px-8 py-6 sm:py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
-              >
-                <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span className="font-semibold">Brown Table Talk: Let it Flow Sis</span>
-                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Team Contact Sections */}
-          <div className="mb-8 sm:mb-12">
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Our Health Services</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-              {teamContacts.map((team, index) => {
-              const IconComponent = team.icon;
-              return <Card key={index} className="p-4 sm:p-6 bg-card/60 backdrop-blur-sm border-border/30">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-8 sm:w-10 h-8 sm:h-10 bg-secondary/10 rounded-full flex items-center justify-center mb-2 sm:mb-3">
-                        <IconComponent className="w-4 sm:w-5 h-4 sm:h-5 text-secondary" />
+              {/* Contact Methods Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {contactInfo.map((contact, index) => {
+                  const IconComponent = contact.icon;
+                  return (
+                    <Card 
+                      key={index} 
+                      className="p-4 bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 cursor-pointer group hover:scale-105 touch-manipulation" 
+                      onClick={() => window.open(contact.action, '_blank')}
+                    >
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                          <IconComponent className="w-5 h-5 text-primary" />
+                        </div>
+                        <h3 className="font-semibold text-foreground mb-2 text-sm">{contact.type}</h3>
+                        <p className="text-primary font-medium mb-2 text-xs break-all">{contact.value}</p>
+                        <p className="text-xs text-foreground/60">{contact.description}</p>
                       </div>
-                      <h3 className="font-semibold text-foreground mb-2 text-sm sm:text-base">{team.name}</h3>
-                      <p className="text-xs sm:text-sm text-foreground/60">{team.description}</p>
+                    </Card>
+                  );
+                })}
+              </div>
+            </TabsContent>
+
+            {/* Tab 2: Events & Galleries */}
+            <TabsContent value="events" className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-4">Event Photo Galleries</h2>
+                <p className="text-sm text-foreground/60 mb-6">
+                  📸 Black Breastfeeding Week 2025 | August 25-31 | Roots Community Health
+                </p>
+              </div>
+
+              {/* Gallery Buttons */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
+                <Button
+                  size="lg"
+                  variant="hero"
+                  onClick={() => window.open(galleryLink1, '_blank')}
+                  className="text-base px-8 py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
+                >
+                  <Camera className="w-6 h-6" />
+                  <span className="font-semibold">Black Breastfeeding Week 2025</span>
+                  <ExternalLink className="w-5 h-5" />
+                </Button>
+
+                <Button
+                  size="lg"
+                  variant="hero"
+                  onClick={() => window.open(galleryLink2, '_blank')}
+                  className="text-base px-8 py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
+                >
+                  <Camera className="w-6 h-6" />
+                  <span className="font-semibold">Brown Table Talk: Let it Flow Sis</span>
+                  <ExternalLink className="w-5 h-5" />
+                </Button>
+              </div>
+
+              {/* Download & Share Options */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                <Card className="p-6 bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/30 transition-all duration-300">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mb-3">
+                      <Download className="w-6 h-6 text-accent" />
                     </div>
-                  </Card>;
-            })}
-            </div>
-          </div>
-
-          {/* Event Details */}
-          <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border/20">
-            <p className="text-sm text-foreground/60">
-              📸 Black Breastfeeding Week 2025 | August 25-31 | Roots Community Health
-            </p>
-          </div>
-
-          {/* Gallery Options */}
-          <div className="mb-8 sm:mb-12">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-              <Card className="p-4 sm:p-6 bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/30 transition-all duration-300">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 sm:w-12 h-10 sm:h-12 bg-accent/10 rounded-full flex items-center justify-center mb-3">
-                    <Download className="w-5 sm:w-6 h-5 sm:h-6 text-accent" />
+                    <h3 className="font-semibold text-foreground mb-2">Download Photos</h3>
+                    <p className="text-sm text-foreground/60">
+                      High-resolution images available for download
+                    </p>
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2 text-sm sm:text-base">Download Photos</h3>
-                  <p className="text-xs sm:text-sm text-foreground/60">
-                    High-resolution images available for download
-                  </p>
-                </div>
-              </Card>
+                </Card>
 
-              <Card className="p-4 sm:p-6 bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/30 transition-all duration-300">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 sm:w-12 h-10 sm:h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-3">
-                    <Share2 className="w-5 sm:w-6 h-5 sm:h-6 text-secondary" />
+                <Card className="p-6 bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/30 transition-all duration-300">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-3">
+                      <Share2 className="w-6 h-6 text-secondary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-2">Share Memories</h3>
+                    <p className="text-sm text-foreground/60">
+                      Tag us on social media with your favorite moments
+                    </p>
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2 text-sm sm:text-base">Share Memories</h3>
-                  <p className="text-xs sm:text-sm text-foreground/60">
-                    Tag us on social media with your favorite moments
-                  </p>
-                </div>
-              </Card>
-            </div>
-          </div>
+                </Card>
+              </div>
+            </TabsContent>
 
-          {/* Office Location */}
-          
+            {/* Tab 3: Our Services */}
+            <TabsContent value="services" className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-4">Our Health Services</h2>
+                <p className="text-sm text-foreground/60 mb-6">
+                  Comprehensive health services for our community
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                {teamContacts.map((team, index) => {
+                  const IconComponent = team.icon;
+                  return (
+                    <Card key={index} className="p-6 bg-card/60 backdrop-blur-sm border-border/30 hover:border-primary/30 transition-all duration-300">
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+                          <IconComponent className="w-6 h-6 text-secondary" />
+                        </div>
+                        <h3 className="font-semibold text-foreground mb-3 text-base">{team.name}</h3>
+                        <p className="text-sm text-foreground/60">{team.description}</p>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 
@@ -250,4 +278,5 @@ const ContactSlide = () => {
     </SlideBackground>
   );
 };
+
 export default ContactSlide;
