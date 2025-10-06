@@ -315,6 +315,17 @@ export const defaultSlideContent: Record<string, SlideContent> = {
       category: 'CONNECT'
     }
   },
+  gallery: {
+    id: 'gallery',
+    title: '15 GALLERY',
+    subtitle: 'Event Photo Gallery',
+    description: 'View the complete collection of photos from Black Breastfeeding Week 2025. Relive the highlights, testimonials, and memorable moments.',
+    buttonText: 'View Full Gallery',
+    customFields: {
+      category: 'GALLERY',
+      galleryLink: 'https://photos.rootscommunityhealth.org/bbw-2025'
+    }
+  },
   resourcesSupport: {
     id: 'resources-support',
     title: '10 RESOURCES & SUPPORT',

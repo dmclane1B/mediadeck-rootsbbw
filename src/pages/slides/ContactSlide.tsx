@@ -14,7 +14,7 @@ const ContactSlide = () => {
   const navigate = useNavigate();
   const { getSlideImageForDisplay } = useSlideImageResolver();
   const slideImage = getSlideImageForDisplay('contact');
-  const handleNext = () => navigate('/');
+  const handleNext = () => navigate('/slides/gallery');
   const handlePrevious = () => navigate('/slides/ask');
   const handleHome = () => navigate('/');
   useSwipeNavigation({
@@ -177,7 +177,8 @@ const ContactSlide = () => {
       <SlideNavigation 
         currentSlide={14}
         previousRoute="/slides/ask"
-        isLastSlide={true}
+        nextRoute="/slides/gallery"
+        isLastSlide={false}
       />
     </SlideBackground>
   );

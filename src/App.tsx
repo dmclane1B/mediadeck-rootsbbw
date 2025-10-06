@@ -29,6 +29,7 @@ const TeamLeadershipSlide = lazy(() => import("./pages/slides/TeamLeadershipSlid
 const RoadmapSlide = lazy(() => import("./pages/slides/RoadmapSlide"));
 const AskSlide = lazy(() => import("./pages/slides/AskSlide"));
 const ContactSlide = lazy(() => import("./pages/slides/ContactSlide"));
+const GallerySlide = lazy(() => import("./pages/slides/GallerySlide"));
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/slides/roadmap" element={<LazySlideWrapper><RoadmapSlide /></LazySlideWrapper>} />
             <Route path="/slides/ask" element={<LazySlideWrapper><AskSlide /></LazySlideWrapper>} />
             <Route path="/slides/contact" element={<LazySlideWrapper><ContactSlide /></LazySlideWrapper>} />
+            <Route path="/slides/gallery" element={<LazySlideWrapper><GallerySlide /></LazySlideWrapper>} />
             <Route path="/media" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}><MediaDashboard /></Suspense>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}><NotFound /></Suspense>} />
