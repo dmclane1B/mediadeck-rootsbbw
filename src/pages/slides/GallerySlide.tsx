@@ -92,12 +92,6 @@ const GallerySlide = () => {
           </div>
 
 
-          {/* Event Details Footer */}
-          <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border/20">
-            <p className="text-sm text-foreground/60">
-              📸 Black Breastfeeding Week 2025 | August 25-31 | Roots Community Health
-            </p>
-          </div>
 
         </div>
       </div>

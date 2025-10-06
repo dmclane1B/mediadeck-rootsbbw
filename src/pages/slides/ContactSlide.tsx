@@ -200,6 +200,13 @@ const ContactSlide = () => {
             </div>
           </div>
 
+          {/* Event Details */}
+          <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border/20">
+            <p className="text-sm text-foreground/60">
+              📸 Black Breastfeeding Week 2025 | August 25-31 | Roots Community Health
+            </p>
+          </div>
+
           {/* Gallery Options */}
           <div className="mb-8 sm:mb-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
