@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mail, Phone, MapPin, Linkedin, Globe, Calendar, MessageSquare, Building2, Users } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Globe, Calendar, MessageSquare, Building2, Users, Camera, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
@@ -70,6 +70,10 @@ const ContactSlide = () => {
       action: 'https://rootscommunityhealth.org'
     }
   ];
+  // Portfolio gallery links
+  const galleryLink1 = "https://studio.jamiitech.com/Roots-Clinic-1/BBFW-2025";
+  const galleryLink2 = "https://studio.jamiitech.com/Roots-Clinic-1/Brown-Table-Talk-Let-it-Flow-Sis";
+
   const teamContacts = [
     {
       name: 'Medical Care Team',
@@ -147,6 +151,34 @@ const ContactSlide = () => {
                   </div>
                 </Card>;
           })}
+          </div>
+
+          {/* Event Photo Galleries */}
+          <div className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Event Photo Galleries</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto mb-8">
+              <Button
+                size="lg"
+                variant="hero"
+                onClick={() => window.open(galleryLink1, '_blank')}
+                className="text-sm sm:text-base md:text-lg px-6 sm:px-8 py-6 sm:py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
+              >
+                <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span className="font-semibold">Black Breastfeeding Week 2025</span>
+                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+              </Button>
+
+              <Button
+                size="lg"
+                variant="hero"
+                onClick={() => window.open(galleryLink2, '_blank')}
+                className="text-sm sm:text-base md:text-lg px-6 sm:px-8 py-6 sm:py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
+              >
+                <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span className="font-semibold">Brown Table Talk: Let it Flow Sis</span>
+                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Team Contact Sections */}

@@ -27,9 +27,6 @@ const GallerySlide = () => {
     onHome: handleHome
   });
 
-  // Portfolio gallery links
-  const galleryLink1 = "https://studio.jamiitech.com/Roots-Clinic-1/BBFW-2025";
-  const galleryLink2 = "https://studio.jamiitech.com/Roots-Clinic-1/Brown-Table-Talk-Let-it-Flow-Sis";
 
   return (
     <SlideBackground className="flex flex-col">
@@ -94,30 +91,6 @@ const GallerySlide = () => {
             </p>
           </div>
 
-          {/* Main Gallery Buttons - Two Featured Events */}
-          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
-            <Button
-              size="lg"
-              variant="hero"
-              onClick={() => window.open(galleryLink1, '_blank')}
-              className="text-sm sm:text-base md:text-lg px-6 sm:px-8 py-6 sm:py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
-            >
-              <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="font-semibold">Black Breastfeeding Week 2025</span>
-              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-
-            <Button
-              size="lg"
-              variant="hero"
-              onClick={() => window.open(galleryLink2, '_blank')}
-              className="text-sm sm:text-base md:text-lg px-6 sm:px-8 py-6 sm:py-8 rounded-xl shadow-xl min-h-[56px] flex-col h-auto gap-2"
-            >
-              <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="font-semibold">Brown Table Talk: Let it Flow Sis</span>
-              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-          </div>
 
           {/* Additional Options */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
