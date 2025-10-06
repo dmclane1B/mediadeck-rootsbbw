@@ -27,8 +27,8 @@ const GallerySlide = () => {
     onHome: handleHome
   });
 
-  // Placeholder for gallery link - can be updated per event
-  const galleryLink = "https://photos.rootscommunityhealth.org/bbw-2025";
+  // Portfolio gallery link
+  const galleryLink = "https://studio.jamiitech.com/Roots-Clinic-1/BBFW-2025";
 
   return (
     <SlideBackground className="flex flex-col">
