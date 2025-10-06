@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useRequestDeduplication } from '@/hooks/useRequestDeduplication';
 import { ensureDatabaseInitialized } from '@/utils/databaseInitializer';
 import { indexedDBManager } from '@/utils/indexedDBManager';
 import { CloudMediaManager } from '@/utils/cloudMedia';
@@ -42,21 +43,32 @@ export function usePublishedSlides(): UsePublishedSlidesReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { deduplicatedRequest } = useRequestDeduplication();
 
   const loadPublishedSlides = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
-        .from('published_slide_configurations')
-        .select('*')
-        .eq('status', 'active');
+      // Use request deduplication to prevent multiple simultaneous fetches
+      const data = await deduplicatedRequest(
+        'published_slides_fetch',
+        async () => {
+          const { data, error: fetchError } = await supabase
+            .from('published_slide_configurations')
+            .select('*')
+            .eq('status', 'active');
 
-      if (fetchError) throw fetchError;
+          if (fetchError) throw fetchError;
+          return data;
+        },
+        10000 // 10-second cache
+      );
+
+      if (!data) return;
 
       const slidesMap: Record<string, PublishedSlideImage> = {};
-      data?.forEach((slide) => {
+      data.forEach((slide) => {
         slidesMap[slide.slide_id] = {
           slide_id: slide.slide_id,
           image_id: slide.image_id,
