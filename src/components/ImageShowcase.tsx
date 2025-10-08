@@ -5,6 +5,7 @@ import { Upload, Plus, Eye, Image } from 'lucide-react';
 import LazyImage from './LazyImage';
 import ImagePreviewModal from './ImagePreviewModal';
 import { useMediaLibrary } from '@/hooks/useMediaLibrary';
+import { ResolvedSlideImage } from '@/utils/slideImageResolver';
 
 // Helper function to validate image URLs
 const isValidImageUrl = (url: string): boolean => {
@@ -29,6 +30,7 @@ interface ImageShowcaseProps {
   imageUrl?: string;
   imageId?: string;
   imageAlt?: string;
+  resolvedImage?: ResolvedSlideImage | null;
   onImageSelect?: () => void;
   className?: string;
   variant?: 'featured' | 'hero' | 'standard' | 'compact';
@@ -39,6 +41,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({
   imageUrl,
   imageId,
   imageAlt,
+  resolvedImage: passedResolvedImage,
   onImageSelect,
   className = '',
   variant = 'standard',
@@ -47,8 +50,17 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const { images } = useMediaLibrary();
 
-  // Resolve image source - prioritize imageUrl, then fetch from media library by imageId, then fallback by name
+  // If resolvedImage is passed, use it directly, otherwise fallback to legacy behavior
   const resolvedImage = useMemo(() => {
+    if (passedResolvedImage) {
+      return {
+        url: passedResolvedImage.url,
+        alt: passedResolvedImage.alt || passedResolvedImage.name || 'Slide image',
+        source: passedResolvedImage.source
+      };
+    }
+    
+    // Legacy fallback behavior
     if (imageUrl && isValidImageUrl(imageUrl)) {
       return {
         url: imageUrl,
@@ -66,7 +78,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({
       }
     }
     
-    // Fallback: search by name if imageAlt is provided (works when imageId wasn't found or wasn't provided)
+    // Fallback: search by name if imageAlt is provided
     if (imageAlt) {
       const foundImageByName = images.find(img => 
         img.name.toLowerCase() === imageAlt.toLowerCase()
@@ -81,7 +93,7 @@ const ImageShowcase: React.FC<ImageShowcaseProps> = ({
     }
     
     return null;
-  }, [imageUrl, imageId, imageAlt, images]);
+  }, [passedResolvedImage, imageUrl, imageId, imageAlt, images]);
 
   // Get variant-specific classes for height
   const getVariantClasses = () => {

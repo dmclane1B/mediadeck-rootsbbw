@@ -28,7 +28,7 @@ const MediaDashboard = () => {
   const { toast } = useToast();
   const { slideConfig, setSlideImage, getSlideImage, clearAllConfigurations } = useSlideImages();
   const { publishAllSlides, isLoading: isPublishing } = usePublishedSlides();
-  const { isSlidePublished } = useSlideImageResolver();
+  const { isSlidePublished, getSlideImageForDisplay } = useSlideImageResolver();
   const { restoreFromPublishedSlides, restoring } = useMediaLibrary();
   const [selectedSlide, setSelectedSlide] = useState<string | null>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
@@ -516,7 +516,7 @@ const MediaDashboard = () => {
           <TabsContent value="slides" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {slides.map(slide => {
-                const slideImage = getSlideImage(slide.id);
+                const resolvedImage = getSlideImageForDisplay(slide.id);
                 
                 return (
                   <Card key={slide.id} className="p-6 space-y-4">
@@ -526,7 +526,9 @@ const MediaDashboard = () => {
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-sm text-muted-foreground">Slide {slide.id}</span>
                           <SlideImageStatus 
-                            hasImage={!!slideImage} 
+                            hasImage={!!resolvedImage} 
+                            isPublished={resolvedImage?.isPublished}
+                            source={resolvedImage?.source}
                             error={validations.find(v => v.slideId === slide.id)?.error}
                           />
                         </div>
@@ -541,11 +543,10 @@ const MediaDashboard = () => {
                     </div>
                     
                     <ImageShowcase
-                      imageId={slideImage?.imageId}
-                      imageAlt={slideImage?.imageAlt}
+                      resolvedImage={resolvedImage}
                       variant="compact"
                       onImageSelect={() => openImageSelector(slide.id)}
-                      showPlaceholder={!slideImage}
+                      showPlaceholder={!resolvedImage}
                     />
                     
                     <div className="flex gap-2">
@@ -556,9 +557,9 @@ const MediaDashboard = () => {
                         className="flex-1"
                       >
                         <Upload className="w-4 h-4 mr-2" />
-                        {slideImage ? 'Change' : 'Add'} Image
+                        {resolvedImage ? 'Change' : 'Add'} Image
                       </Button>
-                      {slideImage && (
+                      {resolvedImage && (
                         <Button
                           variant="destructive"
                           size="sm"
