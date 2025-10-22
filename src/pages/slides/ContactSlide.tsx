@@ -133,7 +133,7 @@ const ContactSlide = () => {
           </div>
 
           {/* Tabbed Content */}
-          <Tabs defaultValue="contact" className="w-full">
+          <Tabs defaultValue="events" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="contact">Contact Info</TabsTrigger>
               <TabsTrigger value="events">Events & Galleries</TabsTrigger>
