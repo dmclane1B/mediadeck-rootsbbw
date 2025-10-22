@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Mail, Phone, MapPin, Globe, Calendar, MessageSquare, Building2, Users, Camera, ExternalLink, Download, Share2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Calendar, MessageSquare, Building2, Users, Camera, ExternalLink, Download, Share2, PlayCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
@@ -198,6 +198,45 @@ const ContactSlide = () => {
                     allowFullScreen
                     className="w-full h-full"
                   />
+                </div>
+              </div>
+
+              {/* Educational Video Clips */}
+              <div className="mb-8">
+                <div className="flex items-center justify-center gap-2 mb-6">
+                  <PlayCircle className="w-6 h-6 text-primary" />
+                  <h3 className="text-2xl font-bold text-center">Educational Video Clips</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+                  <Card className="overflow-hidden bg-card/60 backdrop-blur-sm border-primary/20">
+                    <video 
+                      controls 
+                      preload="metadata" 
+                      className="w-full aspect-video bg-black"
+                    >
+                      <source src="/videos/why-black-breastfeeding-week-matters.mp4" type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                    <CardContent className="p-4">
+                      <h4 className="font-semibold text-lg">Why Black Breastfeeding Week Matters</h4>
+                      <p className="text-sm text-muted-foreground mt-1">Representation and Cultural Pride</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="overflow-hidden bg-card/60 backdrop-blur-sm border-primary/20">
+                    <video 
+                      controls 
+                      preload="metadata" 
+                      className="w-full aspect-video bg-black"
+                    >
+                      <source src="/videos/common-myths-about-black-breast-milk.mp4" type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                    <CardContent className="p-4">
+                      <h4 className="font-semibold text-lg">Common Myths About Black Breast Milk</h4>
+                      <p className="text-sm text-muted-foreground mt-1">Debunked by Experts</p>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
 
